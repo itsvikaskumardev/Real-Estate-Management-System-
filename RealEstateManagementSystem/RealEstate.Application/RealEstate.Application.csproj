@@ -7,7 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PropertyImages\**" />
+    <EmbeddedResource Remove="PropertyImages\**" />
+    <None Remove="PropertyImages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RealEstate.Domain\RealEstate.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\Commands\DeleteProperty\" />
+    <Folder Include="Properties\Commands\ChangePropertyStatus\" />
+    <Folder Include="Properties\Commands\PublishProperty\" />
+    <Folder Include="Properties\Commands\UpdateProperty\" />
   </ItemGroup>
 
 </Project>
