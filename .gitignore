@@ -1,0 +1,21 @@
+# .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+
+# Node
+node_modules/
+dist/
+build/
+
+backend
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
