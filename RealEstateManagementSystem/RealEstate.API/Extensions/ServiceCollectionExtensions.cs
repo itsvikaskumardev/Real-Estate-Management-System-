@@ -1,4 +1,4 @@
-﻿using RealEstate.Application;
+using RealEstate.Application;
 using RealEstate.Infrastructure;
 
 namespace RealEstate.API.Extensions
@@ -16,7 +16,20 @@ It is just a clean place to organize Dependency Injection registrations.
         {
             services.AddApplication();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             services.AddInfrastructure(configuration);
+
+            services.AddExceptionHandler<Middleware.GlobalExceptionHandler>();
+            services.AddProblemDetails();
 
             services.AddHttpContextAccessor();
             // DbContext
