@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -11,5 +11,7 @@ namespace RealEstate.Infrastructure.Persistence
             : base(options)
         {
         }
+
+        public DbSet<RealEstate.Domain.Entities.Property> Properties { get; set; }
     }
 }
