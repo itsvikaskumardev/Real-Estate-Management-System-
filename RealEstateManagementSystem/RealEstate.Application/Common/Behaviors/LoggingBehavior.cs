@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace RealEstate.Application.Common.Behaviors
 {

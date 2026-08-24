@@ -3,6 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace RealEstate.Application.Common.Models
+/*
+ This gives your application a consistent success/failure response from commands and queries.
+
+    For example, CreatePropertyCommandHandler could return:
+
+return Result<Guid>.Ok(property.Id);
+
+or:
+
+return Result<Guid>.Failure("Property could not be created.");
+ 
+ */
 {
     public class Result<T>
     {

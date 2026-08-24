@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server;
 
 namespace RealEstate.API.Endpoints
 {
@@ -8,6 +8,7 @@ namespace RealEstate.API.Endpoints
         {
             var group = app.MapGroup("/api/properties");
 
+            /*
             group.MapGet("/{id:guid}", async (
                 Guid id,
                 ISender sender) =>
@@ -26,6 +27,7 @@ namespace RealEstate.API.Endpoints
 
                 return Results.Ok(result);
             });
+            */
         }
     }
 }

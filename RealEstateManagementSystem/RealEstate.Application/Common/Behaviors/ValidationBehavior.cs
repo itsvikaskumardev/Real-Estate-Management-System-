@@ -1,8 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 using MediatR;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 //Validates commands/queries before they reach the handler.

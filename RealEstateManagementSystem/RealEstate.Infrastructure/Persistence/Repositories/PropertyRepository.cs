@@ -1,11 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using RealEstate.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using RealEstate.Domain.Entities;
-using RealEstate.Application.Common.Interfaces;
 using RealEstate.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace RealEstate.Infrastructure.Persistence.Repositories
 {
