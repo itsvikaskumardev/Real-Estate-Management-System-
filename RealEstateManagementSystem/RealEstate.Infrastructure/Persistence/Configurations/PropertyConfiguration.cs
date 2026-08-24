@@ -24,10 +24,10 @@ namespace RealEstate.Infrastructure.Persistence.Configurations
 
             builder.OwnsOne(p => p.Address, a =>
             {
-                a.Property(ad => ad.Street).HasMaxLength(200);
-                a.Property(ad => ad.City).HasMaxLength(100);
-                a.Property(ad => ad.State).HasMaxLength(100);
-                a.Property(ad => ad.Pincode).HasMaxLength(10);
+                a.Property(ad => ad.Street).HasColumnName("Street").HasMaxLength(200);
+                a.Property(ad => ad.City).HasColumnName("City").HasMaxLength(100);
+                a.Property(ad => ad.State).HasColumnName("State").HasMaxLength(100);
+                a.Property(ad => ad.Pincode).HasColumnName("Pincode").HasMaxLength(10);
                 
                 a.HasIndex(ad => ad.City);
             });

@@ -11,6 +11,11 @@ namespace RealEstate.Application.Common.Interfaces
         DbSet<Token> Tokens { get; }
         DbSet<Property> Properties { get; }
         DbSet<PropertyImage> PropertyImages { get; }
+        DbSet<Inquiry> Inquiries { get; }
+        DbSet<Wishlist> Wishlists { get; }
+        DbSet<Contact> Contacts { get; }
+        DbSet<Chat> Chats { get; }
+        DbSet<ChatMessage> ChatMessages { get; }
         // ...your other DbSets
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
