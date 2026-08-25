@@ -1,10 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RealEstate.Application.Common.Interfaces;
+using RealEstate.Infrastructure.Identity;
 using RealEstate.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace RealEstate.Infrastructure
@@ -22,6 +24,12 @@ namespace RealEstate.Infrastructure
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
                 options.AddInterceptors(sp.GetRequiredService<Persistence.Interceptors.AuditableEntityInterceptor>());
             });
+
+            services.AddScoped<RealEstate.Application.Common.Interfaces.IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+            services.AddSingleton<RealEstate.Application.Common.Interfaces.IPasswordHasher, RealEstate.Infrastructure.Identity.PasswordHasher>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddTransient<RealEstate.Application.Common.Interfaces.IEmailService, RealEstate.Infrastructure.Services.EmailService>();
 
             // Configure Authentication & JWT
             services.AddAuthentication(options =>

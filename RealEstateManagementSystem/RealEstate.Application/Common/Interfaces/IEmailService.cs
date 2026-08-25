@@ -6,6 +6,6 @@ namespace RealEstate.Application.Common.Interfaces
 {
     public interface IEmailService
     {
-        Task SendAsync(string to, string subject, string body);
+        Task SendAsync(string email, string subject, string message, CancellationToken cancellationToken = default);
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RealEstate.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RealEstate.Infrastructure.Persistence.Configurations
@@ -49,12 +50,27 @@ namespace RealEstate.Infrastructure.Persistence.Configurations
             builder.Property(p => p.AreaSize)
                 .HasColumnType("decimal(18,2)");
 
-            // Primitive collections (EF Core 8+) — stored as JSON column
+            var stringListComparer = new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<string>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList());
+
+            // Use a Value Converter to map List<string> to a JSON string in the database
             builder.Property(p => p.Amenities)
-                .HasColumnType("nvarchar(max)");
+                .HasConversion(
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions)null) ?? new List<string>())
+                .Metadata.SetValueComparer(stringListComparer);
+
+            builder.Property(p => p.Amenities).HasColumnType("jsonb");
 
             builder.Property(p => p.ViewedBy)
-                .HasColumnType("nvarchar(max)");
+                .HasConversion(
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions)null) ?? new List<string>())
+                .Metadata.SetValueComparer(stringListComparer);
+            
+            builder.Property(p => p.ViewedBy).HasColumnType("jsonb");
 
             builder.HasOne(p => p.Seller)
                 .WithMany()

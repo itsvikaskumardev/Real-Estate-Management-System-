@@ -22,7 +22,7 @@ namespace RealEstate.Domain.Entities
         public bool IsVerified { get; set; } = false;
         public int Views { get; set; } = 0;
 
-        public int SellerId { get; set; }
+        public Guid SellerId { get; set; }
         public User Seller { get; set; } = null!;
 
         public List<string> Amenities { get; set; } = [];
