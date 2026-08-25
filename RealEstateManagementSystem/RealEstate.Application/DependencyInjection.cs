@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace RealEstate.Application
 {
@@ -6,7 +7,9 @@ namespace RealEstate.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            // Register MediatR, FluentValidation, etc.
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+            
+            // Register FluentValidation, etc.
             return services;
         }
     }

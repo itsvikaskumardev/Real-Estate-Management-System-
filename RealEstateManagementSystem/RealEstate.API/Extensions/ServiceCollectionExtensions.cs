@@ -1,4 +1,4 @@
-﻿using RealEstate.Application;
+using RealEstate.Application;
 using RealEstate.Infrastructure;
 
 namespace RealEstate.API.Extensions
@@ -16,9 +16,31 @@ It is just a clean place to organize Dependency Injection registrations.
         {
             services.AddApplication();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             services.AddInfrastructure(configuration);
 
+            services.AddExceptionHandler<Middleware.GlobalExceptionHandler>();
+            services.AddProblemDetails();
+
+            services.AddAuthorization();
+
             services.AddHttpContextAccessor();
+            
+            // Configure JSON to parse Enums from strings
+            services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+            {
+                options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+            });
+
             // DbContext
             // Repositories
             // JWT

@@ -1,4 +1,7 @@
-﻿using RealEstate.API.Middleware;
+using RealEstate.API.Middleware;
+using RealEstate.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 
 namespace RealEstate.API.Extensions
 {
@@ -9,10 +12,16 @@ namespace RealEstate.API.Extensions
         {
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapPropertyEndpoints();
+            app.MapUserEndpoints();
 
             return app;
         }
