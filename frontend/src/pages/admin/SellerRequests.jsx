@@ -43,7 +43,7 @@ const SellerRequests = () => {
         },
       );
       if (res.data.success) {
-        setRequests(requests.filter((req) => req._id !== id));
+        setRequests(requests.filter((req) => req.id !== id));
         alert("Seller approved successfully!");
       }
     } catch (err) {
@@ -81,7 +81,7 @@ const SellerRequests = () => {
           ) : (
             <div className={s.requestGrid}>
               {requests.map((request) => (
-                <div key={request._id} className={s.requestCard}>
+                <div key={request.id} className={s.requestCard}>
                   <div className={s.requestHeader}>
                     <div className={s.avatar}>
                       {request.name.charAt(0).toUpperCase()}
@@ -109,7 +109,7 @@ const SellerRequests = () => {
                   </div>
 
                   <button
-                    onClick={() => handleApprove(request._id)}
+                    onClick={() => handleApprove(request.id)}
                     className={s.approveButton}
                   >
                     <HiOutlineCheckCircle size={20} />

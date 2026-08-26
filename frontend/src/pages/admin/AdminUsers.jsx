@@ -73,7 +73,7 @@ const AdminUsers = () => {
       if (res.data.success) {
         setUsers(
           users.map((u) =>
-            u._id === id ? { ...u, isBlocked: res.data.isBlocked } : u,
+            u.id === id ? { ...u, isBlocked: res.data.isBlocked } : u,
           ),
         );
       }
@@ -94,7 +94,7 @@ const AdminUsers = () => {
       await axios.delete(`${API_URL}/api/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setUsers(users.filter((u) => u._id !== id));
+      setUsers(users.filter((u) => u.id !== id));
     } catch (err) {
       alert("Failed to delete user");
     }
@@ -195,7 +195,7 @@ const AdminUsers = () => {
             <tbody>
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
-                  <tr key={user._id} className={s.tableRow}>
+                  <tr key={user.id} className={s.tableRow}>
                     <td className={s.tdUserInfo}>
                       <div className="flex items-center gap-4">
                         <div className={s.userAvatar}>
@@ -204,7 +204,7 @@ const AdminUsers = () => {
                         <div>
                           <div className={s.userInfoName}>{user.name}</div>
                           <div className={s.userInfoId}>
-                            ID: {user._id.slice(-8).toUpperCase()}
+                            ID: {user.id.slice(-8).toUpperCase()}
                           </div>
                         </div>
                       </div>
@@ -245,7 +245,7 @@ const AdminUsers = () => {
                     <td className={s.tdActions}>
                       <div className={s.actionsWrapper}>
                         <button
-                          onClick={() => handleBlock(user._id)}
+                          onClick={() => handleBlock(user.id)}
                           className={s.blockButton(user.isBlocked)}
                           title={user.isBlocked ? "Unblock User" : "Block User"}
                         >
@@ -257,7 +257,7 @@ const AdminUsers = () => {
                         </button>
 
                         <button
-                          onClick={() => handleDelete(user._id)}
+                          onClick={() => handleDelete(user.id)}
                           className={s.deleteButton}
                           title="Delete User"
                         >
