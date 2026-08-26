@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using RealEstate.Application.Users.Dto;
-namespace RealEstate.Application.Users.Commands
+using RealEstate.Application.Auth.Dto;
+namespace RealEstate.Application.Auth.Commands
 {
     public record LoginCommand : IRequest<LoginResponse>
     {

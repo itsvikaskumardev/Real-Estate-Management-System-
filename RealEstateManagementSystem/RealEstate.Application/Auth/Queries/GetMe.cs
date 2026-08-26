@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
-namespace RealEstate.Application.Users.Queries
+namespace RealEstate.Application.Auth.Queries
 {
 
     public record GetMeQuery : IRequest<GetMeResponse>;

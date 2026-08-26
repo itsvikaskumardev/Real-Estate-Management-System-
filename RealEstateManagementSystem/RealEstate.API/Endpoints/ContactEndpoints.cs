@@ -19,7 +19,7 @@ namespace RealEstate.API.Endpoints
             .WithName("CreateContact");
 
 
-            group.MapGet("/contacts", async (ISender sender) =>
+            group.MapGet("/", async (ISender sender) =>
             {
                 var result = await sender.Send(new GetAllContactsQuery());
                 return Results.Ok(new { success = true, result.Contacts });

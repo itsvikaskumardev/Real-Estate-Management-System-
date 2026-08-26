@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RealEstate.Application.Users.Dto
+namespace RealEstate.Application.Auth.Dto
 {
     public record UserDto
     {

@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
-using RealEstate.Application.Users.Commands;
+using RealEstate.Application.Auth.Commands;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace RealEstate.Application.Users.Commands
+namespace RealEstate.Application.Auth.Commands
 {
     public record ForgotPasswordCommand : IRequest<ForgotPasswordResponse>
     {

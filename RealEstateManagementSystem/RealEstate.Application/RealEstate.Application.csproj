@@ -19,6 +19,10 @@
 
   <ItemGroup>
     <Folder Include="Admin\Validator\" />
+    <Folder Include="Auth\Commands\" />
+    <Folder Include="Auth\Dto\" />
+    <Folder Include="Auth\Validator\" />
+    <Folder Include="Auth\Queries\" />
     <Folder Include="Property\Commands\DeleteProperty\" />
     <Folder Include="Property\Commands\ChangePropertyStatus\" />
     <Folder Include="Property\Commands\PublishProperty\" />

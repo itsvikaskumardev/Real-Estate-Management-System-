@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using RealEstate.Application.Users.Commands;
 using System;
 using System.Collections.Generic;

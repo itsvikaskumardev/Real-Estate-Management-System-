@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RealEstate.Application.Users.Commands
+namespace RealEstate.Application.Auth.Commands
 {
     public record VerifyEmailCommand : IRequest<VerifyEmailResponse>
     {
