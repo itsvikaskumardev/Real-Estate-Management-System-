@@ -22,8 +22,6 @@
     <Folder Include="Properties\Commands\ChangePropertyStatus\" />
     <Folder Include="Properties\Commands\PublishProperty\" />
     <Folder Include="Properties\Commands\UpdateProperty\" />
-    <Folder Include="Properties\Dto\" />
-    <Folder Include="Wishlist\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
