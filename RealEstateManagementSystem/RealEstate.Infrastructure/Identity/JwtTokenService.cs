@@ -24,7 +24,7 @@ namespace RealEstate.Infrastructure.Identity
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString().ToLowerInvariant())
             };
 
             var secretKey = _configuration["Jwt:SecretKey"];

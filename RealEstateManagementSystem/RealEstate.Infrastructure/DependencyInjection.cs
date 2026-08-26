@@ -4,9 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Infrastructure.Identity;
 using RealEstate.Infrastructure.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using RealEstate.Infrastructure.Services;
+
 
 
 namespace RealEstate.Infrastructure
@@ -25,11 +24,15 @@ namespace RealEstate.Infrastructure
                 options.AddInterceptors(sp.GetRequiredService<Persistence.Interceptors.AuditableEntityInterceptor>());
             });
 
-            services.AddScoped<RealEstate.Application.Common.Interfaces.IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-            services.AddSingleton<RealEstate.Application.Common.Interfaces.IPasswordHasher, RealEstate.Infrastructure.Identity.PasswordHasher>();
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
-            services.AddTransient<RealEstate.Application.Common.Interfaces.IEmailService, RealEstate.Infrastructure.Services.EmailService>();
+            services.AddTransient<IEmailService, EmailService>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IFileStorageService, FileStorage>();
+            services.AddTransient<IDateTimeProvider, DateTimeProvider>();
 
             // Configure Authentication & JWT
             services.AddAuthentication(options =>

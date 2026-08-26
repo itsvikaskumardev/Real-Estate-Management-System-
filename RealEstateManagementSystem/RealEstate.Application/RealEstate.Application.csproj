@@ -17,11 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Admin\Validator\" />
     <Folder Include="Properties\Commands\DeleteProperty\" />
     <Folder Include="Properties\Commands\ChangePropertyStatus\" />
     <Folder Include="Properties\Commands\PublishProperty\" />
     <Folder Include="Properties\Commands\UpdateProperty\" />
     <Folder Include="Properties\Dto\" />
+    <Folder Include="Wishlist\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +31,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.11" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
   </ItemGroup>
 

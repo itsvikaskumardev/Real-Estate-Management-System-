@@ -5,20 +5,17 @@ using System.Text;
 
 namespace RealEstate.Infrastructure.Services
 {
-    public class FileStorageService : IFileStorageService
+    public class FileStorage : IFileStorageService
     {
-        public async Task<string> UploadAsync(
-            Stream file,
-            string fileName)
+        public Task<string> UploadAsync(
+            Stream fileStream,
+            string fileName,
+            string folder,
+            CancellationToken cancellationToken = default)
         {
-            // Implement Azure Blob/Cloudinary/S3 later
-            return await Task.FromResult(fileName);
-        }
-
-        public Task DeleteAsync(string fileUrl)
-        {
-            // Implement later
-            return Task.CompletedTask;
+            // TODO: implement Azure Blob Storage upload here
+            // e.g. BlobServiceClient -> GetBlobContainerClient(folder) -> UploadAsync
+            throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
         }
     }
 }

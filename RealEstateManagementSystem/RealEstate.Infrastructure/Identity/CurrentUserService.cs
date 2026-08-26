@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace RealEstate.Infrastructure.Identity
 {
+    //reads the JWT claims off the current HTTP request
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
