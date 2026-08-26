@@ -68,7 +68,7 @@ const AdminInquiries = () => {
 
       <div className={s.listContainer}>
         {inquiries.map((inq) => (
-          <div key={inq._id} className={s.inquiryCard}>
+          <div key={inq.id} className={s.inquiryCard}>
             <div className={s.cardTopSection}>
               <div className={s.propertyInfoWrapper}>
                 <div className={s.propertyIconWrapper}>
@@ -79,7 +79,7 @@ const AdminInquiries = () => {
                     {inq.property?.title || "Unknown Property"}
                   </div>
                   <div className={s.propertyId}>
-                    Property ID: {inq.property?._id}
+                    Property ID: {inq.property?.id}
                   </div>
                 </div>
               </div>

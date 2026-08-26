@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RealEstate.Application.Users.Commands
+namespace RealEstate.Application.Auth.Commands
 {
 
     public record RegisterUserCommand : IRequest<RegisterUserResponse>

@@ -31,7 +31,11 @@ It is just a clean place to organize Dependency Injection registrations.
             services.AddExceptionHandler<Middleware.GlobalExceptionHandler>();
             services.AddProblemDetails();
 
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => 
+                    policy.RequireRole("admin", "Admin"));
+            });
 
             services.AddHttpContextAccessor();
             

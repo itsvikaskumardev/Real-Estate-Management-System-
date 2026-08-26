@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace RealEstate.Application.Users.Commands
+namespace RealEstate.Application.Auth.Commands
 {
     public record ResetPasswordCommand : IRequest<ResetPasswordResponse>
     {

@@ -59,7 +59,7 @@ const AdminContacts = () => {
           <div className={s.contactList}>
             {contacts.map((contact, index) => (
               <div
-                key={contact._id}
+                key={contact.id}
                 className={s.contactItem(index, contacts.length)}
               >
                 <div className={s.contactHeader}>

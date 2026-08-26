@@ -30,6 +30,8 @@ export const ChatProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
+      // Disabling socket.io connection for now to stop continuous polling requests
+      /*
       const newSocket = io(API_URL);
 
       setSocket(newSocket);
@@ -41,6 +43,7 @@ export const ChatProvider = ({ children }) => {
       });
 
       return () => newSocket.close();
+      */
     }
   }, [user]);
 

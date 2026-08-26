@@ -11,7 +11,8 @@ namespace RealEstate.API.Endpoints
         public static void MapAdminEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/admin")
-                .RequireAuthorization("AdminOnly");
+                .RequireAuthorization("AdminOnly")
+                .WithTags("Admin");
 
 
             group.MapGet("/users", async ([FromServices] ISender sender) =>
@@ -53,7 +54,7 @@ namespace RealEstate.API.Endpoints
 
 
 
-            group.MapGet("/dashboard-stats", async ([FromServices] ISender sender) =>
+            group.MapGet("/stats", async ([FromServices] ISender sender) =>
             {
                 var result = await sender.Send(new GetDashboardStatsQuery());
                 return Results.Ok(new { success = true, stats = result });
@@ -72,7 +73,7 @@ namespace RealEstate.API.Endpoints
 
 
 
-            group.MapPatch("/sellers/{id:Guid}/approve", async (Guid id, [FromServices] ISender sender) =>
+            group.MapPatch("/approve-seller/{id:Guid}", async (Guid id, [FromServices] ISender sender) =>
             {
                 var result = await sender.Send(new ApproveSellerCommand { SellerId = id });
                 return Results.Ok(result);

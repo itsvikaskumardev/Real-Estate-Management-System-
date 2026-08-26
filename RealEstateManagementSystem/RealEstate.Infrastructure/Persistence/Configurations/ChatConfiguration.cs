@@ -26,8 +26,8 @@ namespace RealEstate.Infrastructure.Persistence.Configurations
                 .HasForeignKey(c => c.SellerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // One chat thread per buyer/seller/property combo
-            builder.HasIndex(c => new { c.BuyerId, c.SellerId, c.PropertyId })
+            // Replace with this (matches "one thread per buyer/seller pair"):
+            builder.HasIndex(c => new { c.BuyerId, c.SellerId })
                 .IsUnique();
         }
     }

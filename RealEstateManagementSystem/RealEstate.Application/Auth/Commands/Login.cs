@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using RealEstate.Application.Users.Dto;
-namespace RealEstate.Application.Users.Commands
+using RealEstate.Application.Auth.Dto;
+namespace RealEstate.Application.Auth.Commands
 {
     public record LoginCommand : IRequest<LoginResponse>
     {
@@ -65,7 +65,11 @@ namespace RealEstate.Application.Users.Commands
                     Id = user.Id,
                     Name = user.Name,
                     Email = user.Email,
-                    Role = user.Role.ToString().ToLowerInvariant()
+                    Role = user.Role.ToString().ToLowerInvariant(),
+                    Phone = user.Phone,
+                    Address = user.Address,
+                    ProfilePic = user.ProfilePic,
+                    IsApproved = user.IsApproved
                 }
             };
         }

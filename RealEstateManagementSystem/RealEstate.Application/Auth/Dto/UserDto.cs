@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RealEstate.Application.Users.Dto
+namespace RealEstate.Application.Auth.Dto
 {
     public record UserDto
     {
@@ -13,5 +13,6 @@ namespace RealEstate.Application.Users.Dto
         public string? Phone { get; init; }
         public string? Address { get; init; }
         public string? ProfilePic { get; init; }
+        public bool IsApproved { get; init; }
     }
 }

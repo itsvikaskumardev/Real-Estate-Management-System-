@@ -48,7 +48,7 @@ const AdminProperties = () => {
       await axios.delete(`${API_URL}/api/admin/properties/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProperties(properties.filter((p) => p._id !== id));
+      setProperties(properties.filter((p) => p.id !== id));
     } catch (err) {
       alert("Failed to delete property");
     }
@@ -81,7 +81,7 @@ const AdminProperties = () => {
           <div className={s.propertiesGrid}>
             {properties.map((p) => (
               <PropertyCard
-                key={p._id}
+                key={p.id}
                 property={p}
                 renderActions={() => (
                   <div className={s.actionWrapper}>
@@ -92,11 +92,11 @@ const AdminProperties = () => {
                       <div className={s.sellerEmail}>{p.seller?.email}</div>
                     </div>
                     <div className={s.buttonGroup}>
-                      <Link to={`/property/${p._id}`} className={s.viewLink}>
+                      <Link to={`/property/${p.id}`} className={s.viewLink}>
                         <HiOutlineExternalLink size={16} />
                       </Link>
                       <button
-                        onClick={() => handleDelete(p._id)}
+                        onClick={() => handleDelete(p.id)}
                         className={s.deleteButton}
                       >
                         <HiOutlineTrash size={16} />

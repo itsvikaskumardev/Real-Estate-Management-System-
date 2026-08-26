@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AppDesignerFolder>Property</AppDesignerFolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,12 +19,14 @@
 
   <ItemGroup>
     <Folder Include="Admin\Validator\" />
-    <Folder Include="Properties\Commands\DeleteProperty\" />
-    <Folder Include="Properties\Commands\ChangePropertyStatus\" />
-    <Folder Include="Properties\Commands\PublishProperty\" />
-    <Folder Include="Properties\Commands\UpdateProperty\" />
-    <Folder Include="Properties\Dto\" />
-    <Folder Include="Wishlist\Queries\" />
+    <Folder Include="Auth\Commands\" />
+    <Folder Include="Auth\Dto\" />
+    <Folder Include="Auth\Validator\" />
+    <Folder Include="Auth\Queries\" />
+    <Folder Include="Property\Commands\DeleteProperty\" />
+    <Folder Include="Property\Commands\ChangePropertyStatus\" />
+    <Folder Include="Property\Commands\PublishProperty\" />
+    <Folder Include="Property\Commands\UpdateProperty\" />
   </ItemGroup>
 
   <ItemGroup>

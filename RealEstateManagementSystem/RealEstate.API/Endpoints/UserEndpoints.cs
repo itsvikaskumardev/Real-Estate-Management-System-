@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RealEstate.Application.Properties.Queries;
 using RealEstate.Application.Users.Commands;
 using RealEstate.Application.Users.Queries;
 
@@ -10,67 +9,8 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapUserEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/auth");
-
-            group.MapPost("/register", async (RegisterUserCommand command, [FromServices] ISender sender) =>
-            {
-                var result = await sender.Send(command);
-                return Results.Created(string.Empty, result);
-            })
-            .WithName("RegisterUser");
-
-
-
-            group.MapPost("/verify-email", async (VerifyEmailCommand command, [FromServices] ISender sender) =>
-            {
-                var result = await sender.Send(command);
-                return Results.Ok(result);
-            })
-            .WithName("VerifyEmail");
-
-
-
-            group.MapPost("/login", async (LoginCommand command, [FromServices] ISender sender) =>
-            {
-                var result = await sender.Send(command);
-                return Results.Ok(result);
-            })
-            .WithName("Login");
-
-
-
-            group.MapGet("/me", async ([FromServices] ISender sender) =>
-            {
-                var result = await sender.Send(new GetMeQuery());
-                return Results.Ok(new { success = true, user = result });
-            })
-            .RequireAuthorization()
-            .WithName("GetMe");
-
-
-
-
-            group.MapPost("/forgot-password", async (ForgotPasswordCommand command, [FromServices] ISender sender) =>
-            {
-                var result = await sender.Send(command);
-                return Results.Ok(result);
-            })
-            .WithName("ForgotPassword");
-
-
-
-            group.MapPost("/reset-password/{token}", async (string token, ResetPasswordRequestBody body, [FromServices] ISender sender) =>
-            {
-                var result = await sender.Send(new ResetPasswordCommand
-                {
-                    Token = token,
-                    Password = body.Password
-                });
-                return Results.Ok(result);
-            })
-            .WithName("ResetPassword");
-
-
+            var group = app.MapGroup("/api/users")
+                .WithTags("Users");
 
             group.MapGet("/profile", async ([FromServices] ISender sender) =>
             {
@@ -81,7 +21,7 @@ namespace RealEstate.API.Endpoints
             .WithName("GetProfile");
 
 
-            group.MapGet("/{id:Guid}/public-profile", async (Guid id, [FromServices] ISender sender) =>
+            group.MapGet("/public/{id:Guid}", async (Guid id, [FromServices] ISender sender) =>
             {
                 var result = await sender.Send(new GetPublicProfileQuery { UserId = id });
                 return Results.Ok(new { success = true, user = result });
@@ -122,7 +62,4 @@ namespace RealEstate.API.Endpoints
             .WithName("UpdateProfile");
         }
     }
-
-    // small record to bind the body separately from the route param
-    public record ResetPasswordRequestBody(string Password);
 }
