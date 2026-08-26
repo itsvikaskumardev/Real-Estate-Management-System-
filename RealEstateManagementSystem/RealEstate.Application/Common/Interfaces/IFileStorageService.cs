@@ -6,7 +6,6 @@ namespace RealEstate.Application.Common.Interfaces
 {
     public interface IFileStorageService
     {
-        Task<string> UploadAsync(Stream file, string fileName);
-        Task DeleteAsync(string fileUrl);
+        Task<string> UploadAsync(Stream fileStream, string fileName, string folder, CancellationToken cancellationToken = default);
     }
 }

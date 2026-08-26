@@ -65,7 +65,7 @@ namespace RealEstate.Application.Users.Commands
                     Id = user.Id,
                     Name = user.Name,
                     Email = user.Email,
-                    Role = user.Role.ToString()
+                    Role = user.Role.ToString().ToLowerInvariant()
                 }
             };
         }
