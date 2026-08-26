@@ -11,7 +11,8 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapPropertyEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/property");
+            var group = app.MapGroup("/api/property")
+                .WithTags("Property");
 
             group.MapGet("/counts", async ([FromServices] ISender sender) =>
             {

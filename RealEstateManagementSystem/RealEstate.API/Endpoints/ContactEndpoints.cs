@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Contacts.Commands;
 using RealEstate.Application.Contacts.Queries;
 
@@ -8,7 +8,8 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapContactEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/contact");
+            var group = app.MapGroup("/api/contact")
+                .WithTags("Contact");
 
             group.MapPost("/", async (CreateContactCommand command, ISender sender) =>
             {

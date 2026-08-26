@@ -8,7 +8,8 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapInquiryEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/inquiries");
+            var group = app.MapGroup("/api/inquiry")
+                .WithTags("Inquiries");
             group.MapPost("/", async (SendInquiryCommand command, ISender sender) =>
             {
                 var result = await sender.Send(command);

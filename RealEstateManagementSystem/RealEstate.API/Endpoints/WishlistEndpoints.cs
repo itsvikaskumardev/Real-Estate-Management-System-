@@ -8,7 +8,8 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapWishlistEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/wishlist");
+            var group = app.MapGroup("/api/wishlist")
+                .WithTags("Wishlist");
 
             group.MapPost("/{propertyId:Guid}", async (Guid propertyId, ISender sender) =>
             {

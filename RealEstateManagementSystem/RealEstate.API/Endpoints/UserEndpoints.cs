@@ -10,7 +10,8 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapUserEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/auth");
+            var group = app.MapGroup("/api/auth")
+                .WithTags("Auth");
 
             group.MapPost("/register", async (RegisterUserCommand command, [FromServices] ISender sender) =>
             {
@@ -81,7 +82,7 @@ namespace RealEstate.API.Endpoints
             .WithName("GetProfile");
 
 
-            group.MapGet("/{id:Guid}/public-profile", async (Guid id, [FromServices] ISender sender) =>
+            group.MapGet("/public{id:Guid}/", async (Guid id, [FromServices] ISender sender) =>
             {
                 var result = await sender.Send(new GetPublicProfileQuery { UserId = id });
                 return Results.Ok(new { success = true, user = result });
