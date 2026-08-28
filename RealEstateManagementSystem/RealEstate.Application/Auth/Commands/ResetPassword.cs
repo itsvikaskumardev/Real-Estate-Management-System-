@@ -22,23 +22,23 @@ namespace RealEstate.Application.Auth.Commands
     }
 
     public class ResetPasswordCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         IPasswordHasher passwordHasher,
         IDateTimeProvider dateTimeProvider)
         : IRequestHandler<ResetPasswordCommand, ResetPasswordResponse>
     {
         public async Task<ResetPasswordResponse> Handle(
             ResetPasswordCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             var hashedToken = HashToken(request.Token);
             var now = dateTimeProvider.UtcNow;
 
-            var user = await context.Users
+            var user = await dbContext.Users
                 .FirstOrDefaultAsync(u =>
                     u.ResetPasswordToken == hashedToken &&
                     u.ResetPasswordExpire > now,
-                    cancellationToken);
+                    ct);
 
             if (user is null)
                 throw new BadRequestException("Invalid or expired password reset token");
@@ -47,7 +47,7 @@ namespace RealEstate.Application.Auth.Commands
             user.ResetPasswordToken = null;
             user.ResetPasswordExpire = null;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new ResetPasswordResponse
             {

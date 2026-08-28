@@ -27,17 +27,17 @@ namespace RealEstate.Application.Auth.Commands
 
 
     public class LoginCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         IPasswordHasher passwordHasher,
         IJwtTokenService jwtTokenService)
         : IRequestHandler<LoginCommand, LoginResponse>
     {
         public async Task<LoginResponse> Handle(
             LoginCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var user = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email, ct);
 
             if (user is null)
                 throw new UnauthorizedException("Invalid email or password");

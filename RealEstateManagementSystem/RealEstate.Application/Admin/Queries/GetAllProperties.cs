@@ -20,14 +20,14 @@ namespace RealEstate.Application.Admin.Queries
 
 
 
-    public class GetAllPropertiesQueryHandler(IApplicationDbContext context)
+    public class GetAllPropertiesQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetAllPropertiesQuery, GetAllPropertiesResponse>
     {
         public async Task<GetAllPropertiesResponse> Handle(
             GetAllPropertiesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var properties = await context.Properties
+            var properties = await dbContext.Properties
                 .Where(p => p.IsActive && !p.IsDeleted)
                 .Select(p => new PropertyListItemDto
                 {
@@ -46,7 +46,7 @@ namespace RealEstate.Application.Admin.Queries
                         Email = p.Seller.Email
                     }
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetAllPropertiesResponse
             {

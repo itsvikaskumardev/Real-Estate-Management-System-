@@ -14,18 +14,18 @@ namespace RealEstate.Application.Property.Queries
 
 
     public class GetMyPropertiesQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetMyPropertiesQuery, List<PropertyDto>>
     {
         public async Task<List<PropertyDto>> Handle(
             GetMyPropertiesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var properties = await context.Properties
+            var properties = await dbContext.Properties
                 .Where(p => p.SellerId == currentUser.UserId && p.IsActive && !p.IsDeleted)
                 .Select(p => new PropertyDto
                 {
@@ -48,7 +48,7 @@ namespace RealEstate.Application.Property.Queries
                     Images = p.Images.Select(i => i.Url).ToList(),
                     CreatedAt = p.CreatedAt
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return properties;
         }

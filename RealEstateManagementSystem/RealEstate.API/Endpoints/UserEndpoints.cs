@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using RealEstate.API.Dto;
 using RealEstate.Application.Users.Commands;
 using RealEstate.Application.Users.Queries;
 
@@ -30,28 +31,16 @@ namespace RealEstate.API.Endpoints
 
 
 
-            group.MapPut("/profile", async (HttpRequest httpRequest, [FromServices] ISender sender) =>
+            group.MapPut("/profile", async ([FromForm] UpdateProfileRequest request, [FromServices] ISender sender) =>
             {
-                var form = await httpRequest.ReadFormAsync();
-
-                var file = form.Files.GetFile("profilePic");
-                Stream? fileStream = null;
-                string? fileName = null;
-
-                if (file is not null)
-                {
-                    fileStream = file.OpenReadStream();
-                    fileName = file.FileName;
-                }
-
                 var command = new UpdateProfileCommand
                 {
-                    Name = form["name"].FirstOrDefault(),
-                    Phone = form["phone"].FirstOrDefault(),
-                    Address = form["address"].FirstOrDefault(),
-                    RemoveProfilePic = form["removeProfilePic"].FirstOrDefault() == "true",
-                    ProfilePicStream = fileStream,
-                    ProfilePicFileName = fileName
+                    Name = request.Name,
+                    Phone = request.Phone,
+                    Address = request.Address,
+                    RemoveProfilePic = request.RemoveProfilePic,
+                    ProfilePicStream = request.ProfilePic?.OpenReadStream(),
+                    ProfilePicFileName = request.ProfilePic?.FileName
                 };
 
                 var result = await sender.Send(command);

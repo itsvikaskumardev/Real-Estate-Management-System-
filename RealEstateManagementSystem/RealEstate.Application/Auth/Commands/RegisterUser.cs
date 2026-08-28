@@ -29,7 +29,7 @@ namespace RealEstate.Application.Auth.Commands
     }
 
     public class RegisterUserCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         IPasswordHasher passwordHasher,
         IEmailService emailService,
         ILogger<RegisterUserCommandHandler> logger)
@@ -37,10 +37,10 @@ namespace RealEstate.Application.Auth.Commands
     {
         public async Task<RegisterUserResponse> Handle(
             RegisterUserCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var userExists = await context.Users
-                .AnyAsync(u => u.Email == request.Email, cancellationToken);
+            var userExists = await dbContext.Users
+                .AnyAsync(u => u.Email == request.Email, ct);
 
             if (userExists)
                 throw new ConflictException("User already exists");
@@ -58,8 +58,8 @@ namespace RealEstate.Application.Auth.Commands
                 VerificationToken = verificationToken
             };
 
-            context.Users.Add(user);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Users.Add(user);
+            await dbContext.SaveChangesAsync(ct);
 
             try
             {
@@ -68,7 +68,7 @@ namespace RealEstate.Application.Auth.Commands
                     "Verify Your Email - Real Estate Platform",
                     $"<p>Your email verification code is: <strong>{verificationToken}</strong></p>" +
                     "<p>Please enter this code on the verification page to activate your account.</p>",
-                    cancellationToken);
+                    ct);
             }
             catch (Exception ex)
             {

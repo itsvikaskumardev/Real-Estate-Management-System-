@@ -26,19 +26,19 @@ namespace RealEstate.Application.Property.Commands
     }
 
     public class UpdatePropertyStatusCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<UpdatePropertyStatusCommand, UpdatePropertyStatusResponse>
     {
         public async Task<UpdatePropertyStatusResponse> Handle(
             UpdatePropertyStatusCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var property = await context.Properties
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+            var property = await dbContext.Properties
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, ct);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
@@ -48,7 +48,7 @@ namespace RealEstate.Application.Property.Commands
 
             property.Status = request.Status;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new UpdatePropertyStatusResponse
             {

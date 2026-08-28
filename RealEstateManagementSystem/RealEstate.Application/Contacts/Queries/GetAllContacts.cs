@@ -17,14 +17,14 @@ namespace RealEstate.Application.Contacts.Queries
 
 
 
-    public class GetAllContactsQueryHandler(IApplicationDbContext context)
+    public class GetAllContactsQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetAllContactsQuery, GetAllContactsResponse>
     {
         public async Task<GetAllContactsResponse> Handle(
             GetAllContactsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var contacts = await context.Contacts
+            var contacts = await dbContext.Contacts
                 .Where(c => c.IsActive && !c.IsDeleted)
                 .OrderByDescending(c => c.CreatedAt)
                 .Select(c => new ContactDto
@@ -37,7 +37,7 @@ namespace RealEstate.Application.Contacts.Queries
                     Message = c.Message,
                     CreatedAt = c.CreatedAt
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetAllContactsResponse
             {

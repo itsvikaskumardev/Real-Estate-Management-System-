@@ -30,20 +30,20 @@ namespace RealEstate.Application.Users.Commands
 
 
     public class UpdateProfileCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
         IFileStorageService fileStorageService)
         : IRequestHandler<UpdateProfileCommand, UpdateProfileResponse>
     {
         public async Task<UpdateProfileResponse> Handle(
             UpdateProfileCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, cancellationToken);
+            var user = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, ct);
 
             if (user is null)
                 throw new NotFoundException(nameof(User), currentUser.UserId);
@@ -56,7 +56,7 @@ namespace RealEstate.Application.Users.Commands
                     request.ProfilePicStream,
                     request.ProfilePicFileName,
                     "profiles",
-                    cancellationToken);
+                    ct);
 
                 user.ProfilePic = url;
             }
@@ -69,7 +69,7 @@ namespace RealEstate.Application.Users.Commands
             if (request.Phone is not null) user.Phone = request.Phone;
             if (request.Address is not null) user.Address = request.Address;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new UpdateProfileResponse
             {

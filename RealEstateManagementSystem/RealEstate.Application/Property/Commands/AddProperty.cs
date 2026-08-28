@@ -38,14 +38,14 @@ namespace RealEstate.Application.Property.Commands
 
 
     public class AddPropertyCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
         IFileStorageService fileStorageService)
         : IRequestHandler<AddPropertyCommand, AddPropertyResponse>
     {
         public async Task<AddPropertyResponse> Handle(
             AddPropertyCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
@@ -59,7 +59,7 @@ namespace RealEstate.Application.Property.Commands
                     image.Stream,
                     image.FileName,
                     "properties",
-                    cancellationToken);
+                    ct);
 
                 imageUrls.Add(url);
             }
@@ -89,8 +89,8 @@ namespace RealEstate.Application.Property.Commands
                     .ToList()
             };
 
-            context.Properties.Add(property);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Properties.Add(property);
+            await dbContext.SaveChangesAsync(ct);
 
             return new AddPropertyResponse
             {

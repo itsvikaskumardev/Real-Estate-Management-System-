@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -20,28 +20,28 @@ namespace RealEstate.Application.Wishlist.Commands
     }
 
     public class RemoveFromWishlistCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<RemoveFromWishlistCommand, RemoveFromWishlistResponse>
     {
         public async Task<RemoveFromWishlistResponse> Handle(
             RemoveFromWishlistCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var item = await context.Wishlists
+            var item = await dbContext.Wishlists
                 .FirstOrDefaultAsync(w =>
                     w.UserId == currentUser.UserId &&
                     w.PropertyId == request.PropertyId,
-                    cancellationToken);
+                    ct);
 
             if (item is null)
                 throw new NotFoundException("Wishlist item", request.PropertyId);
 
-            context.Wishlists.Remove(item);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Wishlists.Remove(item);
+            await dbContext.SaveChangesAsync(ct);
 
             return new RemoveFromWishlistResponse
             {

@@ -39,18 +39,18 @@ namespace RealEstate.Application.Property.Queries
     }
 
     public class GetPropertyDetailsQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetPropertyDetailsQuery, GetPropertyDetailsResponse>
     {
         public async Task<GetPropertyDetailsResponse> Handle(
             GetPropertyDetailsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var property = await context.Properties
+            var property = await dbContext.Properties
                 .Include(p => p.Seller)
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, ct);
 
             if (property is null)
                 throw new NotFoundException(nameof(RealEstate.Domain.Entities.Property), request.PropertyId);
@@ -63,10 +63,10 @@ namespace RealEstate.Application.Property.Queries
             {
                 property.Views += 1;
                 property.ViewedBy.Add(visitorId);
-                await context.SaveChangesAsync(cancellationToken);
+                await dbContext.SaveChangesAsync(ct);
             }
 
-            var similarProperties = await context.Properties
+            var similarProperties = await dbContext.Properties
                 .Where(p =>
                     p.Id != property.Id &&
                     p.IsActive && !p.IsDeleted &&
@@ -87,7 +87,7 @@ namespace RealEstate.Application.Property.Queries
                     AreaSize = p.AreaSize,
                     Status = p.Status.ToString()
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetPropertyDetailsResponse
             {

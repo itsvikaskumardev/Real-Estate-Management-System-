@@ -22,18 +22,18 @@ namespace RealEstate.Application.Wishlist.Queries
 
 
     public class GetWishlistQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetWishlistQuery, List<WishlistItemDto>>
     {
         public async Task<List<WishlistItemDto>> Handle(
             GetWishlistQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var wishlist = await context.Wishlists
+            var wishlist = await dbContext.Wishlists
                 .Where(w => w.UserId == currentUser.UserId)
                 .Select(w => new WishlistItemDto
                 {
@@ -56,7 +56,7 @@ namespace RealEstate.Application.Wishlist.Queries
                             .ToList()
                     }
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return wishlist;
         }

@@ -1,4 +1,4 @@
-ï»¿using RealEstate.Application.Common.Interfaces;
+using RealEstate.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,19 +11,19 @@ namespace RealEstate.Infrastructure.Services
             Stream fileStream,
             string fileName,
             string folder,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             // TODO: implement Azure Blob Storage upload here
             // e.g. BlobServiceClient -> GetBlobContainerClient(folder) -> UploadAsync
-            throw new NotImplementedException("File storage not yet implemented â€” Azure Blob Storage pending");
+            throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
 
 
         }
-        public Task DeleteAsync(string fileUrl, CancellationToken cancellationToken = default)
+        public Task DeleteAsync(string fileUrl, CancellationToken ct = default)
         {
             // TODO: implement Azure Blob Storage delete here
             // e.g. parse blob name from fileUrl -> BlobContainerClient.DeleteBlobIfExistsAsync
-            throw new NotImplementedException("File storage not yet implemented â€” Azure Blob Storage pending");
+            throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
         }
     }
 }

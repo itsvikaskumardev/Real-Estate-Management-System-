@@ -23,15 +23,15 @@ namespace RealEstate.Application.Auth.Commands
         public bool Success { get; init; }
     }
 
-    public class VerifyEmailCommandHandler(IApplicationDbContext context)
+    public class VerifyEmailCommandHandler(IApplicationDbContext dbContext)
         : IRequestHandler<VerifyEmailCommand, VerifyEmailResponse>
     {
         public async Task<VerifyEmailResponse> Handle(
             VerifyEmailCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var user = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email, ct);
 
             if (user is null)
                 throw new NotFoundException(nameof(User), request.Email);
@@ -46,7 +46,7 @@ namespace RealEstate.Application.Auth.Commands
             user.IsVerified = true;
             user.VerificationToken = null;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new VerifyEmailResponse
             {

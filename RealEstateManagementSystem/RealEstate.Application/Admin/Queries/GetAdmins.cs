@@ -18,12 +18,12 @@ namespace RealEstate.Application.Admin.Queries
         public List<UserDto> Admins { get; init; } = new();
     }
 
-    public class GetAdminsQueryHandler(IApplicationDbContext context) 
+    public class GetAdminsQueryHandler(IApplicationDbContext dbContext) 
         : IRequestHandler<GetAdminsQuery, GetAdminsResponse>
     {
-        public async Task<GetAdminsResponse> Handle(GetAdminsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAdminsResponse> Handle(GetAdminsQuery request, CancellationToken ct)
         {
-            var users = await context.Users.Where(u => u.IsActive && !u.IsDeleted).ToListAsync(cancellationToken);
+            var users = await dbContext.Users.Where(u => u.IsActive && !u.IsDeleted).ToListAsync(ct);
             
             var admins = users
                 .Where(u => u.Role == UserRole.Admin)

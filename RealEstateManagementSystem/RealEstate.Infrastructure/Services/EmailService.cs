@@ -13,7 +13,7 @@ namespace RealEstate.Infrastructure.Services
             string email,
             string subject,
             string message,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             // Email provider implementation later
             return Task.CompletedTask;

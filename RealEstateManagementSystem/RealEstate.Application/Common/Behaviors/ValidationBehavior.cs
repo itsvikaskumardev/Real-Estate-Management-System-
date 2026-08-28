@@ -22,14 +22,14 @@ namespace RealEstate.Application.Common.Behaviors
         public async Task<TResponse> Handle(
             TRequest request,
             RequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (_validators.Any())
             {
                 var context = new ValidationContext<TRequest>(request);
 
                 var results = await Task.WhenAll(
-                    _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+                    _validators.Select(v => v.ValidateAsync(context, ct)));
 
                 var errors = results
                     .SelectMany(r => r.Errors)

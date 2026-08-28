@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using RealEstate.API.Dto;
 using RealEstate.Application.Property.Commands;
 using RealEstate.Application.Property.Queries;
 using RealEstate.Domain.Enums;
@@ -27,34 +28,27 @@ namespace RealEstate.API.Endpoints
 
 
             //------------------------
-            group.MapPost("/", async (HttpRequest httpRequest, ISender sender) =>
+            group.MapPost("/", async ([FromForm] AddPropertyRequest request, ISender sender) =>
             {
-                var form = await httpRequest.ReadFormAsync();
-
-                var images = form.Files
-                    .Where(f => f.Name == "images")
+                var images = request.Images?
                     .Select(f => new PropertyImageUpload(f.OpenReadStream(), f.FileName))
-                    .ToList();
+                    .ToList() ?? new List<PropertyImageUpload>();
 
                 var command = new AddPropertyCommand
                 {
-                    Title = form["title"].ToString(),
-                    Description = form["description"].ToString(),
-                    Price = decimal.Parse(form["price"].ToString()),
-                    City = form["city"].ToString(),
-                    Area = form["area"].ToString(),
-                    Pincode = form["pincode"].ToString(),
-                    PropertyType = Enum.Parse<PropertyType>(form["propertyType"].ToString(), ignoreCase: true),
-                    Bhk = form["bhk"].ToString() is { Length: > 0 } bhk ? bhk : null,
-                    Bathrooms = int.TryParse(form["bathrooms"], out var bathrooms) ? bathrooms : null,
-                    AreaSize = decimal.TryParse(form["areaSize"], out var areaSize) ? areaSize : null,
-                    Furnishing = Enum.TryParse<Furnishing>(form["furnishing"], ignoreCase: true, out var furnishing)
-                        ? furnishing
-                        : null,
-                    Status = Enum.TryParse<PropertyStatus>(form["status"], ignoreCase: true, out var status)
-                        ? status
-                        : PropertyStatus.Sale,
-                    Amenities = ParseAmenities(form["amenities"].ToString()),
+                    Title = request.Title,
+                    Description = request.Description,
+                    Price = request.Price,
+                    City = request.City,
+                    Area = request.Area,
+                    Pincode = request.Pincode,
+                    PropertyType = request.PropertyType,
+                    Bhk = request.Bhk,
+                    Bathrooms = request.Bathrooms,
+                    AreaSize = request.AreaSize,
+                    Furnishing = request.Furnishing,
+                    Status = request.Status,
+                    Amenities = ParseAmenities(request.Amenities ?? ""),
                     Images = images
                 };
 
@@ -80,43 +74,34 @@ namespace RealEstate.API.Endpoints
 
 
 
-            group.MapPut("/{id:Guid}", async (Guid id, HttpRequest httpRequest, ISender sender) =>
+            group.MapPut("/{id:Guid}", async (Guid id, [FromForm] UpdatePropertyRequest request, ISender sender) =>
             {
-                var form = await httpRequest.ReadFormAsync();
-
-                var newImages = form.Files
-                    .Where(f => f.Name == "images")
+                var newImages = request.Images?
                     .Select(f => new PropertyImageUpload(f.OpenReadStream(), f.FileName))
                     .ToList();
 
                 List<string>? existingImageUrls = null;
-                if (form.ContainsKey("existingImages"))
+                if (!string.IsNullOrEmpty(request.ExistingImages))
                 {
-                    existingImageUrls = ParseExistingImages(form["existingImages"].ToString());
+                    existingImageUrls = ParseExistingImages(request.ExistingImages);
                 }
 
                 var command = new UpdatePropertyCommand
                 {
                     PropertyId = id,
-                    Title = form["title"].FirstOrDefault(),
-                    Description = form["description"].FirstOrDefault(),
-                    Price = decimal.TryParse(form["price"], out var price) ? price : null,
-                    City = form["city"].FirstOrDefault(),
-                    Area = form["area"].FirstOrDefault(),
-                    Pincode = form["pincode"].FirstOrDefault(),
-                    PropertyType = Enum.TryParse<Domain.Enums.PropertyType>(form["propertyType"], ignoreCase: true, out var pt)
-                        ? pt
-                        : null,
-                    Bhk = form["bhk"].FirstOrDefault(),
-                    Bathrooms = int.TryParse(form["bathrooms"], out var bathrooms) ? bathrooms : null,
-                    AreaSize = decimal.TryParse(form["areaSize"], out var areaSize) ? areaSize : null,
-                    Furnishing = Enum.TryParse<Domain.Enums.Furnishing>(form["furnishing"], ignoreCase: true, out var furnishing)
-                        ? furnishing
-                        : null,
-                    Status = Enum.TryParse<Domain.Enums.PropertyStatus>(form["status"], ignoreCase: true, out var status)
-                        ? status
-                        : null,
-                    Amenities = form.ContainsKey("amenities") ? ParseAmenities(form["amenities"].ToString()) : null,
+                    Title = request.Title,
+                    Description = request.Description,
+                    Price = request.Price,
+                    City = request.City,
+                    Area = request.Area,
+                    Pincode = request.Pincode,
+                    PropertyType = request.PropertyType,
+                    Bhk = request.Bhk,
+                    Bathrooms = request.Bathrooms,
+                    AreaSize = request.AreaSize,
+                    Furnishing = request.Furnishing,
+                    Status = request.Status,
+                    Amenities = !string.IsNullOrEmpty(request.Amenities) ? ParseAmenities(request.Amenities) : null,
                     ExistingImageUrls = existingImageUrls,
                     NewImages = newImages
                 };

@@ -20,19 +20,19 @@ namespace RealEstate.Application.Chats.Commands
     }
 
     public class DeleteChatCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<DeleteChatCommand, DeleteChatResponse>
     {
         public async Task<DeleteChatResponse> Handle(
             DeleteChatCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var chat = await context.Chats
-                .FirstOrDefaultAsync(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted, cancellationToken);
+            var chat = await dbContext.Chats
+                .FirstOrDefaultAsync(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted, ct);
 
             if (chat is null)
                 throw new NotFoundException(nameof(Chat), request.ChatId);
@@ -42,7 +42,7 @@ namespace RealEstate.Application.Chats.Commands
 
             chat.IsDeleted = true;
             chat.IsActive = false;
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new DeleteChatResponse
             {

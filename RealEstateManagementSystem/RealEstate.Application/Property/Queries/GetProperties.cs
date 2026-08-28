@@ -15,11 +15,11 @@ namespace RealEstate.Application.Property.Queries
         public string? City { get; set; }
     }
 
-    public class GetPropertiesQueryHandler(IApplicationDbContext context) : IRequestHandler<GetPropertiesQuery, List<PropertyDto>>
+    public class GetPropertiesQueryHandler(IApplicationDbContext dbContext) : IRequestHandler<GetPropertiesQuery, List<PropertyDto>>
     {
-        public async Task<List<PropertyDto>> Handle(GetPropertiesQuery request, CancellationToken cancellationToken)
+        public async Task<List<PropertyDto>> Handle(GetPropertiesQuery request, CancellationToken ct)
         {
-            var query = context.Properties
+            var query = dbContext.Properties
                 .Where(p => p.IsActive && !p.IsDeleted)
                 .Include(p => p.Images)
                 .Include(p => p.Seller)
@@ -59,7 +59,7 @@ namespace RealEstate.Application.Property.Queries
                     IsApproved = p.Seller.IsApproved,
                     ProfilePic = p.Seller.ProfilePic
                 } : null!
-            }).ToListAsync(cancellationToken);
+            }).ToListAsync(ct);
 
             return properties;
         }

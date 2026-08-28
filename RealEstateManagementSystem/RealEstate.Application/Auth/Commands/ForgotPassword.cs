@@ -25,7 +25,7 @@ namespace RealEstate.Application.Auth.Commands
     }
 
     public class ForgotPasswordCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         IEmailService emailService,
         IDateTimeProvider dateTimeProvider,
         IConfiguration configuration,
@@ -34,10 +34,10 @@ namespace RealEstate.Application.Auth.Commands
     {
         public async Task<ForgotPasswordResponse> Handle(
             ForgotPasswordCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var user = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email, ct);
 
             if (user is null)
                 throw new NotFoundException("No user found with that email address", request.Email);
@@ -48,7 +48,7 @@ namespace RealEstate.Application.Auth.Commands
             user.ResetPasswordToken = hashedToken;
             user.ResetPasswordExpire = dateTimeProvider.UtcNow.AddMinutes(15);
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             var clientUrl = configuration["ClientUrl"] ?? "http://localhost:5173";
             var resetUrl = $"{clientUrl}/reset-password/{resetToken}";
@@ -65,7 +65,7 @@ namespace RealEstate.Application.Auth.Commands
                     user.Email,
                     "Password Reset - Real Estate Platform",
                     message,
-                    cancellationToken);
+                    ct);
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace RealEstate.Application.Auth.Commands
 
                 user.ResetPasswordToken = null;
                 user.ResetPasswordExpire = null;
-                await context.SaveChangesAsync(cancellationToken);
+                await dbContext.SaveChangesAsync(ct);
 
                 throw new InternalServerException("Could not send email");
             }

@@ -25,20 +25,20 @@ namespace RealEstate.Application.Chats.Commands
 
 
     public class SendMessageCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
         IChatNotificationService chatNotificationService)
         : IRequestHandler<SendMessageCommand, SendMessageResponse>
     {
         public async Task<SendMessageResponse> Handle(
             SendMessageCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var chat = await context.Chats
-                .FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
+            var chat = await dbContext.Chats
+                .FirstOrDefaultAsync(c => c.Id == request.ChatId, ct);
 
             if (chat is null)
                 throw new NotFoundException(nameof(Chat), request.ChatId);
@@ -55,8 +55,8 @@ namespace RealEstate.Application.Chats.Commands
                 CreatedAt = DateTimeOffset.UtcNow
             };
 
-            context.ChatMessages.Add(message);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.ChatMessages.Add(message);
+            await dbContext.SaveChangesAsync(ct);
 
             var response = new SendMessageResponse
             {

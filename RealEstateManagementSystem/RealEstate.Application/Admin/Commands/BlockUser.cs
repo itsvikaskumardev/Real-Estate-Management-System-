@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
@@ -21,22 +21,22 @@ namespace RealEstate.Application.Admin.Commands
         public bool IsBlocked { get; init; }
     }
 
-    public class BlockUserCommandHandler(IApplicationDbContext context)
+    public class BlockUserCommandHandler(IApplicationDbContext dbContext)
         : IRequestHandler<BlockUserCommand, BlockUserResponse>
     {
         public async Task<BlockUserResponse> Handle(
             BlockUserCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            var user = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == request.UserId, ct);
 
             if (user is null)
                 throw new NotFoundException(nameof(User), request.UserId);
 
             user.IsBlocked = !user.IsBlocked;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new BlockUserResponse
             {

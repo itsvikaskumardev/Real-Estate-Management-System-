@@ -35,14 +35,14 @@ namespace RealEstate.Application.Property.Queries
         public List<RealEstate.Application.Property.Dto.PropertyDto> Properties { get; init; } = [];
     }
 
-    public class GetAllPropertiesQueryHandler(IApplicationDbContext context)
+    public class GetAllPropertiesQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetAllPropertiesQuery, GetAllPropertiesResponse>
     {
         public async Task<GetAllPropertiesResponse> Handle(
             GetAllPropertiesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var query = context.Properties.Where(p => p.IsActive && !p.IsDeleted).AsQueryable();
+            var query = dbContext.Properties.Where(p => p.IsActive && !p.IsDeleted).AsQueryable();
 
             // Default status filter, overridden if 'status' is explicitly provided
             var status = PropertyStatus.Sale;
@@ -152,7 +152,7 @@ namespace RealEstate.Application.Property.Queries
                         ProfilePic = p.Seller.ProfilePic
                     } : null!
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetAllPropertiesResponse
             {

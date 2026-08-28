@@ -22,7 +22,7 @@ namespace RealEstate.Application.Property.Commands
     }
 
     public class DeletePropertyBySellerCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
         IFileStorageService fileStorageService,
         ILogger<DeletePropertyBySellerCommandHandler> logger)
@@ -30,14 +30,14 @@ namespace RealEstate.Application.Property.Commands
     {
         public async Task<DeletePropertyBySellerResponse> Handle(
             DeletePropertyBySellerCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var property = await context.Properties
+            var property = await dbContext.Properties
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, ct);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
@@ -51,7 +51,7 @@ namespace RealEstate.Application.Property.Commands
                 try
                 {
                     // TODO: switch to Azure Blob Storage implementation later
-                    await fileStorageService.DeleteAsync(image.Url, cancellationToken);
+                    await fileStorageService.DeleteAsync(image.Url, ct);
                 }
                 catch (Exception ex)
                 {
@@ -61,7 +61,7 @@ namespace RealEstate.Application.Property.Commands
 
             property.IsDeleted = true;
             property.IsActive = false;
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new DeletePropertyBySellerResponse
             {

@@ -26,17 +26,17 @@ namespace RealEstate.Application.Admin.Commands
     }
 
     public class CreateAdminCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         IPasswordHasher passwordHasher,
         ILogger<CreateAdminCommandHandler> logger)
         : IRequestHandler<CreateAdminCommand, CreateAdminResponse>
     {
         public async Task<CreateAdminResponse> Handle(
             CreateAdminCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var userExists = await context.Users
-                .AnyAsync(u => u.Email == request.Email, cancellationToken);
+            var userExists = await dbContext.Users
+                .AnyAsync(u => u.Email == request.Email, ct);
 
             if (userExists)
                 throw new ConflictException("User with this email already exists.");
@@ -52,8 +52,8 @@ namespace RealEstate.Application.Admin.Commands
                 IsBlocked = false
             };
 
-            context.Users.Add(adminUser);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Users.Add(adminUser);
+            await dbContext.SaveChangesAsync(ct);
 
             logger.LogInformation("New admin user created: {Email}", adminUser.Email);
 

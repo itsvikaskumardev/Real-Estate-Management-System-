@@ -23,14 +23,14 @@ namespace RealEstate.Application.Users.Queries
         public DateTimeOffset CreatedAt { get; init; }
     }
 
-    public class GetPublicProfileQueryHandler(IApplicationDbContext context)
+    public class GetPublicProfileQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetPublicProfileQuery, GetPublicProfileResponse>
     {
         public async Task<GetPublicProfileResponse> Handle(
             GetPublicProfileQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var user = await context.Users
+            var user = await dbContext.Users
                 .Where(u => u.Id == request.UserId && u.IsActive && !u.IsDeleted)
                 .Select(u => new GetPublicProfileResponse
                 {
@@ -39,7 +39,7 @@ namespace RealEstate.Application.Users.Queries
                     Role = u.Role.ToString(),
                     CreatedAt = u.CreatedAt
                 })
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(ct);
 
             if (user is null)
                 throw new NotFoundException(nameof(User), request.UserId);
