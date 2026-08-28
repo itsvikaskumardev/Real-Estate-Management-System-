@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import axios from "axios";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
@@ -17,6 +18,10 @@ const AdminProperties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  
+  // Modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState(null);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -37,20 +42,24 @@ const AdminProperties = () => {
     fetchProperties();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this property? This action is permanent.",
-      )
-    )
-      return;
+  const confirmDelete = (id) => {
+    setPropertyToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const executeDelete = async () => {
+    if (!propertyToDelete) return;
     try {
-      await axios.delete(`${API_URL}/api/admin/properties/${id}`, {
+      await axios.delete(`${API_URL}/api/admin/properties/${propertyToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProperties(properties.filter((p) => p.id !== id));
+      setProperties(properties.filter((p) => p.id !== propertyToDelete));
+      setShowDeleteModal(false);
+      setPropertyToDelete(null);
     } catch (err) {
       alert("Failed to delete property");
+      setShowDeleteModal(false);
+      setPropertyToDelete(null);
     }
   };
 
@@ -103,7 +112,7 @@ const AdminProperties = () => {
                         <HiOutlineExternalLink size={16} />
                       </Link>
                       <button
-                        onClick={() => handleDelete(p.id)}
+                        onClick={() => confirmDelete(p.id)}
                         className={s.deleteButton}
                       >
                         <HiOutlineTrash size={16} />
@@ -116,6 +125,33 @@ const AdminProperties = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && createPortal(
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "400px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1rem", color: "#1e293b" }}>Delete Property?</h3>
+            <p style={{ color: "#475569", marginBottom: "1.5rem" }}>
+              Are you sure you want to delete this property? This action is permanent.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                style={{ padding: "0.5rem 1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#475569", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeDelete}
+                style={{ padding: "0.5rem 1rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#ef4444", color: "#fff", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 };

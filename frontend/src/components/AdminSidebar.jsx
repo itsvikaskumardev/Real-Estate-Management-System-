@@ -9,6 +9,7 @@ import {
   HiOutlineHome,
   HiOutlineUserCircle,
   HiOutlineMail,
+  HiOutlineShieldCheck,
 } from "react-icons/hi";
 import { useAuth } from "../context/AuthContext";
 import Logo from "./common/Logo";
@@ -27,6 +28,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     { name: "Properties", icon: HiOutlineLibrary, path: "/admin/properties" },
     { name: "Inquiries", icon: HiOutlineChatAlt2, path: "/admin/inquiries" },
     { name: "Contact Inbox", icon: HiOutlineMail, path: "/admin/contacts" },
+    { name: "Admin Management", icon: HiOutlineShieldCheck, path: "/admin/management" },
   ];
 
   return (

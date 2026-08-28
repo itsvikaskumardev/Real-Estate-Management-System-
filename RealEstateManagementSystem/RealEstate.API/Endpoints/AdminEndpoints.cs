@@ -14,6 +14,19 @@ namespace RealEstate.API.Endpoints
                 .RequireAuthorization("AdminOnly")
                 .WithTags("Admin");
 
+            group.MapPost("/admins", async (CreateAdminCommand command, [FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(command);
+                return Results.Ok(new { success = true, result.Message, result.Admin });
+            })
+            .WithName("CreateAdmin");
+
+            group.MapGet("/admins", async ([FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(new GetAdminsQuery());
+                return Results.Ok(new { success = true, result.Count, result.Admins });
+            })
+            .WithName("GetAdmins");
 
             group.MapGet("/users", async ([FromServices] ISender sender) =>
             {
