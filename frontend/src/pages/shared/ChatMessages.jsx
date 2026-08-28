@@ -22,6 +22,7 @@ const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [chatToDelete, setChatToDelete] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -79,7 +80,10 @@ const ChatMessages = () => {
     if (socket) {
       socket.on("receiveMessage", (data) => {
         if (activeChat && data.chatId === (activeChat.id || activeChat._id)) {
-          setMessages((prev) => [...prev, data]);
+          setMessages((prev) => {
+            if (prev.some((m) => (m.id || m._id) === (data.id || data._id))) return prev;
+            return [...prev, data];
+          });
         }
       });
     }
@@ -117,6 +121,11 @@ const ChatMessages = () => {
       );
 
       if (res.data.newMessage) {
+        setMessages((prev) => {
+          if (prev.some((m) => (m.id || m._id) === (res.data.newMessage.id || res.data.newMessage._id))) return prev;
+          return [...prev, res.data.newMessage];
+        });
+
         sendMessage(
           activeChat.id || activeChat._id,
           textToSend,
@@ -131,20 +140,24 @@ const ChatMessages = () => {
     }
   };
 
-  const handleDeleteChat = async (e, chatId) => {
+  const handleDeleteChat = (e, chatId) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this conversation?"))
-      return;
+    setChatToDelete(chatId);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
 
     try {
-      await axios.delete(`${API_URL}/api/chat/${chatId}`, {
+      await axios.delete(`${API_URL}/api/chat/${chatToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setConversations((prev) => prev.filter((c) => (c.id || c._id) !== chatId));
-      if ((activeChat?.id || activeChat?._id) === chatId) setActiveChat(null);
+      setConversations((prev) => prev.filter((c) => (c.id || c._id) !== chatToDelete));
+      if ((activeChat?.id || activeChat?._id) === chatToDelete) setActiveChat(null);
     } catch (err) {
       console.error("Error deleting chat:", err);
     }
+    setChatToDelete(null);
   };
 
   const handleDeleteMessage = async (chatId, messageId) => {
@@ -263,7 +276,7 @@ const ChatMessages = () => {
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`${s.messageBubble} ${(msg.sender?.id || msg.sender?._id || msg.sender) === (user.id || user._id) ? s.messageOwn : s.messageOther}`}
+                    className={`${s.messageBubble} ${(msg.senderId || msg.sender?.id || msg.sender?._id || msg.sender) === (user.id || user._id) ? s.messageOwn : s.messageOther}`}
                   >
                     <div className={s.messageContent}>
                       {msg.image && (
@@ -276,7 +289,7 @@ const ChatMessages = () => {
                         </div>
                       )}
                       <div className={s.messageText}>{msg.text}</div>
-                      {((msg.sender?.id || msg.sender?._id) || msg.sender) === (user.id || user._id) && (
+                      {(msg.senderId || msg.sender?.id || msg.sender?._id || msg.sender) === (user.id || user._id) && (
                         <button
                           className={s.deleteMessageButton}
                           onClick={() =>
@@ -321,6 +334,75 @@ const ChatMessages = () => {
           )}
         </div>
       </div>
+
+      {chatToDelete && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          padding: "1rem"
+        }}>
+          <div style={{
+            backgroundColor: "#fff",
+            padding: "2rem",
+            borderRadius: "1rem",
+            width: "100%",
+            maxWidth: "400px",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+            textAlign: "center"
+          }}>
+            <h3 style={{
+              margin: "0 0 1rem 0",
+              fontSize: "1.25rem",
+              fontWeight: "bold",
+              color: "#0f172a"
+            }}>Delete Conversation</h3>
+            <p style={{
+              margin: "0 0 1.5rem 0",
+              color: "#64748b",
+              fontSize: "0.95rem"
+            }}>Are you sure you want to delete this conversation?</p>
+            <div style={{
+              display: "flex",
+              gap: "1rem",
+              justifyContent: "center"
+            }}>
+              <button 
+                onClick={() => setChatToDelete(null)}
+                style={{
+                  padding: "0.6rem 1.5rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fff",
+                  color: "#334155",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDeleteChat}
+                style={{
+                  padding: "0.6rem 1.5rem",
+                  borderRadius: "0.5rem",
+                  border: "none",
+                  backgroundColor: "#ef4444",
+                  color: "#fff",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

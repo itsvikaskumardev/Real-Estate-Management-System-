@@ -54,7 +54,7 @@ const MyInquiries = () => {
       );
       setInquiries(
         inquiries.map((inq) =>
-          inq._id === id ? { ...inq, isRead: true } : inq,
+          (inq.id || inq._id) === id ? { ...inq, isRead: true } : inq,
         ),
       );
     } catch (err) {
@@ -67,8 +67,8 @@ const MyInquiries = () => {
       const res = await axios.post(
         `${API_URL}/api/chat/start`,
         {
-          propertyId: inq.property?._id,
-          buyerId: inq.buyer?._id,
+          propertyId: inq.property?.id || inq.property?._id,
+          buyerId: inq.buyer?.id || inq.buyer?._id,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -152,7 +152,7 @@ const MyInquiries = () => {
         ) : (
           <div className={s.flexColGap6}>
             {inquiries.map((inq) => (
-              <div key={inq._id} className={s.inquiryCard}>
+              <div key={inq.id || inq._id} className={s.inquiryCard}>
                 <div className={s.inquiryMain}>
                   <div className={s.iconWrapper}>
                     <HiHome className={s.iconSize} />
@@ -206,14 +206,14 @@ const MyInquiries = () => {
 
                 <div className={s.actions}>
                   <Link
-                    to={`/property/${inq.property?._id}`}
+                    to={`/property/${inq.property?.id || inq.property?._id}`}
                     className={s.btnOutline}
                   >
                     View Property <HiExternalLink />
                   </Link>
                   {isSeller && !inq.isRead && (
                     <button
-                      onClick={() => markAsRead(inq._id)}
+                      onClick={() => markAsRead(inq.id || inq._id)}
                       className={s.btnPrimaryWhitespaceNowrap}
                     >
                       Mark as Read

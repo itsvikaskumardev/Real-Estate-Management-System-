@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Chats.Dto;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
@@ -26,7 +26,8 @@ namespace RealEstate.Application.Chats.Commands
 
     public class SendMessageCommandHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        IChatNotificationService chatNotificationService)
         : IRequestHandler<SendMessageCommand, SendMessageResponse>
     {
         public async Task<SendMessageResponse> Handle(
@@ -57,7 +58,7 @@ namespace RealEstate.Application.Chats.Commands
             context.ChatMessages.Add(message);
             await context.SaveChangesAsync(cancellationToken);
 
-            return new SendMessageResponse
+            var response = new SendMessageResponse
             {
                 NewMessage = new ChatMessageDto
                 {
@@ -69,6 +70,10 @@ namespace RealEstate.Application.Chats.Commands
                     CreatedAt = message.CreatedAt
                 }
             };
+
+            await chatNotificationService.BroadcastMessageAsync(chat.Id, response.NewMessage);
+
+            return response;
         }
     }
 }

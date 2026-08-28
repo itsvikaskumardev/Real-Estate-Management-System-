@@ -50,7 +50,11 @@ const PropertyCard = ({
         {/* Image Section */}
         <div className={s.imageSection}>
           <img
-            src={property.images && property.images.length > 0 ? property.images[0] : "/placeholder-property.jpg"}
+            src={
+              property.images && property.images.length > 0
+                ? property.images[0]
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(property.title || 'Property')}&background=random&size=512`
+            }
             alt={property.title}
             className={s.image}
           />

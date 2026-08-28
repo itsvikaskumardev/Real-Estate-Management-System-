@@ -149,7 +149,7 @@ const PropertyDetails = () => {
         `${API_URL}/api/chat/send`,
         {
           chatId: (chat.id || chat._id),
-          text: `(Context: Interested in property "${property.title}")`,
+          text: `Hi! I am very interested in your property: ${property.title}. Could you provide more details?`,
           image: property.images[0],
         },
         {
@@ -196,6 +196,8 @@ const PropertyDetails = () => {
     setLightboxIndex(
       (prev) => (prev - 1 + property.images.length) % property.images.length,
     );
+
+  const isOwner = user && property?.seller && (user.id || user._id) === (property.seller.id || property.seller._id);
 
   return (
     <div className={s.pageContainer}>
@@ -489,52 +491,56 @@ const PropertyDetails = () => {
                 </div>
               </div>
 
-              <div className={s.chatButtonWrapper}>
-                <button className={s.chatButton} onClick={handleChatStart}>
-                  <HiChatAlt /> Chat
-                </button>
-              </div>
-
-              {/* Inquiry Form */}
-              <h4 className={s.inquiryFormTitle}>Inquire</h4>
-              <form onSubmit={handleInquirySubmit}>
-                {user?.role === "buyer" ? (
-                  <>
-                    <textarea
-                      placeholder="Your Message..."
-                      value={inquiry.message}
-                      onChange={(e) =>
-                        setInquiry({ ...inquiry, message: e.target.value })
-                      }
-                      className={s.inquiryTextarea}
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className={s.inquirySubmitButton}
-                      disabled={inquiryStatus.loading}
-                    >
-                      {inquiryStatus.loading ? "Sending..." : "Send Inquiry"}
+              {!isOwner && (
+                <>
+                  <div className={s.chatButtonWrapper}>
+                    <button className={s.chatButton} onClick={handleChatStart}>
+                      <HiChatAlt /> Chat
                     </button>
-                    {inquiryStatus.success && (
-                      <p className={s.inquirySuccessMessage}>Inquiry sent!</p>
-                    )}
-                  </>
-                ) : (
-                  <div className={s.inquiryDisabledMessage}>
-                    <p className={s.inquiryDisabledText}>
-                      {user
-                        ? "Only buyers can send inquiries."
-                        : "Please login as a buyer to send inquiries."}
-                    </p>
-                    {!user && (
-                      <Link to="/login" className={s.inquiryLoginButton}>
-                        Login
-                      </Link>
-                    )}
                   </div>
-                )}
-              </form>
+
+                  {/* Inquiry Form */}
+                  <h4 className={s.inquiryFormTitle}>Inquire</h4>
+                  <form onSubmit={handleInquirySubmit}>
+                    {user?.role === "buyer" ? (
+                      <>
+                        <textarea
+                          placeholder="Your Message..."
+                          value={inquiry.message}
+                          onChange={(e) =>
+                            setInquiry({ ...inquiry, message: e.target.value })
+                          }
+                          className={s.inquiryTextarea}
+                          required
+                        />
+                        <button
+                          type="submit"
+                          className={s.inquirySubmitButton}
+                          disabled={inquiryStatus.loading}
+                        >
+                          {inquiryStatus.loading ? "Sending..." : "Send Inquiry"}
+                        </button>
+                        {inquiryStatus.success && (
+                          <p className={s.inquirySuccessMessage}>Inquiry sent!</p>
+                        )}
+                      </>
+                    ) : (
+                      <div className={s.inquiryDisabledMessage}>
+                        <p className={s.inquiryDisabledText}>
+                          {user
+                            ? "Only buyers can send inquiries."
+                            : "Please login as a buyer to send inquiries."}
+                        </p>
+                        {!user && (
+                          <Link to="/login" className={s.inquiryLoginButton}>
+                            Login
+                          </Link>
+                        )}
+                      </div>
+                    )}
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </div>
