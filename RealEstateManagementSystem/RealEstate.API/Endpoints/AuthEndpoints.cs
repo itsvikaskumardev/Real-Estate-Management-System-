@@ -58,6 +58,13 @@ namespace RealEstate.API.Endpoints
                 return Results.Ok(result);
             })
             .WithName("ResetPassword");
+
+            group.MapPost("/logout", async ([FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(new LogoutCommand());
+                return Results.Ok(result);
+            })
+            .WithName("Logout");
         }
     }
 

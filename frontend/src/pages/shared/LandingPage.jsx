@@ -60,7 +60,7 @@ const LandingPage = () => {
       setWishlistedIds(
         res.data
           .filter((item) => item.property)
-          .map((item) => String(item.property._id)),
+          .map((item) => String((item.property?.id || item.property?._id))),
       );
     } catch (err) {
       console.error("Failed to fetch wishlist:", err);
@@ -421,9 +421,9 @@ const LandingPage = () => {
                 .slice(0, 6)
                 .map((property) => (
                   <PropertyCard
-                    key={property._id}
+                    key={(property.id || property._id)}
                     property={property}
-                    isWishlisted={wishlistedIds.includes(String(property._id))}
+                    isWishlisted={wishlistedIds.includes(String((property.id || property._id)))}
                     onToggleWishlist={handleToggleWishlist}
                   />
                 ))}

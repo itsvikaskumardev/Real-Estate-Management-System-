@@ -39,7 +39,7 @@ const ChatMessages = () => {
 
         if (location.state?.chat) {
           const existingChat = fetchedConversations.find(
-            (c) => c._id === location.state.chat._id,
+            (c) => (c.id || c._id) === (location.state.chat.id || location.state.chat._id),
           );
           if (existingChat) {
             setActiveChat(existingChat);
@@ -61,11 +61,11 @@ const ChatMessages = () => {
     if (activeChat) {
       const fetchMessages = async () => {
         try {
-          const res = await axios.get(`${API_URL}/api/chat/${activeChat._id}`, {
+          const res = await axios.get(`${API_URL}/api/chat/${activeChat.id || activeChat._id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setMessages(res.data.messages || []);
-          joinChat(activeChat._id);
+          joinChat(activeChat.id || activeChat._id);
           scrollToBottom();
         } catch (err) {
           console.error("Error fetching messages:", err);
@@ -78,7 +78,7 @@ const ChatMessages = () => {
   useEffect(() => {
     if (socket) {
       socket.on("receiveMessage", (data) => {
-        if (activeChat && data.chatId === activeChat._id) {
+        if (activeChat && data.chatId === (activeChat.id || activeChat._id)) {
           setMessages((prev) => [...prev, data]);
         }
       });
@@ -108,7 +108,7 @@ const ChatMessages = () => {
       const res = await axios.post(
         `${API_URL}/api/chat/send`,
         {
-          chatId: activeChat._id,
+          chatId: activeChat.id || activeChat._id,
           text: textToSend,
         },
         {
@@ -118,9 +118,9 @@ const ChatMessages = () => {
 
       if (res.data.newMessage) {
         sendMessage(
-          activeChat._id,
+          activeChat.id || activeChat._id,
           textToSend,
-          res.data.newMessage._id,
+          res.data.newMessage.id || res.data.newMessage._id,
           res.data.newMessage.createdAt,
         );
       }
@@ -140,8 +140,8 @@ const ChatMessages = () => {
       await axios.delete(`${API_URL}/api/chat/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setConversations((prev) => prev.filter((c) => c._id !== chatId));
-      if (activeChat?._id === chatId) setActiveChat(null);
+      setConversations((prev) => prev.filter((c) => (c.id || c._id) !== chatId));
+      if ((activeChat?.id || activeChat?._id) === chatId) setActiveChat(null);
     } catch (err) {
       console.error("Error deleting chat:", err);
     }
@@ -164,7 +164,7 @@ const ChatMessages = () => {
   };
 
   const getChatPartner = (chat) => {
-    return user._id === chat.buyer._id ? chat.seller : chat.buyer;
+    return (user.id || user._id) === (chat.buyer.id || chat.buyer._id) ? chat.seller : chat.buyer;
   };
 
   if (loading)
@@ -194,8 +194,8 @@ const ChatMessages = () => {
             ) : (
               conversations.map((chat) => (
                 <div
-                  key={chat._id}
-                  className={`${s.conversationItem} ${activeChat?._id === chat._id ? s.conversationItemActive : ""}`}
+                  key={chat.id || chat._id}
+                  className={`${s.conversationItem} ${(activeChat?.id || activeChat?._id) === (chat.id || chat._id) ? s.conversationItemActive : ""}`}
                   onClick={() => setActiveChat(chat)}
                 >
                   <div className={s.avatar}>
@@ -214,12 +214,12 @@ const ChatMessages = () => {
                       {getChatPartner(chat)?.name}
                     </div>
                     <div className={s.conversationPreview}>
-                      {chat.messages.at(-1)?.text || "Started a conversation"}
+                      {chat.messages?.at(-1)?.text || "Started a conversation"}
                     </div>
                   </div>
                   <button
                     className={s.deleteChatButton}
-                    onClick={(e) => handleDeleteChat(e, chat._id)}
+                    onClick={(e) => handleDeleteChat(e, chat.id || chat._id)}
                     title="Delete Conversation"
                   >
                     <HiOutlineTrash />
@@ -263,7 +263,7 @@ const ChatMessages = () => {
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`${s.messageBubble} ${(msg.sender?._id || msg.sender) === user._id ? s.messageOwn : s.messageOther}`}
+                    className={`${s.messageBubble} ${(msg.sender?.id || msg.sender?._id || msg.sender) === (user.id || user._id) ? s.messageOwn : s.messageOther}`}
                   >
                     <div className={s.messageContent}>
                       {msg.image && (
@@ -276,11 +276,11 @@ const ChatMessages = () => {
                         </div>
                       )}
                       <div className={s.messageText}>{msg.text}</div>
-                      {(msg.sender?._id || msg.sender) === user._id && (
+                      {((msg.sender?.id || msg.sender?._id) || msg.sender) === (user.id || user._id) && (
                         <button
                           className={s.deleteMessageButton}
                           onClick={() =>
-                            handleDeleteMessage(activeChat._id, msg._id)
+                            handleDeleteMessage(activeChat.id || activeChat._id, msg.id || msg._id)
                           }
                           title="Delete Message"
                         >

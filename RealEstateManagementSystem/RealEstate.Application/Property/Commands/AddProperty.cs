@@ -1,0 +1,120 @@
+using MediatR;
+using RealEstate.Application.Common.Exceptions;
+using RealEstate.Application.Common.Interfaces;
+using RealEstate.Domain.Enums;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using RealEstate.Application.Property.Dto;
+
+namespace RealEstate.Application.Property.Commands
+{
+    public record AddPropertyCommand : IRequest<AddPropertyResponse>
+    {
+        public string Title { get; init; } = string.Empty;
+        public string Description { get; init; } = string.Empty;
+        public decimal Price { get; init; }
+        public string City { get; init; } = string.Empty;
+        public string Area { get; init; } = string.Empty;
+        public string Pincode { get; init; } = string.Empty;
+        public PropertyType PropertyType { get; init; }
+        public string? Bhk { get; init; }
+        public int? Bathrooms { get; init; }
+        public decimal? AreaSize { get; init; }
+        public Furnishing? Furnishing { get; init; }
+        public PropertyStatus Status { get; init; } = PropertyStatus.Sale;
+        public List<string> Amenities { get; init; } = [];
+        public List<PropertyImageUpload> Images { get; init; } = [];
+    }
+
+    public record PropertyImageUpload(Stream Stream, string FileName);
+
+    public record AddPropertyResponse
+    {
+        public bool Success { get; init; }
+        public PropertyDto Property { get; init; } = null!;
+    }
+
+
+
+    public class AddPropertyCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUserService currentUser,
+        IFileStorageService fileStorageService)
+        : IRequestHandler<AddPropertyCommand, AddPropertyResponse>
+    {
+        public async Task<AddPropertyResponse> Handle(
+            AddPropertyCommand request,
+            CancellationToken cancellationToken)
+        {
+            if (currentUser.UserId is null)
+                throw new UnauthorizedException("Not authenticated");
+
+            var imageUrls = new List<string>();
+
+            foreach (var image in request.Images)
+            {
+                // TODO: switch to Azure Blob Storage implementation later
+                var url = await fileStorageService.UploadAsync(
+                    image.Stream,
+                    image.FileName,
+                    "properties",
+                    cancellationToken);
+
+                imageUrls.Add(url);
+            }
+
+            if (imageUrls.Count == 0)
+            {
+                // Fallback UI avatar if no images are provided
+                imageUrls.Add($"https://ui-avatars.com/api/?name={Uri.EscapeDataString(request.Title)}&background=random&size=512");
+            }
+
+            var property = new Domain.Entities.Property
+            {
+                Title = request.Title,
+                Description = request.Description,
+                Price = request.Price,
+                Address = new Domain.ValueObjects.Address(request.Area, request.City, "", request.Pincode),
+                PropertyType = request.PropertyType,
+                Bhk = request.Bhk,
+                Bathrooms = request.Bathrooms,
+                AreaSize = request.AreaSize,
+                Furnishing = request.Furnishing,
+                Status = request.Status,
+                Amenities = request.Amenities,
+                SellerId = currentUser.UserId.Value,
+                Images = imageUrls
+                    .Select(url => new Domain.Entities.PropertyImage { Url = url })
+                    .ToList()
+            };
+
+            context.Properties.Add(property);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return new AddPropertyResponse
+            {
+                Success = true,
+                Property = new PropertyDto
+                {
+                    Id = property.Id,
+                    Title = property.Title,
+                    Description = property.Description,
+                    Price = property.Price,
+                    City = property.Address.City,
+                    Area = property.Address.Street,
+                    Pincode = property.Address.Pincode,
+                    PropertyType = property.PropertyType.ToString(),
+                    Bhk = property.Bhk,
+                    Bathrooms = property.Bathrooms,
+                    AreaSize = property.AreaSize,
+                    Furnishing = property.Furnishing?.ToString(),
+                    Status = property.Status.ToString(),
+                    Amenities = property.Amenities,
+                    Images = property.Images.Select(i => i.Url).ToList(),
+                    SellerId = property.SellerId
+                }
+            };
+        }
+    }
+}

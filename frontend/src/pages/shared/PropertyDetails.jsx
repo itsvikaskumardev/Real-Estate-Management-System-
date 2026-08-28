@@ -62,7 +62,7 @@ const PropertyDetails = () => {
           const wishRes = await axios.get(`${API_URL}/api/wishlist`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          const found = wishRes.data.some((item) => item.property?._id === id);
+          const found = wishRes.data.some((item) => (item.property?.id || item.property?._id) === id);
           setIsInWishlist(found);
         }
         setLoading(false);
@@ -136,7 +136,7 @@ const PropertyDetails = () => {
         `${API_URL}/api/chat/start`,
         {
           propertyId: id,
-          sellerId: property.seller._id,
+          sellerId: (property.seller?.id || property.seller?._id),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -148,7 +148,7 @@ const PropertyDetails = () => {
       await axios.post(
         `${API_URL}/api/chat/send`,
         {
-          chatId: chat._id,
+          chatId: (chat.id || chat._id),
           text: `(Context: Interested in property "${property.title}")`,
           image: property.images[0],
         },
@@ -546,7 +546,7 @@ const PropertyDetails = () => {
             {[
               {
                 label: "Property ID",
-                value: property._id.slice(-8).toUpperCase(),
+                value: (property.id || property._id).slice(-8).toUpperCase(),
               },
               {
                 label: "Added On",
@@ -580,7 +580,7 @@ const PropertyDetails = () => {
             {similarProperties.length > 0 ? (
               similarProperties
                 .slice(0, 3)
-                .map((p) => <PropertyCard key={p._id} property={p} />)
+                .map((p) => <PropertyCard key={(p.id || p._id)} property={p} />)
             ) : (
               <div className={s.similarEmptyState}>
                 No similar properties found in this location.

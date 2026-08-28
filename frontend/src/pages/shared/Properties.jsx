@@ -86,7 +86,7 @@ const Properties = () => {
       setWishlistedIds(
         res.data
           .filter((item) => item.property)
-          .map((item) => String(item.property._id)),
+          .map((item) => String((item.property?.id || item.property?._id))),
       );
     } catch (err) {
       console.error("Failed to fetch wishlist:", err);
@@ -431,9 +431,9 @@ const Properties = () => {
                   .filter((p) => p)
                   .map((p) => (
                     <PropertyCard
-                      key={p._id}
+                      key={(p.id || p._id)}
                       property={p}
-                      isWishlisted={wishlistedIds.includes(String(p._id))}
+                      isWishlisted={wishlistedIds.includes(String((p.id || p._id)))}
                       onToggleWishlist={handleToggleWishlist}
                     />
                   ))}
