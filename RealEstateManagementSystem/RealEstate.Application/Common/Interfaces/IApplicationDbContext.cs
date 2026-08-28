@@ -9,7 +9,7 @@ namespace RealEstate.Application.Common.Interfaces
     {
         DbSet<User> Users { get; }
         DbSet<Token> Tokens { get; }
-        DbSet<Property> Properties { get; }
+        DbSet<RealEstate.Domain.Entities.Property> Properties { get; }
         DbSet<PropertyImage> PropertyImages { get; }
         DbSet<Inquiry> Inquiries { get; }
         DbSet<RealEstate.Domain.Entities.Wishlist> Wishlists { get; }

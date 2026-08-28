@@ -82,7 +82,9 @@ namespace RealEstate.Application.Users.Commands
                     Email = user.Email,
                     Phone = user.Phone,
                     Address = user.Address,
-                    ProfilePic = user.ProfilePic
+                    ProfilePic = user.ProfilePic,
+                    Role = user.Role.ToString().ToLower(),
+                    IsApproved = user.IsApproved
                 }
             };
         }

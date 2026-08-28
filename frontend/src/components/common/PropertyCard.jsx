@@ -32,7 +32,7 @@ const PropertyCard = ({
     }
 
     if (onToggleWishlist) {
-      onToggleWishlist(property._id);
+      onToggleWishlist(property.id || property._id);
     }
   };
 
@@ -46,11 +46,15 @@ const PropertyCard = ({
 
   return (
     <div className={s.card}>
-      <Link to={`/property/${property._id}`} className={s.link}>
+      <Link to={`/property/${property.id || property._id}`} className={s.link}>
         {/* Image Section */}
         <div className={s.imageSection}>
           <img
-            src={property.images[0]}
+            src={
+              property.images && property.images.length > 0
+                ? property.images[0]
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(property.title || 'Property')}&background=random&size=512`
+            }
             alt={property.title}
             className={s.image}
           />

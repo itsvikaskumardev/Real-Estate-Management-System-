@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using RealEstate.Application.Properties.Dto;
+using RealEstate.Application.Property.Dto;
 
 
 namespace RealEstate.Application.Wishlist.Queries

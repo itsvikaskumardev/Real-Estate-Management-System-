@@ -8,15 +8,17 @@ import {
   HiOutlineLocationMarker,
   HiCheck,
   HiX,
+  HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";
-import { profileStyles as s } from "../../assets/dummyStyles";
+import { profileStyles as s, contactStyles as cs } from "../../assets/dummyStyles";
 
 const Profile = () => {
   const { user, setUser, token } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -72,12 +74,13 @@ const Profile = () => {
       });
 
       if (res.data.success) {
-        const updatedUser = res.data.user;
+        const updatedUser = { ...user, ...res.data.user };
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
         setIsEditing(false);
         setImageFile(null);
         setImagePreview(null);
+        setSuccess(true);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile");
@@ -214,6 +217,20 @@ const Profile = () => {
                 </button>
               </div>
             </form>
+          ) : success ? (
+            <div className={cs.successContainer} style={{ padding: "3rem", margin: "0 auto", maxWidth: "600px" }}>
+              <HiOutlineCheckCircle size={64} className={cs.successIcon} />
+              <h2 className={cs.successTitle}>Profile Updated!</h2>
+              <p className={cs.successMessage}>
+                Your profile has been updated successfully.
+              </p>
+              <button
+                onClick={() => setSuccess(false)}
+                className={cs.successButton}
+              >
+                Close
+              </button>
+            </div>
           ) : (
             <div className={s.infoSection}>
               <div className={s.infoItem}>

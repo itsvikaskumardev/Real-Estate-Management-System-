@@ -77,7 +77,7 @@ const SellerDashboard = () => {
       await axios.delete(`${API_URL}/api/property/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProperties(properties.filter((p) => p._id !== id));
+      setProperties(properties.filter((p) => (p.id || p._id) !== id));
     } catch (err) {
       alert("Failed to delete property.");
     }
@@ -95,7 +95,7 @@ const SellerDashboard = () => {
         },
       );
       setProperties(
-        properties.map((p) => (p._id === id ? { ...p, status: newStatus } : p)),
+        properties.map((p) => ((p.id || p._id) === id ? { ...p, status: newStatus } : p)),
       );
     } catch (err) {
       alert("Failed to update status.");
@@ -232,14 +232,14 @@ const SellerDashboard = () => {
             <div className={s.propertiesGrid}>
               {filteredProperties.slice(0, 3).map((p) => (
                 <PropertyCard
-                  key={p._id}
+                  key={(p.id || p._id)}
                   property={p}
                   renderActions={() => (
                     <div className={s.propertyActions}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleStatusUpdate(p._id, p.status);
+                          handleStatusUpdate((p.id || p._id), p.status);
                         }}
                         className={s.statusButton(p.status)}
                         title={
@@ -252,13 +252,13 @@ const SellerDashboard = () => {
                         {p.status === "sold" ? "Available" : "Sold"}
                       </button>
                       <Link
-                        to={`/edit-property/${p._id}`}
+                        to={`/edit-property/${(p.id || p._id)}`}
                         className={s.editButton}
                       >
                         <HiOutlinePencilAlt size={14} /> Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(p._id)}
+                        onClick={() => handleDelete((p.id || p._id))}
                         className={s.deleteButton}
                       >
                         <HiOutlineTrash size={14} /> Delete
@@ -295,7 +295,7 @@ const SellerDashboard = () => {
 
           <div className={s.inquiriesList}>
             {inquiries.map((inq, i) => (
-              <div key={inq._id} className={s.inquiryItem}>
+              <div key={(inq.id || inq._id)} className={s.inquiryItem}>
                 <div className={s.inquiryLeft}>
                   <div className={s.inquiryIcon}>
                     <HiOutlineBell size={18} color="var(--primary)" />

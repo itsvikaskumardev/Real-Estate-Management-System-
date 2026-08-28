@@ -16,6 +16,14 @@ namespace RealEstate.Infrastructure.Services
             // TODO: implement Azure Blob Storage upload here
             // e.g. BlobServiceClient -> GetBlobContainerClient(folder) -> UploadAsync
             throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
+
+
+        }
+        public Task DeleteAsync(string fileUrl, CancellationToken cancellationToken = default)
+        {
+            // TODO: implement Azure Blob Storage delete here
+            // e.g. parse blob name from fileUrl -> BlobContainerClient.DeleteBlobIfExistsAsync
+            throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
         }
     }
 }

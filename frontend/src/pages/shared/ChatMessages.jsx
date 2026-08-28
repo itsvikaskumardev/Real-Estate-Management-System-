@@ -22,6 +22,7 @@ const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [chatToDelete, setChatToDelete] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -39,7 +40,7 @@ const ChatMessages = () => {
 
         if (location.state?.chat) {
           const existingChat = fetchedConversations.find(
-            (c) => c._id === location.state.chat._id,
+            (c) => (c.id || c._id) === (location.state.chat.id || location.state.chat._id),
           );
           if (existingChat) {
             setActiveChat(existingChat);
@@ -61,11 +62,11 @@ const ChatMessages = () => {
     if (activeChat) {
       const fetchMessages = async () => {
         try {
-          const res = await axios.get(`${API_URL}/api/chat/${activeChat._id}`, {
+          const res = await axios.get(`${API_URL}/api/chat/${activeChat.id || activeChat._id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setMessages(res.data.messages || []);
-          joinChat(activeChat._id);
+          joinChat(activeChat.id || activeChat._id);
           scrollToBottom();
         } catch (err) {
           console.error("Error fetching messages:", err);
@@ -78,8 +79,11 @@ const ChatMessages = () => {
   useEffect(() => {
     if (socket) {
       socket.on("receiveMessage", (data) => {
-        if (activeChat && data.chatId === activeChat._id) {
-          setMessages((prev) => [...prev, data]);
+        if (activeChat && data.chatId === (activeChat.id || activeChat._id)) {
+          setMessages((prev) => {
+            if (prev.some((m) => (m.id || m._id) === (data.id || data._id))) return prev;
+            return [...prev, data];
+          });
         }
       });
     }
@@ -108,7 +112,7 @@ const ChatMessages = () => {
       const res = await axios.post(
         `${API_URL}/api/chat/send`,
         {
-          chatId: activeChat._id,
+          chatId: activeChat.id || activeChat._id,
           text: textToSend,
         },
         {
@@ -117,10 +121,15 @@ const ChatMessages = () => {
       );
 
       if (res.data.newMessage) {
+        setMessages((prev) => {
+          if (prev.some((m) => (m.id || m._id) === (res.data.newMessage.id || res.data.newMessage._id))) return prev;
+          return [...prev, res.data.newMessage];
+        });
+
         sendMessage(
-          activeChat._id,
+          activeChat.id || activeChat._id,
           textToSend,
-          res.data.newMessage._id,
+          res.data.newMessage.id || res.data.newMessage._id,
           res.data.newMessage.createdAt,
         );
       }
@@ -131,20 +140,24 @@ const ChatMessages = () => {
     }
   };
 
-  const handleDeleteChat = async (e, chatId) => {
+  const handleDeleteChat = (e, chatId) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this conversation?"))
-      return;
+    setChatToDelete(chatId);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
 
     try {
-      await axios.delete(`${API_URL}/api/chat/${chatId}`, {
+      await axios.delete(`${API_URL}/api/chat/${chatToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setConversations((prev) => prev.filter((c) => c._id !== chatId));
-      if (activeChat?._id === chatId) setActiveChat(null);
+      setConversations((prev) => prev.filter((c) => (c.id || c._id) !== chatToDelete));
+      if ((activeChat?.id || activeChat?._id) === chatToDelete) setActiveChat(null);
     } catch (err) {
       console.error("Error deleting chat:", err);
     }
+    setChatToDelete(null);
   };
 
   const handleDeleteMessage = async (chatId, messageId) => {
@@ -164,7 +177,7 @@ const ChatMessages = () => {
   };
 
   const getChatPartner = (chat) => {
-    return user._id === chat.buyer._id ? chat.seller : chat.buyer;
+    return (user.id || user._id) === (chat.buyer.id || chat.buyer._id) ? chat.seller : chat.buyer;
   };
 
   if (loading)
@@ -194,8 +207,8 @@ const ChatMessages = () => {
             ) : (
               conversations.map((chat) => (
                 <div
-                  key={chat._id}
-                  className={`${s.conversationItem} ${activeChat?._id === chat._id ? s.conversationItemActive : ""}`}
+                  key={chat.id || chat._id}
+                  className={`${s.conversationItem} ${(activeChat?.id || activeChat?._id) === (chat.id || chat._id) ? s.conversationItemActive : ""}`}
                   onClick={() => setActiveChat(chat)}
                 >
                   <div className={s.avatar}>
@@ -214,12 +227,12 @@ const ChatMessages = () => {
                       {getChatPartner(chat)?.name}
                     </div>
                     <div className={s.conversationPreview}>
-                      {chat.messages.at(-1)?.text || "Started a conversation"}
+                      {chat.messages?.at(-1)?.text || "Started a conversation"}
                     </div>
                   </div>
                   <button
                     className={s.deleteChatButton}
-                    onClick={(e) => handleDeleteChat(e, chat._id)}
+                    onClick={(e) => handleDeleteChat(e, chat.id || chat._id)}
                     title="Delete Conversation"
                   >
                     <HiOutlineTrash />
@@ -263,7 +276,7 @@ const ChatMessages = () => {
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`${s.messageBubble} ${(msg.sender?._id || msg.sender) === user._id ? s.messageOwn : s.messageOther}`}
+                    className={`${s.messageBubble} ${(msg.senderId || msg.sender?.id || msg.sender?._id || msg.sender) === (user.id || user._id) ? s.messageOwn : s.messageOther}`}
                   >
                     <div className={s.messageContent}>
                       {msg.image && (
@@ -276,11 +289,11 @@ const ChatMessages = () => {
                         </div>
                       )}
                       <div className={s.messageText}>{msg.text}</div>
-                      {(msg.sender?._id || msg.sender) === user._id && (
+                      {(msg.senderId || msg.sender?.id || msg.sender?._id || msg.sender) === (user.id || user._id) && (
                         <button
                           className={s.deleteMessageButton}
                           onClick={() =>
-                            handleDeleteMessage(activeChat._id, msg._id)
+                            handleDeleteMessage(activeChat.id || activeChat._id, msg.id || msg._id)
                           }
                           title="Delete Message"
                         >
@@ -321,6 +334,75 @@ const ChatMessages = () => {
           )}
         </div>
       </div>
+
+      {chatToDelete && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          padding: "1rem"
+        }}>
+          <div style={{
+            backgroundColor: "#fff",
+            padding: "2rem",
+            borderRadius: "1rem",
+            width: "100%",
+            maxWidth: "400px",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+            textAlign: "center"
+          }}>
+            <h3 style={{
+              margin: "0 0 1rem 0",
+              fontSize: "1.25rem",
+              fontWeight: "bold",
+              color: "#0f172a"
+            }}>Delete Conversation</h3>
+            <p style={{
+              margin: "0 0 1.5rem 0",
+              color: "#64748b",
+              fontSize: "0.95rem"
+            }}>Are you sure you want to delete this conversation?</p>
+            <div style={{
+              display: "flex",
+              gap: "1rem",
+              justifyContent: "center"
+            }}>
+              <button 
+                onClick={() => setChatToDelete(null)}
+                style={{
+                  padding: "0.6rem 1.5rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fff",
+                  color: "#334155",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDeleteChat}
+                style={{
+                  padding: "0.6rem 1.5rem",
+                  borderRadius: "0.5rem",
+                  border: "none",
+                  backgroundColor: "#ef4444",
+                  color: "#fff",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

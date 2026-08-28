@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RealEstate.Application.Properties.Queries
+namespace RealEstate.Application.Property.Queries
 {
 
     public record GetPropertyCountsQuery : IRequest<Dictionary<string, int>>;

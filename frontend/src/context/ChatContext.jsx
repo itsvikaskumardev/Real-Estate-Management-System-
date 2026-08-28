@@ -5,7 +5,7 @@ import React, {
   useState,
   useRef,
 } from "react";
-import { io } from "socket.io-client";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { useAuth } from "./AuthContext";
 import API_URL from "../config";
 
@@ -30,26 +30,36 @@ export const ChatProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      // Disabling socket.io connection for now to stop continuous polling requests
-      /*
-      const newSocket = io(API_URL);
+      const newConnection = new HubConnectionBuilder()
+        .withUrl(`${API_URL}/chatHub`)
+        .configureLogging(LogLevel.Information)
+        .withAutomaticReconnect()
+        .build();
 
-      setSocket(newSocket);
+      setSocket(newConnection);
 
-      newSocket.on("receiveMessage", (data) => {
-        if (activeChatRef.current?._id !== data.chatId) {
-          setNotifications((prev) => [...prev, data]);
+      newConnection.on("receiveMessage", (data) => {
+        if ((activeChatRef.current?.id || activeChatRef.current?._id) !== (data.chatId || data.chat?.id)) {
+          setNotifications((prev) => {
+            if (prev.some((m) => (m.id || m._id) === (data.id || data._id))) return prev;
+            return [...prev, data];
+          });
         }
       });
 
-      return () => newSocket.close();
-      */
+      newConnection.start()
+        .then(() => console.log("Connected to SignalR ChatHub"))
+        .catch((err) => console.error("Error connecting to ChatHub:", err));
+
+      return () => {
+        newConnection.stop();
+      };
     }
   }, [user]);
 
   const joinChat = (chatId) => {
-    if (socket) {
-      socket.emit("joinChat", chatId);
+    if (socket && socket.state === "Connected") {
+      socket.invoke("JoinChat", String(chatId)).catch(err => console.error(err));
     }
   };
 
@@ -70,7 +80,7 @@ export const ChatProvider = ({ children }) => {
         _id: messageId,
       };
 
-      socket.emit("sendMessage", messageData);
+      // Message is broadcasted via HTTP POST in the backend, no need to invoke SignalR here.
 
       return messageData;
     }

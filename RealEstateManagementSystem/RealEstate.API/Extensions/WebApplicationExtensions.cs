@@ -1,5 +1,6 @@
 using RealEstate.API.Middleware;
 using RealEstate.API.Endpoints;
+using RealEstate.API.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 
@@ -29,7 +30,7 @@ namespace RealEstate.API.Extensions
             app.MapChatEndpoints();
             app.MapContactEndpoints();
 
-
+            app.MapHub<ChatHub>("/chatHub");
             return app;
         }
     }

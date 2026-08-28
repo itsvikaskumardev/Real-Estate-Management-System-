@@ -85,11 +85,18 @@ const AdminProperties = () => {
                 property={p}
                 renderActions={() => (
                   <div className={s.actionWrapper}>
-                    <div className={s.sellerInfo}>
-                      <div className={s.sellerName}>
-                        Seller: {p.seller?.name || "Unknown"}
+                    <div className={s.sellerInfo} style={{ display: "flex", alignItems: "center", gap: "12px", flexDirection: "row" }}>
+                      <img 
+                        src={p.seller?.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.seller?.name || "Unknown")}&background=0d6e59&color=fff&size=40`}
+                        alt="Seller"
+                        style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                      />
+                      <div>
+                        <div className={s.sellerName}>
+                          Seller: {p.seller?.name || "Unknown"}
+                        </div>
+                        <div className={s.sellerEmail}>{p.seller?.email}</div>
                       </div>
-                      <div className={s.sellerEmail}>{p.seller?.email}</div>
                     </div>
                     <div className={s.buttonGroup}>
                       <Link to={`/property/${p.id}`} className={s.viewLink}>

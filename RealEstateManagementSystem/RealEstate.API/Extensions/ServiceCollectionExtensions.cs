@@ -1,5 +1,7 @@
 using RealEstate.Application;
 using RealEstate.Infrastructure;
+using RealEstate.Application.Common.Interfaces;
+using RealEstate.API.Services;
 
 namespace RealEstate.API.Extensions
 /*
@@ -20,9 +22,10 @@ It is just a clean place to organize Dependency Injection registrations.
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
 
@@ -38,7 +41,8 @@ It is just a clean place to organize Dependency Injection registrations.
             });
 
             services.AddHttpContextAccessor();
-            
+            services.AddSignalR();
+            services.AddScoped<IChatNotificationService, ChatNotificationService>();
             // Configure JSON to parse Enums from strings
             services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
             {

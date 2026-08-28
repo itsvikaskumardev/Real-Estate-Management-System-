@@ -47,7 +47,7 @@ const MyProperties = () => {
       await axios.delete(`${API_URL}/api/property/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProperties(properties.filter((p) => p._id !== id));
+      setProperties(properties.filter((p) => (p.id || p._id) !== id));
     } catch (err) {
       alert("Failed to delete property.");
     }
@@ -63,7 +63,7 @@ const MyProperties = () => {
         },
       );
       setProperties(
-        properties.map((p) => (p._id === id ? { ...p, status: newStatus } : p)),
+        properties.map((p) => ((p.id || p._id) === id ? { ...p, status: newStatus } : p)),
       );
     } catch (err) {
       alert("Failed to update status.");
@@ -114,7 +114,7 @@ const MyProperties = () => {
             <div className={s.grid}>
               {properties.map((p) => (
                 <PropertyCard
-                  key={p._id}
+                  key={(p.id || p._id)}
                   property={p}
                   renderActions={() => (
                     <>
@@ -125,9 +125,9 @@ const MyProperties = () => {
                             onChange={(e) => {
                               const val = e.target.value;
                               if (val === "available") {
-                                updateStatus(p._id, getAvailableStatus(p));
+                                updateStatus((p.id || p._id), getAvailableStatus(p));
                               } else {
-                                updateStatus(p._id, val);
+                                updateStatus((p.id || p._id), val);
                               }
                             }}
                             onClick={(e) => e.stopPropagation()}
@@ -142,7 +142,7 @@ const MyProperties = () => {
                           </div>
                         </div>
                         <Link
-                          to={`/edit-property/${p._id}`}
+                          to={`/edit-property/${(p.id || p._id)}`}
                           className={s.editButton}
                         >
                           <HiOutlinePencilAlt /> Edit
@@ -150,7 +150,7 @@ const MyProperties = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(p._id);
+                            handleDelete((p.id || p._id));
                           }}
                           className={s.deleteButton}
                         >

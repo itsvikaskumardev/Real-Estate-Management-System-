@@ -9,7 +9,7 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapUserEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/users")
+            var group = app.MapGroup("/api/user")
                 .WithTags("Users");
 
             group.MapGet("/profile", async ([FromServices] ISender sender) =>

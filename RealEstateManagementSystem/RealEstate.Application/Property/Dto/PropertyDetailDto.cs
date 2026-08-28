@@ -1,12 +1,11 @@
+using RealEstate.Application.Admin.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using RealEstate.Application.Admin.Dto;
-
 
 namespace RealEstate.Application.Property.Dto
 {
-    public record PropertyDto
+    public record PropertyDetailDto
     {
         public Guid Id { get; init; }
         public string Title { get; init; } = string.Empty;
@@ -16,22 +15,11 @@ namespace RealEstate.Application.Property.Dto
         public string Area { get; init; } = string.Empty;
         public string PropertyType { get; init; } = string.Empty;
         public string? Bhk { get; init; }
-        public int? Bathrooms { get; init; }
         public decimal? AreaSize { get; init; }
         public string Status { get; init; } = string.Empty;
-        public List<string> Images { get; init; } = [];
-
-
-        public string Pincode { get; init; } = string.Empty;
-        public string? Furnishing { get; init; }
-        public List<string> Amenities { get; init; } = [];
-        public Guid SellerId { get; init; }
-        public bool IsVerified { get; init; }
         public int Views { get; init; }
-        public DateTimeOffset CreatedAt { get; init; }
-
-        ///
+        public List<string> Amenities { get; init; } = [];
+        public List<string> Images { get; init; } = [];
         public SellerDto Seller { get; init; } = null!;
-
     }
 }
