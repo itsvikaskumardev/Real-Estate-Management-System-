@@ -19,7 +19,7 @@ namespace RealEstate.Application.Property.Queries
             CancellationToken cancellationToken)
         {
             var counts = await context.Properties
-                .Where(p => p.Status == PropertyStatus.Sale)
+                .Where(p => p.Status == PropertyStatus.Sale && p.IsActive && !p.IsDeleted)
                 .GroupBy(p => p.PropertyType)
                 .Select(g => new { PropertyType = g.Key, Count = g.Count() })
                 .ToListAsync(cancellationToken);

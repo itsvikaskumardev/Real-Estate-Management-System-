@@ -42,7 +42,7 @@ namespace RealEstate.Application.Property.Queries
             GetAllPropertiesQuery request,
             CancellationToken cancellationToken)
         {
-            var query = context.Properties.AsQueryable();
+            var query = context.Properties.Where(p => p.IsActive && !p.IsDeleted).AsQueryable();
 
             // Default status filter, overridden if 'status' is explicitly provided
             var status = PropertyStatus.Sale;

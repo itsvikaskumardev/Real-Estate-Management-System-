@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Application.Contacts.Dto;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +25,7 @@ namespace RealEstate.Application.Contacts.Queries
             CancellationToken cancellationToken)
         {
             var contacts = await context.Contacts
+                .Where(c => c.IsActive && !c.IsDeleted)
                 .OrderByDescending(c => c.CreatedAt)
                 .Select(c => new ContactDto
                 {

@@ -8,7 +8,7 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapChatEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/chat")
+            var group = app.MapGroup("/api/chat").WithTags("Chats")
                 .RequireAuthorization();
 
             group.MapPost("/start", async (StartOrGetChatCommand command, ISender sender) =>

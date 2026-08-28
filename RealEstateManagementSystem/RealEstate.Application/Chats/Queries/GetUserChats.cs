@@ -34,7 +34,7 @@ namespace RealEstate.Application.Chats.Queries
             var userId = currentUser.UserId.Value;
 
             var chats = await context.Chats
-                .Where(c => c.BuyerId == userId || c.SellerId == userId)
+                .Where(c => (c.BuyerId == userId || c.SellerId == userId) && c.IsActive && !c.IsDeleted)
                 .OrderByDescending(c => c.ModifiedAt ?? c.CreatedAt)
                 .Select(c => new ChatDto
                 {

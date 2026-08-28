@@ -20,6 +20,7 @@ namespace RealEstate.Application.Property.Queries
         public async Task<List<PropertyDto>> Handle(GetPropertiesQuery request, CancellationToken cancellationToken)
         {
             var query = context.Properties
+                .Where(p => p.IsActive && !p.IsDeleted)
                 .Include(p => p.Images)
                 .Include(p => p.Seller)
                 .AsQueryable();

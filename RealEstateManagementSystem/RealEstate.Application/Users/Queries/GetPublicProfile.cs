@@ -31,7 +31,7 @@ namespace RealEstate.Application.Users.Queries
             CancellationToken cancellationToken)
         {
             var user = await context.Users
-                .Where(u => u.Id == request.UserId)
+                .Where(u => u.Id == request.UserId && u.IsActive && !u.IsDeleted)
                 .Select(u => new GetPublicProfileResponse
                 {
                     Name = u.Name,

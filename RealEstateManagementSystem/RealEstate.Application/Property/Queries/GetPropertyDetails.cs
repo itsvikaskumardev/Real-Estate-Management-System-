@@ -50,7 +50,7 @@ namespace RealEstate.Application.Property.Queries
             var property = await context.Properties
                 .Include(p => p.Seller)
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, cancellationToken);
 
             if (property is null)
                 throw new NotFoundException(nameof(RealEstate.Domain.Entities.Property), request.PropertyId);
@@ -69,6 +69,7 @@ namespace RealEstate.Application.Property.Queries
             var similarProperties = await context.Properties
                 .Where(p =>
                     p.Id != property.Id &&
+                    p.IsActive && !p.IsDeleted &&
                     p.Address.City == property.Address.City &&
                     p.PropertyType == property.PropertyType &&
                     p.Status == property.Status)

@@ -28,12 +28,13 @@ namespace RealEstate.Application.Admin.Commands
             CancellationToken cancellationToken)
         {
             var property = await context.Properties
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, cancellationToken);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
 
-            context.Properties.Remove(property);
+            property.IsDeleted = true;
+            property.IsActive = false;
             await context.SaveChangesAsync(cancellationToken);
 
             return new DeletePropertyResponse

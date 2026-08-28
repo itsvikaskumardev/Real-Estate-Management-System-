@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RealEstate.Application.Admin.Dto;
 using RealEstate.Application.Common.Interfaces;
@@ -20,9 +20,10 @@ namespace RealEstate.Application.Admin.Queries
        GetDashboardStatsQuery request,
        CancellationToken cancellationToken)
         {
-            var totalUsers = await context.Users.CountAsync(cancellationToken);
+            var totalUsers = await context.Users.CountAsync(u => u.IsActive && !u.IsDeleted, cancellationToken);
 
             var propertyStats = await context.Properties
+                .Where(p => p.IsActive && !p.IsDeleted)
                 .GroupBy(p => 1)
                 .Select(g => new
                 {

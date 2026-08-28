@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Admin.Dto;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
@@ -45,7 +45,7 @@ namespace RealEstate.Application.Inquiries.Queries
                 throw new UnauthorizedException("Not authenticated");
 
             var inquiries = await context.Inquiries
-                .Where(i => i.SellerId == currentUser.UserId)
+                .Where(i => i.SellerId == currentUser.UserId && i.IsActive && !i.IsDeleted)
                 .OrderByDescending(i => i.CreatedAt)
                 .Select(i => new SellerInquiryDto
                 {

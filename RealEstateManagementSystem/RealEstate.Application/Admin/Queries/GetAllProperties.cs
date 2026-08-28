@@ -28,6 +28,7 @@ namespace RealEstate.Application.Admin.Queries
             CancellationToken cancellationToken)
         {
             var properties = await context.Properties
+                .Where(p => p.IsActive && !p.IsDeleted)
                 .Select(p => new PropertyListItemDto
                 {
                     Id = p.Id,

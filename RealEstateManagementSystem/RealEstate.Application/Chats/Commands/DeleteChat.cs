@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
@@ -32,7 +32,7 @@ namespace RealEstate.Application.Chats.Commands
                 throw new UnauthorizedException("Not authenticated");
 
             var chat = await context.Chats
-                .FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
+                .FirstOrDefaultAsync(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted, cancellationToken);
 
             if (chat is null)
                 throw new NotFoundException(nameof(Chat), request.ChatId);
@@ -40,7 +40,8 @@ namespace RealEstate.Application.Chats.Commands
             if (chat.BuyerId != currentUser.UserId && chat.SellerId != currentUser.UserId)
                 throw new ForbiddenAccessException("Not authorized");
 
-            context.Chats.Remove(chat);
+            chat.IsDeleted = true;
+            chat.IsActive = false;
             await context.SaveChangesAsync(cancellationToken);
 
             return new DeleteChatResponse

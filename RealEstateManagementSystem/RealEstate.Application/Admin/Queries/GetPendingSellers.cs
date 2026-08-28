@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RealEstate.Application.Admin.Dto;
 using RealEstate.Application.Common.Interfaces;
@@ -27,7 +27,7 @@ namespace RealEstate.Application.Admin.Queries
             CancellationToken cancellationToken)
         {
             var pendingSellers = await context.Users
-                .Where(u => u.Role == UserRole.Seller && !u.IsApproved)
+                .Where(u => u.Role == UserRole.Seller && !u.IsApproved && u.IsActive && !u.IsDeleted)
                 .Select(u => new PendingSellerDto
                 {
                     Id = u.Id,

@@ -42,7 +42,7 @@ namespace RealEstate.Application.Chats.Queries
                 throw new UnauthorizedException("Not authenticated");
 
             var chat = await context.Chats
-                .FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
+                .FirstOrDefaultAsync(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted, cancellationToken);
 
             if (chat is null)
                 throw new NotFoundException(nameof(Chat), request.ChatId);
@@ -51,7 +51,7 @@ namespace RealEstate.Application.Chats.Queries
                 throw new ForbiddenAccessException("Not authorized to view these messages");
 
             var result = await context.Chats
-                .Where(c => c.Id == request.ChatId)
+                .Where(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted)
                 .Select(c => new ChatDetailDto
                 {
                     Id = c.Id,

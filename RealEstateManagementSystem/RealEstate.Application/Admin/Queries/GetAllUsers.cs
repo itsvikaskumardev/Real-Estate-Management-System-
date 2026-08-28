@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Interfaces;
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +26,7 @@ namespace RealEstate.Application.Admin.Queries
             CancellationToken cancellationToken)
         {
             var users = await context.Users
+                .Where(u => u.IsActive && !u.IsDeleted)
                 .Select(u => new UserListItemDto
                 {
                     Id = u.Id,

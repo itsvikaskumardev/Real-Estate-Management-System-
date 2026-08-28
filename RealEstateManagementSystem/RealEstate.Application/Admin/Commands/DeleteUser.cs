@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
@@ -28,12 +28,13 @@ namespace RealEstate.Application.Admin.Commands
             CancellationToken cancellationToken)
         {
             var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id == request.UserId && u.IsActive && !u.IsDeleted, cancellationToken);
 
             if (user is null)
                 throw new NotFoundException(nameof(User), request.UserId);
 
-            context.Users.Remove(user);
+            user.IsDeleted = true;
+            user.IsActive = false;
             await context.SaveChangesAsync(cancellationToken);
 
             return new DeleteUserResponse

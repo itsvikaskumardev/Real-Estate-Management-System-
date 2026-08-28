@@ -26,7 +26,7 @@ namespace RealEstate.Application.Property.Queries
                 throw new UnauthorizedException("Not authenticated");
 
             var properties = await context.Properties
-                .Where(p => p.SellerId == currentUser.UserId)
+                .Where(p => p.SellerId == currentUser.UserId && p.IsActive && !p.IsDeleted)
                 .Select(p => new PropertyDto
                 {
                     Id = p.Id,

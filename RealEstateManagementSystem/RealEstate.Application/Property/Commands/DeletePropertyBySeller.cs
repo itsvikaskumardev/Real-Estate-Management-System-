@@ -37,7 +37,7 @@ namespace RealEstate.Application.Property.Commands
 
             var property = await context.Properties
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, cancellationToken);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
@@ -59,7 +59,8 @@ namespace RealEstate.Application.Property.Commands
                 }
             }
 
-            context.Properties.Remove(property);
+            property.IsDeleted = true;
+            property.IsActive = false;
             await context.SaveChangesAsync(cancellationToken);
 
             return new DeletePropertyBySellerResponse

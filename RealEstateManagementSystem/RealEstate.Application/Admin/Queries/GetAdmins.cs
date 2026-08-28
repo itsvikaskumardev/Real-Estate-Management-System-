@@ -23,7 +23,7 @@ namespace RealEstate.Application.Admin.Queries
     {
         public async Task<GetAdminsResponse> Handle(GetAdminsQuery request, CancellationToken cancellationToken)
         {
-            var users = await context.Users.ToListAsync(cancellationToken);
+            var users = await context.Users.Where(u => u.IsActive && !u.IsDeleted).ToListAsync(cancellationToken);
             
             var admins = users
                 .Where(u => u.Role == UserRole.Admin)

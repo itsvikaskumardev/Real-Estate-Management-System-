@@ -37,7 +37,7 @@ namespace RealEstate.Application.Property.Queries
             var sellerId = currentUser.UserId.Value;
 
             var propertyStats = await context.Properties
-                .Where(p => p.SellerId == sellerId)
+                .Where(p => p.SellerId == sellerId && p.IsActive && !p.IsDeleted)
                 .GroupBy(p => 1)
                 .Select(g => new
                 {
@@ -49,7 +49,7 @@ namespace RealEstate.Application.Property.Queries
                 .FirstOrDefaultAsync(cancellationToken);
 
             var totalInquiries = await context.Inquiries
-                .CountAsync(i => i.SellerId == sellerId, cancellationToken);
+                .CountAsync(i => i.SellerId == sellerId && i.IsActive && !i.IsDeleted, cancellationToken);
 
             return new SellerDashboardStatsDto
             {

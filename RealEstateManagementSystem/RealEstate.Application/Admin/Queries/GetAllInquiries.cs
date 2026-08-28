@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Interfaces;
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +25,7 @@ namespace RealEstate.Application.Admin.Queries
             CancellationToken cancellationToken)
         {
             var inquiries = await context.Inquiries
+                .Where(i => i.IsActive && !i.IsDeleted)
                 .OrderByDescending(i => i.CreatedAt)
                 .Select(i => new InquiryListItemDto
                 {
