@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Interfaces;
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +18,15 @@ namespace RealEstate.Application.Admin.Queries
 
 
 
-    public class GetAllUsersQueryHandler(IApplicationDbContext context)
+    public class GetAllUsersQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetAllUsersQuery, GetAllUsersResponse>
     {
         public async Task<GetAllUsersResponse> Handle(
             GetAllUsersQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var users = await context.Users
+            var users = await dbContext.Users
+                .Where(u => u.IsActive && !u.IsDeleted)
                 .Select(u => new UserListItemDto
                 {
                     Id = u.Id,
@@ -38,7 +39,7 @@ namespace RealEstate.Application.Admin.Queries
                     IsVerified = u.IsVerified,
                     CreatedAt = u.CreatedAt
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetAllUsersResponse
             {

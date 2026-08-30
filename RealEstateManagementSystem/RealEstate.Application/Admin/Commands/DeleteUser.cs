@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
@@ -20,21 +20,22 @@ namespace RealEstate.Application.Admin.Commands
         public string Message { get; init; } = string.Empty;
     }
 
-    public class DeleteUserCommandHandler(IApplicationDbContext context)
+    public class DeleteUserCommandHandler(IApplicationDbContext dbContext)
         : IRequestHandler<DeleteUserCommand, DeleteUserResponse>
     {
         public async Task<DeleteUserResponse> Handle(
             DeleteUserCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            var user = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == request.UserId && u.IsActive && !u.IsDeleted, ct);
 
             if (user is null)
                 throw new NotFoundException(nameof(User), request.UserId);
 
-            context.Users.Remove(user);
-            await context.SaveChangesAsync(cancellationToken);
+            user.IsDeleted = true;
+            user.IsActive = false;
+            await dbContext.SaveChangesAsync(ct);
 
             return new DeleteUserResponse
             {

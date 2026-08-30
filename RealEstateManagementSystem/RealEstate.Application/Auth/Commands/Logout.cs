@@ -14,7 +14,7 @@ namespace RealEstate.Application.Auth.Commands
 
     public class LogoutCommandHandler : IRequestHandler<LogoutCommand, LogoutResponse>
     {
-        public Task<LogoutResponse> Handle(LogoutCommand request, CancellationToken cancellationToken)
+        public Task<LogoutResponse> Handle(LogoutCommand request, CancellationToken ct)
         {
             // If we needed to blacklist tokens or clear server-side session, it would go here.
             return Task.FromResult(new LogoutResponse

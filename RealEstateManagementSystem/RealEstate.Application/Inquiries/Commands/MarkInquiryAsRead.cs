@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
@@ -21,19 +21,19 @@ namespace RealEstate.Application.Inquiries.Commands
     }
 
     public class MarkInquiryAsReadCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<MarkInquiryAsReadCommand, MarkInquiryAsReadResponse>
     {
         public async Task<MarkInquiryAsReadResponse> Handle(
             MarkInquiryAsReadCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var inquiry = await context.Inquiries
-                .FirstOrDefaultAsync(i => i.Id == request.InquiryId, cancellationToken);
+            var inquiry = await dbContext.Inquiries
+                .FirstOrDefaultAsync(i => i.Id == request.InquiryId, ct);
 
             if (inquiry is null)
                 throw new NotFoundException(nameof(Inquiry), request.InquiryId);
@@ -43,7 +43,7 @@ namespace RealEstate.Application.Inquiries.Commands
 
             inquiry.IsRead = true;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new MarkInquiryAsReadResponse
             {

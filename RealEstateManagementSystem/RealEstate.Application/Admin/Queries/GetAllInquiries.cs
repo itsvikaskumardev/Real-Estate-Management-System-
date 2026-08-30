@@ -1,10 +1,11 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Interfaces;
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Text;
 using RealEstate.Application.Admin.Dto;
+using RealEstate.Application.Property.Dto;
 
 namespace RealEstate.Application.Admin.Queries
 {
@@ -17,14 +18,15 @@ namespace RealEstate.Application.Admin.Queries
     }
 
 
-    public class GetAllInquiriesQueryHandler(IApplicationDbContext context)
+    public class GetAllInquiriesQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetAllInquiriesQuery, GetAllInquiriesResponse>
     {
         public async Task<GetAllInquiriesResponse> Handle(
             GetAllInquiriesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var inquiries = await context.Inquiries
+            var inquiries = await dbContext.Inquiries
+                .Where(i => i.IsActive && !i.IsDeleted)
                 .OrderByDescending(i => i.CreatedAt)
                 .Select(i => new InquiryListItemDto
                 {
@@ -51,7 +53,7 @@ namespace RealEstate.Application.Admin.Queries
                         Price = i.Property.Price
                     }
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetAllInquiriesResponse
             {

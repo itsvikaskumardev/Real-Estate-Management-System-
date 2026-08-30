@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
@@ -20,19 +20,19 @@ namespace RealEstate.Application.Chats.Commands
     }
 
     public class DeleteChatCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<DeleteChatCommand, DeleteChatResponse>
     {
         public async Task<DeleteChatResponse> Handle(
             DeleteChatCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var chat = await context.Chats
-                .FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
+            var chat = await dbContext.Chats
+                .FirstOrDefaultAsync(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted, ct);
 
             if (chat is null)
                 throw new NotFoundException(nameof(Chat), request.ChatId);
@@ -40,8 +40,9 @@ namespace RealEstate.Application.Chats.Commands
             if (chat.BuyerId != currentUser.UserId && chat.SellerId != currentUser.UserId)
                 throw new ForbiddenAccessException("Not authorized");
 
-            context.Chats.Remove(chat);
-            await context.SaveChangesAsync(cancellationToken);
+            chat.IsDeleted = true;
+            chat.IsActive = false;
+            await dbContext.SaveChangesAsync(ct);
 
             return new DeleteChatResponse
             {

@@ -11,18 +11,18 @@ namespace RealEstate.Application.Property.Queries
 
     public record GetPropertyCountsQuery : IRequest<Dictionary<string, int>>;
 
-    public class GetPropertyCountsQueryHandler(IApplicationDbContext context)
+    public class GetPropertyCountsQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetPropertyCountsQuery, Dictionary<string, int>>
     {
         public async Task<Dictionary<string, int>> Handle(
             GetPropertyCountsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var counts = await context.Properties
-                .Where(p => p.Status == PropertyStatus.Sale)
+            var counts = await dbContext.Properties
+                .Where(p => p.Status == PropertyStatus.Sale && p.IsActive && !p.IsDeleted)
                 .GroupBy(p => p.PropertyType)
                 .Select(g => new { PropertyType = g.Key, Count = g.Count() })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return counts.ToDictionary(
                 x => x.PropertyType.ToString(),

@@ -27,7 +27,7 @@ namespace RealEstate.Application.Users.Queries
     }
 
     public class GetProfileQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetProfileQuery, GetProfileResponse>
     {
@@ -38,7 +38,7 @@ namespace RealEstate.Application.Users.Queries
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var user = await context.Users
+            var user = await dbContext.Users
                 .Where(u => u.Id == currentUser.UserId)
                 .Select(u => new GetProfileResponse
                 {

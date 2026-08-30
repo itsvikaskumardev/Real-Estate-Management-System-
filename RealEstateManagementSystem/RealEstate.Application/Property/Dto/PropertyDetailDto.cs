@@ -1,4 +1,5 @@
 using RealEstate.Application.Admin.Dto;
+using RealEstate.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +15,10 @@ namespace RealEstate.Application.Property.Dto
         public string City { get; init; } = string.Empty;
         public string Area { get; init; } = string.Empty;
         public string PropertyType { get; init; } = string.Empty;
+        public Furnishing? Furnishing { get; init; }
+        public DateTime CreatedAt { get; set; }
         public string? Bhk { get; init; }
+        public int? Bathrooms { get; init; }
         public decimal? AreaSize { get; init; }
         public string Status { get; init; } = string.Empty;
         public int Views { get; init; }

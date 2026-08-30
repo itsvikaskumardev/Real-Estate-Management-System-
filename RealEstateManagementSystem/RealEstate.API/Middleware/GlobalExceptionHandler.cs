@@ -15,7 +15,7 @@ namespace RealEstate.API.Middleware
         public async ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
             Exception exception,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
@@ -31,7 +31,7 @@ namespace RealEstate.API.Middleware
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;
 
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            await httpContext.Response.WriteAsJsonAsync(problemDetails, ct);
 
             return true; // Indicates the exception was handled
         }

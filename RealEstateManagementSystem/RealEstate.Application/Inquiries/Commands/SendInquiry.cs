@@ -26,19 +26,19 @@ namespace RealEstate.Application.Inquiries.Commands
    
 
     public class SendInquiryCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<SendInquiryCommand, SendInquiryResponse>
     {
         public async Task<SendInquiryResponse> Handle(
             SendInquiryCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var property = await context.Properties
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+            var property = await dbContext.Properties
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, ct);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
@@ -51,8 +51,8 @@ namespace RealEstate.Application.Inquiries.Commands
                 Message = request.Message
             };
 
-            context.Inquiries.Add(inquiry);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Inquiries.Add(inquiry);
+            await dbContext.SaveChangesAsync(ct);
 
             return new SendInquiryResponse
             {

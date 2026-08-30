@@ -21,28 +21,28 @@ namespace RealEstate.Application.Wishlist.Commands
     }
 
     public class AddToWishlistCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<AddToWishlistCommand, AddToWishlistResponse>
     {
         public async Task<AddToWishlistResponse> Handle(
     AddToWishlistCommand request,
-    CancellationToken cancellationToken)
+    CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var propertyExists = await context.Properties
-                .AnyAsync(p => p.Id == request.PropertyId, cancellationToken);
+            var propertyExists = await dbContext.Properties
+                .AnyAsync(p => p.Id == request.PropertyId, ct);
 
             if (!propertyExists)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
 
-            var existing = await context.Wishlists
+            var existing = await dbContext.Wishlists
                 .AnyAsync(w =>
                     w.UserId == currentUser.UserId &&
                     w.PropertyId == request.PropertyId,
-                    cancellationToken);
+                    ct);
 
             if (existing)
             {
@@ -59,8 +59,8 @@ namespace RealEstate.Application.Wishlist.Commands
                 PropertyId = request.PropertyId
             };
 
-            context.Wishlists.Add(wishlistItem);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Wishlists.Add(wishlistItem);
+            await dbContext.SaveChangesAsync(ct);
 
             return new AddToWishlistResponse
             {

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RealEstate.Application.Common.Interfaces;
@@ -26,7 +26,7 @@ namespace RealEstate.Application.Contacts.Commands
     }
 
     public class CreateContactCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         IEmailService emailService,
         IConfiguration configuration,
         ILogger<CreateContactCommandHandler> logger)
@@ -34,7 +34,7 @@ namespace RealEstate.Application.Contacts.Commands
     {
         public async Task<CreateContactResponse> Handle(
             CreateContactCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             var contact = new Contact
             {
@@ -45,8 +45,8 @@ namespace RealEstate.Application.Contacts.Commands
                 Message = request.Message
             };
 
-            context.Contacts.Add(contact);
-            await context.SaveChangesAsync(cancellationToken);
+            dbContext.Contacts.Add(contact);
+            await dbContext.SaveChangesAsync(ct);
 
             var adminEmail = configuration["Admin:NotificationEmail"];
 
@@ -73,7 +73,7 @@ namespace RealEstate.Application.Contacts.Commands
                         adminEmail,
                         $"New Contact Message from {request.Name}",
                         adminMessage,
-                        cancellationToken);
+                        ct);
                 }
                 catch (Exception ex)
                 {

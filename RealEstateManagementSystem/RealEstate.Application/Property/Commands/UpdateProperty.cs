@@ -43,21 +43,21 @@ namespace RealEstate.Application.Property.Commands
 
 
     public class UpdatePropertyCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
         IFileStorageService fileStorageService)
         : IRequestHandler<UpdatePropertyCommand, UpdatePropertyResponse>
     {
         public async Task<UpdatePropertyResponse> Handle(
             UpdatePropertyCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var property = await context.Properties
+            var property = await dbContext.Properties
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, ct);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
@@ -94,7 +94,7 @@ namespace RealEstate.Application.Property.Commands
                     .ToList();
 
                 foreach (var img in toRemove)
-                    context.PropertyImages.Remove(img);
+                    dbContext.PropertyImages.Remove(img);
             }
 
             // Upload and append new images
@@ -104,13 +104,13 @@ namespace RealEstate.Application.Property.Commands
                 var url = await fileStorageService.UploadAsync(
                     image.Stream,
                     image.FileName,
-                    "properties",
-                    cancellationToken);
+                    "RealState",
+                    ct);
 
                 property.Images.Add(new PropertyImage { Url = url });
             }
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new UpdatePropertyResponse
             {

@@ -30,19 +30,19 @@ namespace RealEstate.Application.Chats.Queries
 
 
     public class GetChatByIdQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetChatByIdQuery, ChatDetailDto>
     {
         public async Task<ChatDetailDto> Handle(
             GetChatByIdQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var chat = await context.Chats
-                .FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
+            var chat = await dbContext.Chats
+                .FirstOrDefaultAsync(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted, ct);
 
             if (chat is null)
                 throw new NotFoundException(nameof(Chat), request.ChatId);
@@ -50,8 +50,8 @@ namespace RealEstate.Application.Chats.Queries
             if (chat.BuyerId != currentUser.UserId && chat.SellerId != currentUser.UserId)
                 throw new ForbiddenAccessException("Not authorized to view these messages");
 
-            var result = await context.Chats
-                .Where(c => c.Id == request.ChatId)
+            var result = await dbContext.Chats
+                .Where(c => c.Id == request.ChatId && c.IsActive && !c.IsDeleted)
                 .Select(c => new ChatDetailDto
                 {
                     Id = c.Id,
@@ -82,7 +82,7 @@ namespace RealEstate.Application.Chats.Queries
                         })
                         .ToList()
                 })
-                .FirstAsync(cancellationToken);
+                .FirstAsync(ct);
 
             return result;
         }

@@ -26,19 +26,19 @@ namespace RealEstate.Application.Chats.Commands
 
 
     public class StartOrGetChatCommandHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<StartOrGetChatCommand, ChatDto>
     {
         public async Task<ChatDto> Handle(
             StartOrGetChatCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var caller = await context.Users
-                .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, cancellationToken);
+            var caller = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, ct);
 
             if (caller is null)
                 throw new NotFoundException(nameof(User), currentUser.UserId);
@@ -63,11 +63,11 @@ namespace RealEstate.Application.Chats.Commands
                 sellerId = request.SellerId.Value;
             }
 
-            var chat = await context.Chats
+            var chat = await dbContext.Chats
                 .FirstOrDefaultAsync(c =>
                     c.BuyerId == buyerId &&
                     c.SellerId == sellerId,
-                    cancellationToken);
+                    ct);
 
             if (chat is null)
             {
@@ -78,11 +78,11 @@ namespace RealEstate.Application.Chats.Commands
                     SellerId = sellerId
                 };
 
-                context.Chats.Add(chat);
-                await context.SaveChangesAsync(cancellationToken);
+                dbContext.Chats.Add(chat);
+                await dbContext.SaveChangesAsync(ct);
             }
 
-            var result = await context.Chats
+            var result = await dbContext.Chats
                 .Where(c => c.Id == chat.Id)
                 .Select(c => new ChatDto
                 {
@@ -109,7 +109,7 @@ namespace RealEstate.Application.Chats.Commands
                         Images = c.Property.Images.Select(i => i.Url).ToList()
                     }
                 })
-                .FirstAsync(cancellationToken);
+                .FirstAsync(ct);
 
             return result;
         }

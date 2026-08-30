@@ -20,21 +20,21 @@ namespace RealEstate.Application.Chats.Queries
 
 
     public class GetUserChatsQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetUserChatsQuery, List<ChatDto>>
     {
         public async Task<List<ChatDto>> Handle(
             GetUserChatsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
             var userId = currentUser.UserId.Value;
 
-            var chats = await context.Chats
-                .Where(c => c.BuyerId == userId || c.SellerId == userId)
+            var chats = await dbContext.Chats
+                .Where(c => (c.BuyerId == userId || c.SellerId == userId) && c.IsActive && !c.IsDeleted)
                 .OrderByDescending(c => c.ModifiedAt ?? c.CreatedAt)
                 .Select(c => new ChatDto
                 {
@@ -62,7 +62,7 @@ namespace RealEstate.Application.Chats.Queries
                         Images = c.Property.Images.Select(i => i.Url).ToList()
                     }
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return chats;
         }

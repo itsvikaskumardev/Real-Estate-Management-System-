@@ -23,21 +23,21 @@ namespace RealEstate.Application.Property.Queries
     }
 
     public class GetSellerDashboardQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetSellerDashboardQuery, SellerDashboardStatsDto>
     {
         public async Task<SellerDashboardStatsDto> Handle(
             GetSellerDashboardQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
             var sellerId = currentUser.UserId.Value;
 
-            var propertyStats = await context.Properties
-                .Where(p => p.SellerId == sellerId)
+            var propertyStats = await dbContext.Properties
+                .Where(p => p.SellerId == sellerId && p.IsActive && !p.IsDeleted)
                 .GroupBy(p => 1)
                 .Select(g => new
                 {
@@ -46,10 +46,10 @@ namespace RealEstate.Application.Property.Queries
                     Sold = g.Count(p => p.Status == PropertyStatus.Sold),
                     TotalViews = g.Sum(p => p.Views)
                 })
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(ct);
 
-            var totalInquiries = await context.Inquiries
-                .CountAsync(i => i.SellerId == sellerId, cancellationToken);
+            var totalInquiries = await dbContext.Inquiries
+                .CountAsync(i => i.SellerId == sellerId && i.IsActive && !i.IsDeleted, ct);
 
             return new SellerDashboardStatsDto
             {

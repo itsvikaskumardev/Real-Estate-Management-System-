@@ -25,6 +25,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminProperties from "./pages/admin/AdminProperties";
 import AdminInquiries from "./pages/admin/AdminInquiries";
 import AdminContacts from "./pages/admin/AdminContacts";
+import AdminManagement from "./pages/admin/AdminManagement";
 import SellerRequests from "./pages/admin/SellerRequests";
 import Contact from "./pages/shared/Contact";
 import {
@@ -147,6 +148,7 @@ function App() {
               <Route path="/admin/properties" element={<AdminProperties />} />
               <Route path="/admin/inquiries" element={<AdminInquiries />} />
               <Route path="/admin/contacts" element={<AdminContacts />} />
+              <Route path="/admin/management" element={<AdminManagement />} />
             </Route>
           </Route>
         </Route>

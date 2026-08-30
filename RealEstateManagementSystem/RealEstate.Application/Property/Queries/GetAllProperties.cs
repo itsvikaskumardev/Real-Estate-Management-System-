@@ -35,14 +35,14 @@ namespace RealEstate.Application.Property.Queries
         public List<RealEstate.Application.Property.Dto.PropertyDto> Properties { get; init; } = [];
     }
 
-    public class GetAllPropertiesQueryHandler(IApplicationDbContext context)
+    public class GetAllPropertiesQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetAllPropertiesQuery, GetAllPropertiesResponse>
     {
         public async Task<GetAllPropertiesResponse> Handle(
             GetAllPropertiesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var query = context.Properties.AsQueryable();
+            var query = dbContext.Properties.Where(p => p.IsActive && !p.IsDeleted).AsQueryable();
 
             // Default status filter, overridden if 'status' is explicitly provided
             var status = PropertyStatus.Sale;
@@ -57,10 +57,10 @@ namespace RealEstate.Application.Property.Queries
                 query = query.Where(p => p.SellerId == request.SellerId);
 
             if (!string.IsNullOrWhiteSpace(request.City))
-                query = query.Where(p => EF.Functions.Like(p.Address.City, $"%{request.City}%"));
+                query = query.Where(p => p.Address.City.ToLower().Contains(request.City.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(request.Area))
-                query = query.Where(p => EF.Functions.Like(p.Address.Street, $"%{request.Area}%"));
+                query = query.Where(p => p.Address.Street.ToLower().Contains(request.Area.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(request.Pincode))
                 query = query.Where(p => p.Address.Pincode == request.Pincode);
@@ -152,7 +152,7 @@ namespace RealEstate.Application.Property.Queries
                         ProfilePic = p.Seller.ProfilePic
                     } : null!
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetAllPropertiesResponse
             {

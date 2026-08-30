@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RealEstate.Application.Admin.Dto;
 using RealEstate.Application.Common.Interfaces;
@@ -19,15 +19,15 @@ namespace RealEstate.Application.Admin.Queries
 
 
 
-    public class GetPendingSellersQueryHandler(IApplicationDbContext context)
+    public class GetPendingSellersQueryHandler(IApplicationDbContext dbContext)
         : IRequestHandler<GetPendingSellersQuery, GetPendingSellersResponse>
     {
         public async Task<GetPendingSellersResponse> Handle(
             GetPendingSellersQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var pendingSellers = await context.Users
-                .Where(u => u.Role == UserRole.Seller && !u.IsApproved)
+            var pendingSellers = await dbContext.Users
+                .Where(u => u.Role == UserRole.Seller && !u.IsApproved && u.IsActive && !u.IsDeleted)
                 .Select(u => new PendingSellerDto
                 {
                     Id = u.Id,
@@ -37,7 +37,7 @@ namespace RealEstate.Application.Admin.Queries
                     Address = u.Address,
                     CreatedAt = u.CreatedAt
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetPendingSellersResponse
             {

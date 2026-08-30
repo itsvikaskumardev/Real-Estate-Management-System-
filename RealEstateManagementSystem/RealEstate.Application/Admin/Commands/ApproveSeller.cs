@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Admin.Dto;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
@@ -24,22 +24,22 @@ namespace RealEstate.Application.Admin.Commands
 
 
 
-    public class ApproveSellerCommandHandler(IApplicationDbContext context)
+    public class ApproveSellerCommandHandler(IApplicationDbContext dbContext)
         : IRequestHandler<ApproveSellerCommand, ApproveSellerResponse>
     {
         public async Task<ApproveSellerResponse> Handle(
             ApproveSellerCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var seller = await context.Users
-                .FirstOrDefaultAsync(u => u.Id == request.SellerId, cancellationToken);
+            var seller = await dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == request.SellerId, ct);
 
             if (seller is null || seller.Role != UserRole.Seller)
                 throw new NotFoundException("Seller", request.SellerId);
 
             seller.IsApproved = true;
 
-            await context.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
 
             return new ApproveSellerResponse
             {

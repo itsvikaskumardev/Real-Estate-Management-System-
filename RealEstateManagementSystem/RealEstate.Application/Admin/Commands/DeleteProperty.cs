@@ -20,21 +20,22 @@ namespace RealEstate.Application.Admin.Commands
         public string Message { get; init; } = string.Empty;
     }
 
-    public class DeletePropertyCommandHandler(IApplicationDbContext context)
+    public class DeletePropertyCommandHandler(IApplicationDbContext dbContext)
         : IRequestHandler<DeletePropertyCommand, DeletePropertyResponse>
     {
         public async Task<DeletePropertyResponse> Handle(
             DeletePropertyCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
-            var property = await context.Properties
-                .FirstOrDefaultAsync(p => p.Id == request.PropertyId, cancellationToken);
+            var property = await dbContext.Properties
+                .FirstOrDefaultAsync(p => p.Id == request.PropertyId && p.IsActive && !p.IsDeleted, ct);
 
             if (property is null)
                 throw new NotFoundException(nameof(Property), request.PropertyId);
 
-            context.Properties.Remove(property);
-            await context.SaveChangesAsync(cancellationToken);
+            property.IsDeleted = true;
+            property.IsActive = false;
+            await dbContext.SaveChangesAsync(ct);
 
             return new DeletePropertyResponse
             {

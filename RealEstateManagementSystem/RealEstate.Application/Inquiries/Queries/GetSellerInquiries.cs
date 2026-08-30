@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RealEstate.Application.Admin.Dto;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
@@ -33,19 +33,19 @@ namespace RealEstate.Application.Inquiries.Queries
     }
 
     public class GetSellerInquiriesQueryHandler(
-        IApplicationDbContext context,
+        IApplicationDbContext dbContext,
         ICurrentUserService currentUser)
         : IRequestHandler<GetSellerInquiriesQuery, GetSellerInquiriesResponse>
     {
         public async Task<GetSellerInquiriesResponse> Handle(
             GetSellerInquiriesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (currentUser.UserId is null)
                 throw new UnauthorizedException("Not authenticated");
 
-            var inquiries = await context.Inquiries
-                .Where(i => i.SellerId == currentUser.UserId)
+            var inquiries = await dbContext.Inquiries
+                .Where(i => i.SellerId == currentUser.UserId && i.IsActive && !i.IsDeleted)
                 .OrderByDescending(i => i.CreatedAt)
                 .Select(i => new SellerInquiryDto
                 {
@@ -69,7 +69,7 @@ namespace RealEstate.Application.Inquiries.Queries
                         Images = i.Property.Images.Select(img => img.Url).ToList()
                     }
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new GetSellerInquiriesResponse
             {
