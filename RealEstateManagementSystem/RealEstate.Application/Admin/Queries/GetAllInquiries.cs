@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Text;
 using RealEstate.Application.Admin.Dto;
+using RealEstate.Application.Property.Dto;
 
 namespace RealEstate.Application.Admin.Queries
 {

@@ -1,4 +1,4 @@
-﻿using RealEstate.Application.Admin.Queries;
+using RealEstate.Application.Admin.Queries;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +13,6 @@ namespace RealEstate.Application.Admin.Dto
         public DateTimeOffset CreatedAt { get; init; }
         public BuyerDto Buyer { get; init; } = null!;
         public SellerDto Seller { get; init; } = null!;
-        public PropertyDto Property { get; init; } = null!;
+        public RealEstate.Application.Property.Dto.PropertyDto Property { get; init; } = null!;
     }
 }

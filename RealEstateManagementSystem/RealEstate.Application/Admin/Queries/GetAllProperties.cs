@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using RealEstate.Application.Property.Dto;
 namespace RealEstate.Application.Admin.Queries
 {
     public record GetAllPropertiesQuery : IRequest<GetAllPropertiesResponse>;
@@ -13,7 +13,7 @@ namespace RealEstate.Application.Admin.Queries
     public record GetAllPropertiesResponse
     {
         public int Count { get; init; }
-        public List<PropertyListItemDto> Properties { get; init; } = [];
+        public List<PropertyDto> Properties { get; init; } = [];
     }
 
 
@@ -29,12 +29,15 @@ namespace RealEstate.Application.Admin.Queries
         {
             var properties = await dbContext.Properties
                 .Where(p => p.IsActive && !p.IsDeleted)
-                .Select(p => new PropertyListItemDto
+                .Select(p => new PropertyDto
                 {
                     Id = p.Id,
                     Title = p.Title,
                     Price = p.Price,
                     City = p.Address.City,
+                    Bathrooms = p.Bathrooms,
+                    Bhk = p.Bhk,
+                    AreaSize = p.AreaSize,
                     PropertyType = p.PropertyType.ToString(),
                     Status = p.Status.ToString(),
                     IsVerified = p.IsVerified,
