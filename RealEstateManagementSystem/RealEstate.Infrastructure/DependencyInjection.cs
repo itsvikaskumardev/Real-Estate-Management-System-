@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RealEstate.Application.Common.Interfaces;
+using RealEstate.Infrastructure.Configuration;
 using RealEstate.Infrastructure.Identity;
 using RealEstate.Infrastructure.Persistence;
 using RealEstate.Infrastructure.Services;
@@ -33,6 +34,11 @@ namespace RealEstate.Infrastructure
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileStorageService, FileStorage>();
             services.AddTransient<IDateTimeProvider, DateTimeProvider>();
+
+
+
+            // Bind Cloudinary settings from appsettings.json
+            services.Configure<CloudinarySettings>(configuration.GetSection(CloudinarySettings.SectionName));
 
             // Configure Authentication & JWT
             services.AddAuthentication(options =>

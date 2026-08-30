@@ -58,7 +58,7 @@ namespace RealEstate.Application.Property.Commands
                 var url = await fileStorageService.UploadAsync(
                     image.Stream,
                     image.FileName,
-                    "properties",
+                    "RealState",
                     ct);
 
                 imageUrls.Add(url);
@@ -89,7 +89,7 @@ namespace RealEstate.Application.Property.Commands
                     .ToList()
             };
 
-            dbContext.Properties.Add(property);
+            await dbContext.Properties.AddAsync(property);
             await dbContext.SaveChangesAsync(ct);
 
             return new AddPropertyResponse

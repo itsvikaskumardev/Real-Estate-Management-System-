@@ -104,7 +104,7 @@ namespace RealEstate.Application.Property.Commands
                 var url = await fileStorageService.UploadAsync(
                     image.Stream,
                     image.FileName,
-                    "properties",
+                    "RealState",
                     ct);
 
                 property.Images.Add(new PropertyImage { Url = url });

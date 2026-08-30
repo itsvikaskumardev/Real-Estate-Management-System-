@@ -15,6 +15,12 @@ namespace RealEstate.Application.Users.Queries
         public Guid UserId { get; init; }
     }
 
+    /*
+     
+     GetPublicProfileQuery or GetPublicProfileResponse), you are just defining a concept. No actual data exists yet.
+     
+     */
+
     public record GetPublicProfileResponse
     {
         public string Name { get; init; } = string.Empty;

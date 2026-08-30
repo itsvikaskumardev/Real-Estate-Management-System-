@@ -22,6 +22,34 @@ namespace RealEstate.API.Endpoints
             group.MapGet("", async (ISender sender) =>
             {
                 var result = await sender.Send(new GetAllContactsQuery());
+                /*
+
+ sender.Send() finds the handler registered for GetAllContactsQuery and executes its Handle() method.
+                HTTP GET /contacts
+       ↓
+MapGet()
+       ↓
+new GetAllContactsQuery()
+       ↓
+sender.Send()
+       ↓
+GetAllContactsQueryHandler
+       ↓
+Handle(GetAllContactsQuery request, CancellationToken ct)
+       ↓
+Database
+       ↓
+GetAllContactsResponse
+       ↓
+result
+       ↓
+Results.Ok(...)
+       ↓
+HTTP Response
+
+
+
+                */
                 return Results.Ok(new { success = true, result.Contacts });
             })
             .WithName("GetAllContacts");

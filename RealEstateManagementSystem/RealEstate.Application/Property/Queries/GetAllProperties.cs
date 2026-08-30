@@ -57,10 +57,10 @@ namespace RealEstate.Application.Property.Queries
                 query = query.Where(p => p.SellerId == request.SellerId);
 
             if (!string.IsNullOrWhiteSpace(request.City))
-                query = query.Where(p => EF.Functions.Like(p.Address.City, $"%{request.City}%"));
+                query = query.Where(p => p.Address.City.ToLower().Contains(request.City.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(request.Area))
-                query = query.Where(p => EF.Functions.Like(p.Address.Street, $"%{request.Area}%"));
+                query = query.Where(p => p.Address.Street.ToLower().Contains(request.Area.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(request.Pincode))
                 query = query.Where(p => p.Address.Pincode == request.Pincode);

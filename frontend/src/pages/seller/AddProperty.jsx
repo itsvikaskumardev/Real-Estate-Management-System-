@@ -224,9 +224,9 @@ const AddProperty = () => {
                       onChange={handleInputChange}
                       className={`${s.input} ${s.select}`}
                     >
-                      <option value="unfurnished">Unfurnished</option>
-                      <option value="semi-furnished">Semi-Furnished</option>
-                      <option value="furnished">Fully Furnished</option>
+                      <option value="Unfurnished">Unfurnished</option>
+                      <option value="SemiFurnished">Semi-Furnished</option>
+                      <option value="Furnished">Fully Furnished</option>
                     </select>
                   </div>
                   <div>

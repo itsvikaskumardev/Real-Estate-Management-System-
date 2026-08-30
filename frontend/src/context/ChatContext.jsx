@@ -29,8 +29,10 @@ export const ChatProvider = ({ children }) => {
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      const newConnection = new HubConnectionBuilder()
+    let newConnection = null;
+
+    if (user && activeChat) {
+      newConnection = new HubConnectionBuilder()
         .withUrl(`${API_URL}/chatHub`)
         .configureLogging(LogLevel.Information)
         .withAutomaticReconnect()
@@ -48,16 +50,32 @@ export const ChatProvider = ({ children }) => {
       });
 
       newConnection.start()
-        .then(() => console.log("Connected to SignalR ChatHub"))
+        .then(() => {
+          console.log("Connected to SignalR ChatHub");
+          
+          // Automatically join the SignalR group for this chat
+          const chatId = activeChat.id || activeChat._id;
+          if (chatId) {
+             newConnection.invoke("JoinChat", String(chatId)).catch(err => console.error("Error joining chat:", err));
+          }
+        })
         .catch((err) => console.error("Error connecting to ChatHub:", err));
-
-      return () => {
-        newConnection.stop();
-      };
+    } else {
+      setSocket(null);
     }
-  }, [user]);
+
+    // Cleanup: Disconnect when the user leaves the chat or unmounts (Strict Mode duplicate prevention)
+    return () => {
+      if (newConnection) {
+        newConnection.stop().then(() => console.log("Disconnected from SignalR ChatHub"));
+      }
+    };
+  }, [user, activeChat]);
 
   const joinChat = (chatId) => {
+    // This is now handled automatically in the useEffect above when activeChat is set.
+    // Keeping this function for backwards compatibility if any component calls it directly,
+    // though the socket might not be fully connected yet when they call it.
     if (socket && socket.state === "Connected") {
       socket.invoke("JoinChat", String(chatId)).catch(err => console.error(err));
     }

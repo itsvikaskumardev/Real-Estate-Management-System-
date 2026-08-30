@@ -53,9 +53,9 @@ const Properties = () => {
     "Elevator",
   ];
   const furnishingOptions = [
-    { label: "Furnished", value: "furnished" },
-    { label: "Semi-Furnished", value: "semi-furnished" },
-    { label: "Unfurnished", value: "unfurnished" },
+    { label: "Furnished", value: "Furnished" },
+    { label: "Semi-Furnished", value: "SemiFurnished" },
+    { label: "Unfurnished", value: "Unfurnished" },
   ];
 
   useEffect(() => {

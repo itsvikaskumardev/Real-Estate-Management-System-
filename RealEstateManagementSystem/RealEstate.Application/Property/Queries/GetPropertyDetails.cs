@@ -5,6 +5,7 @@ using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Application.Property.Dto;
 using RealEstate.Domain.Entities;
+using RealEstate.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,11 @@ namespace RealEstate.Application.Property.Queries
         public string Area { get; init; } = string.Empty;
         public string PropertyType { get; init; } = string.Empty;
         public string? Bhk { get; init; }
+        public int? Bathrooms { get; init; }
         public decimal? AreaSize { get; init; }
+        public Furnishing? Furnishing { get; init; }
+        public DateTime CreatedAt { get; set; }
+
         public string Status { get; init; } = string.Empty;
     }
 
@@ -84,6 +89,9 @@ namespace RealEstate.Application.Property.Queries
                     Area = p.Address.Street,
                     PropertyType = p.PropertyType.ToString(),
                     Bhk = p.Bhk,
+                    Bathrooms = p.Bathrooms,
+                    Furnishing = p.Furnishing,
+                    CreatedAt = p.CreatedAt,
                     AreaSize = p.AreaSize,
                     Status = p.Status.ToString()
                 })
@@ -99,8 +107,11 @@ namespace RealEstate.Application.Property.Queries
                     Price = property.Price,
                     City = property.Address.City,
                     Area = property.Address.Street,
+                    Furnishing = property.Furnishing,
+                    CreatedAt = property.CreatedAt,
                     PropertyType = property.PropertyType.ToString(),
                     Bhk = property.Bhk,
+                    Bathrooms = property.Bathrooms,
                     AreaSize = property.AreaSize,
                     Status = property.Status.ToString(),
                     Views = property.Views,

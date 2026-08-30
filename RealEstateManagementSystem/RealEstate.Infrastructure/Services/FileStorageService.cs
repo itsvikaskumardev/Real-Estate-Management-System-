@@ -1,29 +1,65 @@
+ï»¿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.Extensions.Options;
 using RealEstate.Application.Common.Interfaces;
+using RealEstate.Infrastructure.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RealEstate.Infrastructure.Services
 {
     public class FileStorage : IFileStorageService
     {
-        public Task<string> UploadAsync(
+        private readonly Cloudinary _cloudinary;
+
+        public FileStorage(IOptions<CloudinarySettings> settings)
+        {
+            var account = new Account(
+                settings.Value.CloudName,
+                settings.Value.ApiKey,
+                settings.Value.ApiSecret);
+
+            _cloudinary = new Cloudinary(account);
+            _cloudinary.Api.Secure = true;
+        }
+
+        public async Task<string> UploadAsync(
             Stream fileStream,
             string fileName,
             string folder,
             CancellationToken ct = default)
         {
-            // TODO: implement Azure Blob Storage upload here
-            // e.g. BlobServiceClient -> GetBlobContainerClient(folder) -> UploadAsync
-            throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
+            var uploadParams = new ImageUploadParams()
+            {
+                File = new FileDescription(fileName, fileStream),
+                Folder = folder
+            };
 
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams, ct);
 
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"Cloudinary upload failed: {uploadResult.Error.Message}");
+            }
+
+            return uploadResult.SecureUrl.ToString();
         }
-        public Task DeleteAsync(string fileUrl, CancellationToken ct = default)
+
+        public async Task DeleteAsync(string fileUrl, CancellationToken ct = default)
         {
-            // TODO: implement Azure Blob Storage delete here
-            // e.g. parse blob name from fileUrl -> BlobContainerClient.DeleteBlobIfExistsAsync
-            throw new NotImplementedException("File storage not yet implemented — Azure Blob Storage pending");
+            try
+            {
+                var uri = new Uri(fileUrl);
+                var publicId = Path.GetFileNameWithoutExtension(uri.AbsolutePath);
+                var deletionParams = new DeletionParams(publicId);
+                await _cloudinary.DestroyAsync(deletionParams);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Cloudinary deletion failed: {ex.Message}");
+            }
         }
     }
 }

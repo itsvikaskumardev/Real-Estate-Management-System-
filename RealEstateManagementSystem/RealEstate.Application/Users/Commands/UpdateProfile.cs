@@ -55,7 +55,7 @@ namespace RealEstate.Application.Users.Commands
                 var url = await fileStorageService.UploadAsync(
                     request.ProfilePicStream,
                     request.ProfilePicFileName,
-                    "profiles",
+                    "RealState",
                     ct);
 
                 user.ProfilePic = url;
