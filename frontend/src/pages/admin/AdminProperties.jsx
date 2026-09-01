@@ -9,6 +9,9 @@ import {
   HiOutlineLocationMarker,
   HiOutlineCurrencyRupee,
   HiOutlineTag,
+  HiOutlineCheckCircle,
+  HiOutlineSearch,
+  HiOutlineFilter,
 } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import PropertyCard from "../../components/common/PropertyCard";
@@ -23,24 +26,44 @@ const AdminProperties = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState(null);
 
+  // Search & Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [verificationFilter, setVerificationFilter] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search query to avoid spamming the API
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
+        setLoading(true);
         const res = await axios.get(`${API_URL}/api/admin/properties`, {
+          params: {
+            search: debouncedSearch || undefined,
+            status: statusFilter || undefined,
+            isVerified: verificationFilter === "true" ? true : verificationFilter === "false" ? false : undefined,
+          },
           headers: { Authorization: `Bearer ${token}` },
         });
         const props = Array.isArray(res.data)
           ? res.data
           : res.data.properties || [];
         setProperties(props);
-        setLoading(false);
       } catch (err) {
         console.error("Failed to load properties:", err);
+      } finally {
         setLoading(false);
       }
     };
     fetchProperties();
-  }, []);
+  }, [debouncedSearch, statusFilter, verificationFilter, token]);
 
   const confirmDelete = (id) => {
     setPropertyToDelete(id);
@@ -63,6 +86,17 @@ const AdminProperties = () => {
     }
   };
 
+  const handleVerify = async (id, approve) => {
+    try {
+      await axios.patch(`${API_URL}/api/admin/properties/${id}/verify`, { approve }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProperties(properties.map(p => p.id === id ? { ...p, isVerified: approve } : p));
+    } catch (err) {
+      alert("Failed to verify property");
+    }
+  };
+
   if (loading)
     return (
       <div className={s.loaderFullPage}>
@@ -79,12 +113,59 @@ const AdminProperties = () => {
         </p>
       </div>
 
+      {/* Filter Bar */}
+      <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', backgroundColor: '#fff', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+        <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Search</label>
+          <div style={{ position: 'relative' }}>
+            <HiOutlineSearch style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
+            <input
+              type="text"
+              placeholder="Search by title, city, or seller..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ padding: '0.5rem 1rem 0.5rem 2.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none' }}
+            />
+          </div>
+        </div>
+        
+        <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Verification</label>
+          <select
+            value={verificationFilter}
+            onChange={(e) => setVerificationFilter(e.target.value)}
+            style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none', backgroundColor: '#fff', cursor: 'pointer' }}
+          >
+            <option value="">All Statuses</option>
+            <option value="true">Verified Only</option>
+            <option value="false">Unverified Only</option>
+          </select>
+        </div>
+
+        <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Listing Status</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none', backgroundColor: '#fff', cursor: 'pointer' }}
+          >
+            <option value="">All Types</option>
+            <option value="Sale">For Sale</option>
+            <option value="Rent">For Rent</option>
+            <option value="Sold">Sold</option>
+          </select>
+        </div>
+      </div>
+
       <div className={s.headerContainer}>
-        {" "}
         {/* same as headerContainer for spacing, could be separate but it's mb-12 */}
-        {properties.length === 0 ? (
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
+            <div className={s.loader}></div>
+          </div>
+        ) : properties.length === 0 ? (
           <div className={s.emptyStateCard}>
-            No properties pending moderation.
+            No properties found matching your criteria.
           </div>
         ) : (
           <div className={s.propertiesGrid}>
@@ -107,6 +188,22 @@ const AdminProperties = () => {
                         <div className={s.sellerEmail}>{p.seller?.email}</div>
                       </div>
                     </div>
+                    
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      {!p.isVerified ? (
+                        <button 
+                          onClick={() => handleVerify(p.id, true)}
+                          style={{ padding: '4px 12px', background: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}
+                        >
+                          Approve
+                        </button>
+                      ) : (
+                        <span style={{ fontSize: '13px', color: '#10b981', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <HiOutlineCheckCircle /> Verified
+                        </span>
+                      )}
+                    </div>
+
                     <div className={s.buttonGroup}>
                       <Link to={`/property/${p.id}`} className={s.viewLink}>
                         <HiOutlineExternalLink size={16} />

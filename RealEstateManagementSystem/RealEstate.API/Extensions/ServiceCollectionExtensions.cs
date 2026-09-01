@@ -20,11 +20,11 @@ It is just a clean place to organize Dependency Injection registrations.
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
+                    policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173")//Only this frontend origin is allowed.
+                          .AllowAnyHeader()// Allow request headers such as Content-Type, Authorization, etc.
+                          .AllowAnyMethod()// GET POST PUT DELETE 
                           .AllowCredentials();
                 });
             });
@@ -36,7 +36,7 @@ It is just a clean place to organize Dependency Injection registrations.
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AdminOnly", policy => 
+                options.AddPolicy("AdminOnly", policy =>
                     policy.RequireRole("admin", "Admin"));
             });
 

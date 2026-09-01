@@ -48,9 +48,9 @@ namespace RealEstate.API.Endpoints
 
 
 
-            group.MapGet("/properties", async ([FromServices] ISender sender) =>
+            group.MapGet("/properties", async ([AsParameters] GetAllPropertiesQuery query, [FromServices] ISender sender) =>
             {
-                var result = await sender.Send(new GetAllPropertiesQuery());
+                var result = await sender.Send(query);
                 return Results.Ok(new { success = true, result.Count, result.Properties });
             })
             .WithName("GetAllProperties");
@@ -110,8 +110,17 @@ namespace RealEstate.API.Endpoints
             .WithName("DeleteProperty");
 
 
+            group.MapPatch("/properties/{id:Guid}/verify", async (Guid id, [FromBody] VerifyPropertyRequest request, [FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(new VerifyPropertyCommand(id, request.Approve));
+                return Results.Ok(new { success = result });
+            })
+            .WithName("VerifyProperty");
+
         }
 
 
     }
+    
+    public record VerifyPropertyRequest(bool Approve);
 }

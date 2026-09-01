@@ -20,6 +20,7 @@ namespace RealEstate.Application.Property.Queries
         public int SoldProperties { get; init; }
         public int TotalInquiries { get; init; }
         public int TotalViews { get; init; }
+        public decimal TotalRevenue { get; init; }
     }
 
     public class GetSellerDashboardQueryHandler(
@@ -51,13 +52,18 @@ namespace RealEstate.Application.Property.Queries
             var totalInquiries = await dbContext.Inquiries
                 .CountAsync(i => i.SellerId == sellerId && i.IsActive && !i.IsDeleted, ct);
 
+            var totalRevenue = await dbContext.Transactions
+                .Where(t => t.SellerId == sellerId && t.Status == "Completed")
+                .SumAsync(t => t.SellerRevenue, ct);
+
             return new SellerDashboardStatsDto
             {
                 TotalProperties = propertyStats?.Total ?? 0,
                 ActiveListings = propertyStats?.Active ?? 0,
                 SoldProperties = propertyStats?.Sold ?? 0,
                 TotalInquiries = totalInquiries,
-                TotalViews = propertyStats?.TotalViews ?? 0
+                TotalViews = propertyStats?.TotalViews ?? 0,
+                TotalRevenue = totalRevenue
             };
         }
     }

@@ -17,6 +17,7 @@ import {
   HiExternalLink,
   HiOutlineLogout,
   HiOutlineBell,
+  HiOutlineCurrencyRupee,
 } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { sellerDashboardStyles as s } from "../../assets/dummyStyles";
@@ -29,6 +30,7 @@ const SellerDashboard = () => {
     soldProperties: 0,
     totalInquiries: 0,
     totalViews: 0,
+    totalRevenue: 0,
   });
   const [properties, setProperties] = useState([]);
   const [inquiries, setInquiries] = useState([]);
@@ -155,6 +157,12 @@ const SellerDashboard = () => {
       title: "Properties Sold",
       value: stats.soldProperties?.toLocaleString() || "0",
       icon: HiOutlineCheckCircle,
+      color: "#0d6e59",
+    },
+    {
+      title: "Total Revenue",
+      value: `₹${(stats.totalRevenue || 0).toLocaleString("en-IN")}`,
+      icon: HiOutlineCurrencyRupee,
       color: "#0d6e59",
     },
   ];

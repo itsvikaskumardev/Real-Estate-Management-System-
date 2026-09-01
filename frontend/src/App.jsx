@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { FaChevronUp } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
 
 import LandingPage from "./pages/shared/LandingPage";
 import Properties from "./pages/shared/Properties";
@@ -98,6 +99,7 @@ function App() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
+      <Toaster position="top-center" />
       <ScrollToTopOnRouteChange />
       <ScrollTopButton />
 

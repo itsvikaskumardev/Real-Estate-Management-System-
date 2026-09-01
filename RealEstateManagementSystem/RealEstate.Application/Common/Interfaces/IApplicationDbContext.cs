@@ -16,6 +16,7 @@ namespace RealEstate.Application.Common.Interfaces
         DbSet<Contact> Contacts { get; }
         DbSet<Chat> Chats { get; }
         DbSet<ChatMessage> ChatMessages { get; }
+        DbSet<Transaction> Transactions { get; }
         // ...your other DbSets
         Task<int> SaveChangesAsync(CancellationToken ct);
     }

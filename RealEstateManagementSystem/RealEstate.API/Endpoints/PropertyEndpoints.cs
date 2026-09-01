@@ -139,6 +139,14 @@ namespace RealEstate.API.Endpoints
             .WithName("UpdatePropertyStatus");
 
             //-----
+            
+            group.MapPost("/{id:Guid}/purchase", async (Guid id, ISender sender) =>
+            {
+                var result = await sender.Send(new PurchasePropertyCommand(id));
+                return Results.Ok(new { success = result });
+            })
+            .RequireAuthorization()
+            .WithName("PurchaseProperty");
 
             group.MapGet("/", async ([AsParameters] GetAllPropertiesQuery query, ISender sender) =>
             {

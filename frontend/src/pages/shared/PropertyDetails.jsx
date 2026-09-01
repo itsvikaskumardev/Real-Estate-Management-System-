@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 import API_URL from "../../config";
 import {
   HiLocationMarker,
@@ -47,6 +49,8 @@ const PropertyDetails = () => {
     error: null,
   });
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -161,6 +165,31 @@ const PropertyDetails = () => {
     } catch (err) {
       console.error("Error starting chat:", err);
       alert("Failed to start chat.");
+    }
+  };
+
+  const handlePurchaseClick = () => {
+    if (!user) return navigate("/login");
+    if (user.role !== "buyer") return alert("Only buyers can purchase properties");
+    setShowPurchaseModal(true);
+  };
+
+  const executePurchase = async () => {
+    setShowPurchaseModal(false);
+    setPurchaseLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/property/${id}/purchase`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Purchase successful!", { duration: 5000 });
+      const res = await axios.get(`${API_URL}/api/property/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      setProperty(res.data.property);
+    } catch (err) {
+      alert("Failed to purchase property.");
+    } finally {
+      setPurchaseLoading(false);
     }
   };
 
@@ -494,6 +523,16 @@ const PropertyDetails = () => {
               {!isOwner && (
                 <>
                   <div className={s.chatButtonWrapper}>
+                    {property.status?.toLowerCase() === "sale" && (
+                      <button 
+                        className={s.inquirySubmitButton} 
+                        style={{ marginBottom: '10px', backgroundColor: '#059669' }} 
+                        onClick={handlePurchaseClick}
+                        disabled={purchaseLoading}
+                      >
+                        {purchaseLoading ? "Processing..." : "Buy Now"}
+                      </button>
+                    )}
                     <button className={s.chatButton} onClick={handleChatStart}>
                       <HiChatAlt /> Chat
                     </button>
@@ -595,6 +634,33 @@ const PropertyDetails = () => {
           </div>
         </section>
       </main>
+
+      {/* Purchase Confirmation Modal */}
+      {showPurchaseModal && createPortal(
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "400px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1rem", color: "#1e293b" }}>Confirm Purchase</h3>
+            <p style={{ color: "#475569", marginBottom: "1.5rem" }}>
+              Are you sure you want to purchase {property.title} for {formattedPrice}?
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+              <button
+                onClick={() => setShowPurchaseModal(false)}
+                style={{ padding: "0.5rem 1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#475569", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executePurchase}
+                style={{ padding: "0.5rem 1rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#059669", color: "#fff", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                Confirm Purchase
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };
