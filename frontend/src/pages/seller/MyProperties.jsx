@@ -52,35 +52,12 @@ const MyProperties = () => {
       alert("Failed to delete property.");
     }
   };
-
-  const updateStatus = async (id, newStatus) => {
-    try {
-      await axios.patch(
-        `${API_URL}/api/property/${id}/status`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      setProperties(
-        properties.map((p) => ((p.id || p._id) === id ? { ...p, status: newStatus } : p)),
-      );
-    } catch (err) {
-      alert("Failed to update status.");
-    }
-  };
-
   if (loading)
     return (
       <div className={s.loaderFullPage}>
         <div className={s.loader}></div>
       </div>
     );
-
-  const getAvailableStatus = (p) => {
-    return "sale";
-  };
-
   return (
     <div className={s.fadeIn}>
       <div className={s.fadeIn}>
@@ -119,43 +96,25 @@ const MyProperties = () => {
                   renderActions={() => (
                     <>
                       <div className={s.actionContainer}>
-                        <div className={s.selectWrapper}>
-                          <select
-                            value={p.status === "sale" ? "available" : p.status}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (val === "available") {
-                                updateStatus((p.id || p._id), getAvailableStatus(p));
-                              } else {
-                                updateStatus((p.id || p._id), val);
-                              }
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            className={`${s.select} ${p.status === "sold" ? s.selectSold : s.selectAvailable}`}
+                        {p.status?.toLowerCase() !== "sold" && (
+                          <Link
+                            to={`/edit-property/${(p.id || p._id)}`}
+                            className={s.editButton}
                           >
-                            <option value="available">Available</option>
-                            <option value="sold">Sold</option>
-                          </select>
-                          <div className={s.selectIcon}>
-                            <HiOutlineCheckCircle size={14} />
-                          </div>
-                        </div>
-                        <Link
-                          to={`/edit-property/${(p.id || p._id)}`}
-                          className={s.editButton}
-                        >
-                          <HiOutlinePencilAlt /> Edit
-                        </Link>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete((p.id || p._id));
-                          }}
-                          className={s.deleteButton}
-                        >
-                          <HiOutlineTrash />
-                        </button>
+                            <HiOutlinePencilAlt /> Edit
+                          </Link>
+                        )}
+                        {p.status?.toLowerCase() !== "sold" && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete((p.id || p._id));
+                            }}
+                            className={s.deleteButton}
+                          >
+                            <HiOutlineTrash />
+                          </button>
+                        )}
                       </div>
                     </>
                   )}

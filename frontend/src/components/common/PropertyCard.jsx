@@ -69,9 +69,15 @@ const PropertyCard = ({
               ) : (
                 <span className={s.badgeNew}>New</span>
               )}
-              <span className={s.badgeVerified}>
-                <HiShieldCheck size={14} /> Verified
-              </span>
+              {property.isVerified ? (
+                <span className={s.badgeVerified}>
+                  <HiShieldCheck size={14} /> Verified
+                </span>
+              ) : (
+                <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 uppercase">
+                  Pending Review
+                </span>
+              )}
             </div>
             {(!user || user.role === "buyer") && (
               <button

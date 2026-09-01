@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import axios from "axios";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
@@ -13,6 +14,7 @@ import { sellerRequestsStyles as s } from "../../assets/dummyStyles";
 const SellerRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const SellerRequests = () => {
       );
       if (res.data.success) {
         setRequests(requests.filter((req) => req.id !== id));
-        alert("Seller approved successfully!");
+        setShowSuccessModal(true);
       }
     } catch (err) {
       alert("Failed to approve seller");
@@ -121,6 +123,30 @@ const SellerRequests = () => {
           )}
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && createPortal(
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "400px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)", textAlign: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+              <HiOutlineCheckCircle size={48} style={{ color: "#10b981" }} />
+            </div>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1rem", color: "#1e293b" }}>Success</h3>
+            <p style={{ color: "#475569", marginBottom: "1.5rem" }}>
+              Seller approved successfully!
+            </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                style={{ padding: "0.5rem 1.5rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#059669", color: "#fff", cursor: "pointer", transition: "all 0.2s", fontWeight: "500" }}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

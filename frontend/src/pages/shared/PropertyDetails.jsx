@@ -451,10 +451,12 @@ const PropertyDetails = () => {
             {/* Price Card */}
             <div
               className={s.priceCard}
-              style={{ background: "var(--primary)" }}
+              style={{ background: property.status?.toLowerCase() === "sold" ? "#64748b" : "var(--primary)" }}
             >
               <div className={s.priceCardLabel}>
-                {property.status?.toLowerCase() === "rent"
+                {property.status?.toLowerCase() === "sold"
+                  ? "Final Sale Price"
+                  : property.status?.toLowerCase() === "rent"
                   ? "Rental Details"
                   : "Listing Price"}
               </div>
@@ -490,8 +492,14 @@ const PropertyDetails = () => {
                 </div>
               )}
               <div className={s.priceCardAvailability}>
-                Available for{" "}
-                {property.status?.toLowerCase() === "rent" ? "Rent" : "Sale"}
+                {property.status?.toLowerCase() === "sold" ? (
+                  <span style={{ fontWeight: "bold", fontSize: "1.1rem", textTransform: "uppercase" }}>Already Sold</span>
+                ) : (
+                  <>
+                    Available for{" "}
+                    {property.status?.toLowerCase() === "rent" ? "Rent" : "Sale"}
+                  </>
+                )}
               </div>
             </div>
 
@@ -539,45 +547,53 @@ const PropertyDetails = () => {
                   </div>
 
                   {/* Inquiry Form */}
-                  <h4 className={s.inquiryFormTitle}>Inquire</h4>
-                  <form onSubmit={handleInquirySubmit}>
-                    {user?.role === "buyer" ? (
-                      <>
-                        <textarea
-                          placeholder="Your Message..."
-                          value={inquiry.message}
-                          onChange={(e) =>
-                            setInquiry({ ...inquiry, message: e.target.value })
-                          }
-                          className={s.inquiryTextarea}
-                          required
-                        />
-                        <button
-                          type="submit"
-                          className={s.inquirySubmitButton}
-                          disabled={inquiryStatus.loading}
-                        >
-                          {inquiryStatus.loading ? "Sending..." : "Send Inquiry"}
-                        </button>
-                        {inquiryStatus.success && (
-                          <p className={s.inquirySuccessMessage}>Inquiry sent!</p>
+                  {property.status?.toLowerCase() !== "sold" ? (
+                    <>
+                      <h4 className={s.inquiryFormTitle}>Inquire</h4>
+                      <form onSubmit={handleInquirySubmit}>
+                        {user?.role === "buyer" ? (
+                          <>
+                            <textarea
+                              placeholder="Your Message..."
+                              value={inquiry.message}
+                              onChange={(e) =>
+                                setInquiry({ ...inquiry, message: e.target.value })
+                              }
+                              className={s.inquiryTextarea}
+                              required
+                            />
+                            <button
+                              type="submit"
+                              className={s.inquirySubmitButton}
+                              disabled={inquiryStatus.loading}
+                            >
+                              {inquiryStatus.loading ? "Sending..." : "Send Inquiry"}
+                            </button>
+                            {inquiryStatus.success && (
+                              <p className={s.inquirySuccessMessage}>Inquiry sent!</p>
+                            )}
+                          </>
+                        ) : (
+                          <div className={s.inquiryDisabledMessage}>
+                            <p className={s.inquiryDisabledText}>
+                              {user
+                                ? "Only buyers can send inquiries."
+                                : "Please login as a buyer to send inquiries."}
+                            </p>
+                            {!user && (
+                              <Link to="/login" className={s.inquiryLoginButton}>
+                                Login
+                              </Link>
+                            )}
+                          </div>
                         )}
-                      </>
-                    ) : (
-                      <div className={s.inquiryDisabledMessage}>
-                        <p className={s.inquiryDisabledText}>
-                          {user
-                            ? "Only buyers can send inquiries."
-                            : "Please login as a buyer to send inquiries."}
-                        </p>
-                        {!user && (
-                          <Link to="/login" className={s.inquiryLoginButton}>
-                            Login
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </form>
+                      </form>
+                    </>
+                  ) : (
+                    <div style={{ padding: '1rem', backgroundColor: '#f1f5f9', borderRadius: '0.5rem', textAlign: 'center', marginTop: '1rem', color: '#64748b', fontWeight: '500' }}>
+                      This property is no longer accepting inquiries.
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -598,7 +614,7 @@ const PropertyDetails = () => {
                 value: new Date(property.createdAt).toLocaleDateString(),
               },
               { label: "Property Type", value: property.propertyType },
-              { label: "Status", value: `For ${property.status}` },
+              { label: "Status", value: property.status?.toLowerCase() === "sold" ? "Sold" : `For ${property.status}` },
             ].map((detail, i) => (
               <div key={i} className={s.detailRow}>
                 <span className={s.detailLabel}>{detail.label}</span>

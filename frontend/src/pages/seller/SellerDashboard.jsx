@@ -85,24 +85,6 @@ const SellerDashboard = () => {
     }
   };
 
-  const handleStatusUpdate = async (id, currentStatus) => {
-    const newStatus = currentStatus === "sold" ? "sale" : "sold";
-
-    try {
-      await axios.patch(
-        `${API_URL}/api/property/${id}/status`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      setProperties(
-        properties.map((p) => ((p.id || p._id) === id ? { ...p, status: newStatus } : p)),
-      );
-    } catch (err) {
-      alert("Failed to update status.");
-    }
-  };
 
   const handleExport = () => {
     const headers = ["Title", "Location", "Type", "Price", "Status", "Views"];
@@ -244,33 +226,22 @@ const SellerDashboard = () => {
                   property={p}
                   renderActions={() => (
                     <div className={s.propertyActions}>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStatusUpdate((p.id || p._id), p.status);
-                        }}
-                        className={s.statusButton(p.status)}
-                        title={
-                          p.status === "sold"
-                            ? "Mark as Available"
-                            : "Mark as Sold"
-                        }
-                      >
-                        <HiOutlineCheckCircle size={14} />{" "}
-                        {p.status === "sold" ? "Available" : "Sold"}
-                      </button>
-                      <Link
-                        to={`/edit-property/${(p.id || p._id)}`}
-                        className={s.editButton}
-                      >
-                        <HiOutlinePencilAlt size={14} /> Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete((p.id || p._id))}
-                        className={s.deleteButton}
-                      >
-                        <HiOutlineTrash size={14} /> Delete
-                      </button>
+                      {p.status?.toLowerCase() !== "sold" && (
+                        <>
+                          <Link
+                            to={`/edit-property/${(p.id || p._id)}`}
+                            className={s.editButton}
+                          >
+                            <HiOutlinePencilAlt size={14} /> Edit
+                          </Link>
+                          <button
+                            onClick={() => handleDelete((p.id || p._id))}
+                            className={s.deleteButton}
+                          >
+                            <HiOutlineTrash size={14} /> Delete
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                 />
