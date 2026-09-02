@@ -4,12 +4,10 @@ using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Entities;
 using RealEstate.Domain.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RealEstate.Application.Property.Commands
+namespace RealEstate.Application.Buyer.Commands
 {
     public record PurchasePropertyCommand(Guid PropertyId) : IRequest<bool>;
 

@@ -178,7 +178,7 @@ const PropertyDetails = () => {
     setShowPurchaseModal(false);
     setPurchaseLoading(true);
     try {
-      await axios.post(`${API_URL}/api/property/${id}/purchase`, {}, {
+      await axios.post(`${API_URL}/api/buyer/purchase/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Purchase successful!", { duration: 5000 });

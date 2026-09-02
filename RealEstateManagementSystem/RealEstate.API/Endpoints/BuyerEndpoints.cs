@@ -15,6 +15,13 @@ namespace RealEstate.API.Endpoints
                 .RequireAuthorization(policy => policy.RequireRole("buyer", "Buyer"));
 
             group.MapGet("/dashboard", GetBuyerDashboard);
+
+            group.MapPost("/purchase/{id:Guid}", async (Guid id, ISender sender) =>
+            {
+                var result = await sender.Send(new RealEstate.Application.Buyer.Commands.PurchasePropertyCommand(id));
+                return Results.Ok(new { success = result });
+            })
+            .WithName("PurchaseProperty");
         }
 
         private static async Task<IResult> GetBuyerDashboard(IMediator mediator)
