@@ -18,6 +18,7 @@ import MyProperties from "./pages/seller/MyProperties";
 import Wishlist from "./pages/buyer/Wishlist";
 import MyInquiries from "./pages/buyer/MyInquiries";
 import Profile from "./pages/shared/Profile";
+import SellerProfile from "./pages/seller/SellerProfile";
 import ChatMessages from "./pages/shared/ChatMessages";
 import SellerLayout from "./components/SellerLayout";
 import AdminLayout from "./components/AdminLayout";
@@ -85,6 +86,11 @@ const SellerLayoutWrapper = () => {
   return user?.role === "seller" ? <SellerLayout /> : <Outlet />;
 };
 
+const ProfileWrapper = () => {
+  const { user } = useAuth();
+  return user?.role === "seller" ? <SellerProfile /> : <Profile />;
+};
+
 function App() {
   useEffect(() => {
     // Prevent horizontal overflow on the whole app
@@ -123,7 +129,7 @@ function App() {
         >
           <Route element={<SellerLayoutWrapper />}>
             <Route path="/inquiries" element={<MyInquiries />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<ProfileWrapper />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/chat-messages" element={<ChatMessages />} />
             <Route path="/contact" element={<Contact />} />

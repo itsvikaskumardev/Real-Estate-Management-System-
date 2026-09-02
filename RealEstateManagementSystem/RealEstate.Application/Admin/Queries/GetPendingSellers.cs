@@ -26,7 +26,7 @@ namespace RealEstate.Application.Admin.Queries
             GetPendingSellersQuery request,
             CancellationToken ct)
         {
-            var pendingSellers = await dbContext.Users
+            var pendingSellersList = await dbContext.Users
                 .Where(u => u.Role == UserRole.Seller && !u.IsApproved && u.IsActive && !u.IsDeleted)
                 .Select(u => new PendingSellerDto
                 {
@@ -35,14 +35,29 @@ namespace RealEstate.Application.Admin.Queries
                     Email = u.Email,
                     Phone = u.Phone,
                     Address = u.Address,
-                    CreatedAt = u.CreatedAt
+                    CreatedAt = u.CreatedAt,
+                    OnboardingStatus = u.OnboardingStatus
                 })
                 .ToListAsync(ct);
 
+            var sellerIds = pendingSellersList.Select(s => s.Id).ToList();
+            
+            var documents = await dbContext.Documents
+                .Where(d => sellerIds.Contains(d.UserId))
+                .ToListAsync(ct);
+
+            foreach (var seller in pendingSellersList)
+            {
+                seller.Documents = documents
+                    .Where(d => d.UserId == seller.Id)
+                    .Select(d => new RealEstate.Application.Documents.Queries.DocumentDto(d.Id, d.DocumentType, d.DocumentName, d.FileUrl, d.Status, d.CreatedAt, d.VerifiedAt))
+                    .ToList();
+            }
+
             return new GetPendingSellersResponse
             {
-                Count = pendingSellers.Count,
-                PendingSellers = pendingSellers
+                Count = pendingSellersList.Count,
+                PendingSellers = pendingSellersList
             };
         }
     }

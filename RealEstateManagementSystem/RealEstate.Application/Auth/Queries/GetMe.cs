@@ -18,6 +18,7 @@ namespace RealEstate.Application.Auth.Queries
         public string Name { get; init; } = string.Empty;
         public string Email { get; init; } = string.Empty;
         public string Role { get; init; } = string.Empty;
+        public string OnboardingStatus { get; init; } = string.Empty;
         public string? Phone { get; init; }
         public string? ProfilePic { get; init; }
         public string? Address { get; init; }
@@ -53,7 +54,8 @@ namespace RealEstate.Application.Auth.Queries
                     IsBlocked = u.IsBlocked,
                     IsApproved = u.IsApproved,
                     IsVerified = u.IsVerified,
-                    CreatedAt = u.CreatedAt
+                    CreatedAt = u.CreatedAt,
+                    OnboardingStatus = u.OnboardingStatus
                 })
                 .FirstOrDefaultAsync(ct);
 

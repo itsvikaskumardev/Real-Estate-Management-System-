@@ -117,10 +117,18 @@ namespace RealEstate.API.Endpoints
             })
             .WithName("VerifyProperty");
 
+            group.MapPatch("/seller/documents/{documentId:Guid}/verify", async (Guid documentId, [FromBody] VerifyDocumentRequest request, [FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(new VerifyDocumentCommand { DocumentId = documentId, Approve = request.Approve });
+                return Results.Ok(new { success = result });
+            })
+            .WithName("VerifyDocument");
+
         }
 
 
     }
     
     public record VerifyPropertyRequest(bool Approve);
+    public record VerifyDocumentRequest(bool Approve);
 }
