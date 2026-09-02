@@ -25,6 +25,8 @@ namespace RealEstate.Infrastructure.Persistence
         public DbSet<Contact> Contacts => Set<Contact>();
         public DbSet<Chat> Chats => Set<Chat>();
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+        public DbSet<Transaction> Transactions => Set<Transaction>();
+        public DbSet<Document> Documents => Set<Document>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

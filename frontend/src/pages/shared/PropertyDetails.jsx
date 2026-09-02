@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 import API_URL from "../../config";
 import {
   HiLocationMarker,
@@ -47,6 +49,8 @@ const PropertyDetails = () => {
     error: null,
   });
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -161,6 +165,31 @@ const PropertyDetails = () => {
     } catch (err) {
       console.error("Error starting chat:", err);
       alert("Failed to start chat.");
+    }
+  };
+
+  const handlePurchaseClick = () => {
+    if (!user) return navigate("/login");
+    if (user.role !== "buyer") return alert("Only buyers can purchase properties");
+    setShowPurchaseModal(true);
+  };
+
+  const executePurchase = async () => {
+    setShowPurchaseModal(false);
+    setPurchaseLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/buyer/purchase/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Purchase successful!", { duration: 5000 });
+      const res = await axios.get(`${API_URL}/api/property/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      setProperty(res.data.property);
+    } catch (err) {
+      alert("Failed to purchase property.");
+    } finally {
+      setPurchaseLoading(false);
     }
   };
 
@@ -422,10 +451,12 @@ const PropertyDetails = () => {
             {/* Price Card */}
             <div
               className={s.priceCard}
-              style={{ background: "var(--primary)" }}
+              style={{ background: property.status?.toLowerCase() === "sold" ? "#64748b" : "var(--primary)" }}
             >
               <div className={s.priceCardLabel}>
-                {property.status?.toLowerCase() === "rent"
+                {property.status?.toLowerCase() === "sold"
+                  ? "Final Sale Price"
+                  : property.status?.toLowerCase() === "rent"
                   ? "Rental Details"
                   : "Listing Price"}
               </div>
@@ -461,8 +492,14 @@ const PropertyDetails = () => {
                 </div>
               )}
               <div className={s.priceCardAvailability}>
-                Available for{" "}
-                {property.status?.toLowerCase() === "rent" ? "Rent" : "Sale"}
+                {property.status?.toLowerCase() === "sold" ? (
+                  <span style={{ fontWeight: "bold", fontSize: "1.1rem", textTransform: "uppercase" }}>Already Sold</span>
+                ) : (
+                  <>
+                    Available for{" "}
+                    {property.status?.toLowerCase() === "rent" ? "Rent" : "Sale"}
+                  </>
+                )}
               </div>
             </div>
 
@@ -494,51 +531,69 @@ const PropertyDetails = () => {
               {!isOwner && (
                 <>
                   <div className={s.chatButtonWrapper}>
+                    {property.status?.toLowerCase() === "sale" && (
+                      <button 
+                        className={s.inquirySubmitButton} 
+                        style={{ marginBottom: '10px', backgroundColor: '#059669' }} 
+                        onClick={handlePurchaseClick}
+                        disabled={purchaseLoading}
+                      >
+                        {purchaseLoading ? "Processing..." : "Buy Now"}
+                      </button>
+                    )}
                     <button className={s.chatButton} onClick={handleChatStart}>
                       <HiChatAlt /> Chat
                     </button>
                   </div>
 
                   {/* Inquiry Form */}
-                  <h4 className={s.inquiryFormTitle}>Inquire</h4>
-                  <form onSubmit={handleInquirySubmit}>
-                    {user?.role === "buyer" ? (
-                      <>
-                        <textarea
-                          placeholder="Your Message..."
-                          value={inquiry.message}
-                          onChange={(e) =>
-                            setInquiry({ ...inquiry, message: e.target.value })
-                          }
-                          className={s.inquiryTextarea}
-                          required
-                        />
-                        <button
-                          type="submit"
-                          className={s.inquirySubmitButton}
-                          disabled={inquiryStatus.loading}
-                        >
-                          {inquiryStatus.loading ? "Sending..." : "Send Inquiry"}
-                        </button>
-                        {inquiryStatus.success && (
-                          <p className={s.inquirySuccessMessage}>Inquiry sent!</p>
+                  {property.status?.toLowerCase() !== "sold" ? (
+                    <>
+                      <h4 className={s.inquiryFormTitle}>Inquire</h4>
+                      <form onSubmit={handleInquirySubmit}>
+                        {user?.role === "buyer" ? (
+                          <>
+                            <textarea
+                              placeholder="Your Message..."
+                              value={inquiry.message}
+                              onChange={(e) =>
+                                setInquiry({ ...inquiry, message: e.target.value })
+                              }
+                              className={s.inquiryTextarea}
+                              required
+                            />
+                            <button
+                              type="submit"
+                              className={s.inquirySubmitButton}
+                              disabled={inquiryStatus.loading}
+                            >
+                              {inquiryStatus.loading ? "Sending..." : "Send Inquiry"}
+                            </button>
+                            {inquiryStatus.success && (
+                              <p className={s.inquirySuccessMessage}>Inquiry sent!</p>
+                            )}
+                          </>
+                        ) : (
+                          <div className={s.inquiryDisabledMessage}>
+                            <p className={s.inquiryDisabledText}>
+                              {user
+                                ? "Only buyers can send inquiries."
+                                : "Please login as a buyer to send inquiries."}
+                            </p>
+                            {!user && (
+                              <Link to="/login" className={s.inquiryLoginButton}>
+                                Login
+                              </Link>
+                            )}
+                          </div>
                         )}
-                      </>
-                    ) : (
-                      <div className={s.inquiryDisabledMessage}>
-                        <p className={s.inquiryDisabledText}>
-                          {user
-                            ? "Only buyers can send inquiries."
-                            : "Please login as a buyer to send inquiries."}
-                        </p>
-                        {!user && (
-                          <Link to="/login" className={s.inquiryLoginButton}>
-                            Login
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </form>
+                      </form>
+                    </>
+                  ) : (
+                    <div style={{ padding: '1rem', backgroundColor: '#f1f5f9', borderRadius: '0.5rem', textAlign: 'center', marginTop: '1rem', color: '#64748b', fontWeight: '500' }}>
+                      This property is no longer accepting inquiries.
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -559,7 +614,7 @@ const PropertyDetails = () => {
                 value: new Date(property.createdAt).toLocaleDateString(),
               },
               { label: "Property Type", value: property.propertyType },
-              { label: "Status", value: `For ${property.status}` },
+              { label: "Status", value: property.status?.toLowerCase() === "sold" ? "Sold" : `For ${property.status}` },
             ].map((detail, i) => (
               <div key={i} className={s.detailRow}>
                 <span className={s.detailLabel}>{detail.label}</span>
@@ -595,6 +650,33 @@ const PropertyDetails = () => {
           </div>
         </section>
       </main>
+
+      {/* Purchase Confirmation Modal */}
+      {showPurchaseModal && createPortal(
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "400px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1rem", color: "#1e293b" }}>Confirm Purchase</h3>
+            <p style={{ color: "#475569", marginBottom: "1.5rem" }}>
+              Are you sure you want to purchase {property.title} for {formattedPrice}?
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+              <button
+                onClick={() => setShowPurchaseModal(false)}
+                style={{ padding: "0.5rem 1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#475569", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executePurchase}
+                style={{ padding: "0.5rem 1rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#059669", color: "#fff", cursor: "pointer", transition: "all 0.2s" }}
+              >
+                Confirm Purchase
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

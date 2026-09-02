@@ -24,6 +24,8 @@ namespace RealEstate.API.Extensions
             app.MapPropertyEndpoints();
             app.MapAuthEndpoints();
             app.MapUserEndpoints();
+            app.MapBuyerEndpoints();
+            app.MapDocumentEndpoints();
             app.MapAdminEndpoints();
             app.MapWishlistEndpoints();
             app.MapInquiryEndpoints();

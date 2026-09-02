@@ -38,6 +38,7 @@ namespace RealEstate.Application.Admin.Commands
                 throw new NotFoundException("Seller", request.SellerId);
 
             seller.IsApproved = true;
+            seller.OnboardingStatus = "Completed";
 
             await dbContext.SaveChangesAsync(ct);
 

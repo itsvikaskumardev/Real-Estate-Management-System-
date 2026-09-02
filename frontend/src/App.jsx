@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { FaChevronUp } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
 
 import LandingPage from "./pages/shared/LandingPage";
 import Properties from "./pages/shared/Properties";
@@ -17,8 +18,10 @@ import MyProperties from "./pages/seller/MyProperties";
 import Wishlist from "./pages/buyer/Wishlist";
 import MyInquiries from "./pages/buyer/MyInquiries";
 import Profile from "./pages/shared/Profile";
+import SellerProfile from "./pages/seller/SellerProfile";
 import ChatMessages from "./pages/shared/ChatMessages";
 import SellerLayout from "./components/SellerLayout";
+import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -84,6 +87,11 @@ const SellerLayoutWrapper = () => {
   return user?.role === "seller" ? <SellerLayout /> : <Outlet />;
 };
 
+const ProfileWrapper = () => {
+  const { user } = useAuth();
+  return user?.role === "seller" ? <SellerProfile /> : <Profile />;
+};
+
 function App() {
   useEffect(() => {
     // Prevent horizontal overflow on the whole app
@@ -98,6 +106,7 @@ function App() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
+      <Toaster position="top-center" />
       <ScrollToTopOnRouteChange />
       <ScrollTopButton />
 
@@ -120,8 +129,9 @@ function App() {
           }
         >
           <Route element={<SellerLayoutWrapper />}>
+            <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
             <Route path="/inquiries" element={<MyInquiries />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<ProfileWrapper />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/chat-messages" element={<ChatMessages />} />
             <Route path="/contact" element={<Contact />} />

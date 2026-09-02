@@ -138,7 +138,6 @@ namespace RealEstate.API.Endpoints
             .RequireAuthorization()
             .WithName("UpdatePropertyStatus");
 
-            //-----
 
             group.MapGet("/", async ([AsParameters] GetAllPropertiesQuery query, ISender sender) =>
             {

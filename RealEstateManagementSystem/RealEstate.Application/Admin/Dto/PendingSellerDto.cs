@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,5 +12,7 @@ namespace RealEstate.Application.Admin.Dto
         public string? Phone { get; init; }
         public string? Address { get; init; }
         public DateTimeOffset CreatedAt { get; init; }
+        public string OnboardingStatus { get; init; } = string.Empty;
+        public List<RealEstate.Application.Documents.Queries.DocumentDto> Documents { get; set; } = [];
     }
 }

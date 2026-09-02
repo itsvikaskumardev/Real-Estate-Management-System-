@@ -65,6 +65,9 @@ namespace RealEstate.Application.Property.Commands
             if (property.SellerId != currentUser.UserId)
                 throw new ForbiddenAccessException("Not authorized");
 
+            if (property.IsVerified)
+                throw new ForbiddenAccessException("Cannot edit a property that has already been verified by an admin.");
+
             // Update only fields that were actually provided
             if (request.Title is not null) property.Title = request.Title;
             if (request.Description is not null) property.Description = request.Description;

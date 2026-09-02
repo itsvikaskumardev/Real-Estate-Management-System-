@@ -18,6 +18,8 @@ const AdminDashboard = () => {
     totalProperties: 0,
     activeListings: 0,
     soldProperties: 0,
+    totalPlatformRevenue: 0,
+    unverifiedProperties: 0,
   });
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
@@ -77,6 +79,20 @@ const AdminDashboard = () => {
       color: "#10b981",
       bg: "#dcfce7",
     },
+    {
+      title: "Unverified Properties",
+      value: stats.unverifiedProperties || 0,
+      icon: HiOutlineLibrary,
+      color: "#ef4444",
+      bg: "#fee2e2",
+    },
+    {
+      title: "Platform Revenue (2%)",
+      value: `₹${(stats.totalPlatformRevenue || 0).toLocaleString("en-IN")}`,
+      icon: HiOutlineTrendingUp,
+      color: "#8b5cf6",
+      bg: "#ede9fe",
+    },
   ];
 
   return (
@@ -110,7 +126,7 @@ const AdminDashboard = () => {
             </div>
             <div>
               <div className={s.statTitle}>{card.title}</div>
-              <div className={s.statValue}>{card.value.toLocaleString()}</div>
+              <div className={s.statValue}>{typeof card.value === "string" ? card.value : card.value.toLocaleString()}</div>
             </div>
           </div>
         ))}

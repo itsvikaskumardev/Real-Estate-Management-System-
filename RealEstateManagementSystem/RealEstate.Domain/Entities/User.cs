@@ -1,4 +1,4 @@
-﻿using RealEstate.Domain.Common;
+using RealEstate.Domain.Common;
 using RealEstate.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -22,5 +22,6 @@ namespace RealEstate.Domain.Entities
         public string? VerificationToken { get; set; }
         public string? ResetPasswordToken { get; set; }
         public DateTimeOffset? ResetPasswordExpire { get; set; }
+        public string OnboardingStatus { get; set; } = "Incomplete";
     }
 }

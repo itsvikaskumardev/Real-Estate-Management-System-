@@ -33,12 +33,21 @@ namespace RealEstate.Application.Admin.Queries
                 })
                 .FirstOrDefaultAsync(ct);
 
+            var platformRevenue = await dbContext.Transactions
+                .Where(t => t.Status == "Completed")
+                .SumAsync(t => t.AdminCommission, ct);
+
+            var unverified = await dbContext.Properties
+                .CountAsync(p => p.IsActive && !p.IsDeleted && !p.IsVerified, ct);
+
             return new DashboardStatsDto
             {
                 TotalUsers = totalUsers,
                 TotalProperties = propertyStats?.Total ?? 0,
                 ActiveListings = propertyStats?.Active ?? 0,
-                SoldProperties = propertyStats?.Sold ?? 0
+                SoldProperties = propertyStats?.Sold ?? 0,
+                TotalPlatformRevenue = platformRevenue,
+                UnverifiedProperties = unverified
             };
         }
     }

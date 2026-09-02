@@ -65,6 +65,12 @@ namespace RealEstate.API.Endpoints
                 return Results.Ok(result);
             })
             .WithName("Logout");
+            group.MapPost("/setup-admin", async (SetupFirstAdminCommand command, [FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(command);
+                return Results.Created(string.Empty, result);
+            })
+            .WithName("SetupFirstAdmin");
         }
     }
 
