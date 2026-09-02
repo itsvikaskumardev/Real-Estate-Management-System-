@@ -29,6 +29,13 @@ const Navbar = () => {
             Home
           </Link>
           <Link
+            to="/buyer-dashboard"
+            className={s.navLink}
+            onClick={() => setIsOpen(false)}
+          >
+            Dashboard
+          </Link>
+          <Link
             to="/properties"
             className={s.navLink}
             onClick={() => setIsOpen(false)}

@@ -96,7 +96,7 @@ const MyProperties = () => {
                   renderActions={() => (
                     <>
                       <div className={s.actionContainer}>
-                        {p.status?.toLowerCase() !== "sold" && (
+                        {p.status?.toLowerCase() !== "sold" && !p.isVerified && (
                           <Link
                             to={`/edit-property/${(p.id || p._id)}`}
                             className={s.editButton}
@@ -104,7 +104,7 @@ const MyProperties = () => {
                             <HiOutlinePencilAlt /> Edit
                           </Link>
                         )}
-                        {p.status?.toLowerCase() !== "sold" && (
+                        {p.status?.toLowerCase() !== "sold" && !p.isVerified && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();

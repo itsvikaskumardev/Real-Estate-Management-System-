@@ -45,6 +45,9 @@ namespace RealEstate.Application.Property.Commands
             if (property.SellerId != currentUser.UserId)
                 throw new ForbiddenAccessException("Not authorized");
 
+            if (property.IsVerified)
+                throw new ForbiddenAccessException("Cannot delete a property that has already been verified by an admin.");
+
             // Delete images from storage — best-effort, don't block the DB delete if one fails
             foreach (var image in property.Images)
             {

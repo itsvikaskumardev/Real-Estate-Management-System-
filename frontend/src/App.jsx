@@ -21,6 +21,7 @@ import Profile from "./pages/shared/Profile";
 import SellerProfile from "./pages/seller/SellerProfile";
 import ChatMessages from "./pages/shared/ChatMessages";
 import SellerLayout from "./components/SellerLayout";
+import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -128,6 +129,7 @@ function App() {
           }
         >
           <Route element={<SellerLayoutWrapper />}>
+            <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
             <Route path="/inquiries" element={<MyInquiries />} />
             <Route path="/profile" element={<ProfileWrapper />} />
             <Route path="/wishlist" element={<Wishlist />} />

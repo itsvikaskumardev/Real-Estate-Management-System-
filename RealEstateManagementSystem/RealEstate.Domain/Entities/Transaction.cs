@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RealEstate.Domain.Entities
 {
-    public class Transaction : BaseEntity
+    public class Transaction : BaseAuditableEntity
     {
         public Guid PropertyId { get; set; }
         public Guid BuyerId { get; set; }
