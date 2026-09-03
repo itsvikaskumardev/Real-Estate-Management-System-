@@ -142,7 +142,15 @@ namespace RealEstate.API.Endpoints
             group.MapGet("/", async ([AsParameters] GetAllPropertiesQuery query, ISender sender) =>
             {
                 var result = await sender.Send(query);
-                return Results.Ok(new { success = true, result.Count, result.Properties });
+                return Results.Ok(new 
+                { 
+                    success = true, 
+                    count = result.TotalCount, 
+                    properties = result.Items,
+                    pageNumber = result.PageNumber,
+                    pageSize = result.PageSize,
+                    totalPages = result.TotalPages
+                });
             })
             .WithName("GetProperties");
 

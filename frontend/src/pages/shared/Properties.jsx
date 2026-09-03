@@ -35,7 +35,12 @@ const Properties = () => {
     amenities: [],
     furnishing: [],
     sort: "latest",
+    pageNumber: 1,
+    pageSize: 9,
   });
+
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   const propertyTypes = [
     { label: "Flat/Apartment", value: "flat" },
@@ -129,11 +134,15 @@ const Properties = () => {
       if (currentFilters.furnishing && currentFilters.furnishing.length > 0)
         params.append("furnishing", currentFilters.furnishing.join(","));
       if (currentFilters.sort) params.append("sort", currentFilters.sort);
+      params.append("pageNumber", currentFilters.pageNumber);
+      params.append("pageSize", currentFilters.pageSize);
 
       const res = await axios.get(
         `${API_URL}/api/property?${params.toString()}`,
       );
       setProperties(res.data.properties);
+      setTotalPages(res.data.totalPages || 1);
+      setTotalCount(res.data.count || 0);
       setError(null);
     } catch (err) {
       setError("Failed to load properties. Please try again later.");
@@ -159,14 +168,22 @@ const Properties = () => {
     } else {
       current.splice(index, 1);
     }
-    const updatedFilters = { ...filters, [category]: current };
+    const updatedFilters = { ...filters, [category]: current, pageNumber: 1 };
     setFilters(updatedFilters);
     fetchProperties(updatedFilters);
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    const updatedFilters = { ...filters, pageNumber: newPage };
+    setFilters(updatedFilters);
+    fetchProperties(updatedFilters);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handlePriceChange = (e) => {
     const value = parseInt(e.target.value);
-    const updatedFilters = { ...filters, maxPrice: value };
+    const updatedFilters = { ...filters, maxPrice: value, pageNumber: 1 };
     setFilters(updatedFilters);
     debouncedFetch(updatedFilters);
   };
@@ -175,6 +192,7 @@ const Properties = () => {
     const updatedFilters = {
       ...filters,
       bhk: filters.bhk === value ? "" : value,
+      pageNumber: 1
     };
     setFilters(updatedFilters);
     fetchProperties(updatedFilters);
@@ -182,7 +200,7 @@ const Properties = () => {
 
   const handleSortChange = (e) => {
     const newSort = e.target.value;
-    const updatedFilters = { ...filters, sort: newSort };
+    const updatedFilters = { ...filters, sort: newSort, pageNumber: 1 };
     setFilters(updatedFilters);
     fetchProperties(updatedFilters);
   };
@@ -202,6 +220,8 @@ const Properties = () => {
       amenities: [],
       furnishing: [],
       sort: "latest",
+      pageNumber: 1,
+      pageSize: 9,
     };
     setFilters(reset);
     navigate("/properties");
@@ -362,7 +382,7 @@ const Properties = () => {
                 <span className={s.resultCount}>
                   Showing{" "}
                   <strong className={s.resultCountStrong}>
-                    {loading ? "..." : properties.length}
+                    {loading ? "..." : totalCount}
                   </strong>{" "}
                   properties
                 </span>
@@ -437,6 +457,28 @@ const Properties = () => {
                       onToggleWishlist={handleToggleWishlist}
                     />
                   ))}
+              </div>
+            )}
+            
+            {!loading && !error && totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '32px', marginBottom: '32px' }}>
+                <button 
+                  onClick={() => handlePageChange(filters.pageNumber - 1)}
+                  disabled={filters.pageNumber === 1}
+                  style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: filters.pageNumber === 1 ? '#f8fafc' : '#fff', color: filters.pageNumber === 1 ? '#94a3b8' : '#0f172a', cursor: filters.pageNumber === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                >
+                  Previous
+                </button>
+                <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', fontWeight: '500', color: '#475569' }}>
+                  Page {filters.pageNumber} of {totalPages}
+                </div>
+                <button 
+                  onClick={() => handlePageChange(filters.pageNumber + 1)}
+                  disabled={filters.pageNumber === totalPages}
+                  style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: filters.pageNumber === totalPages ? '#f8fafc' : '#fff', color: filters.pageNumber === totalPages ? '#94a3b8' : '#0f172a', cursor: filters.pageNumber === totalPages ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                >
+                  Next
+                </button>
               </div>
             )}
           </main>

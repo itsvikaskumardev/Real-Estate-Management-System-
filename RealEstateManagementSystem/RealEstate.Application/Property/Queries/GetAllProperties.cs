@@ -9,11 +9,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using RealEstate.Application.Property.Dto;
 using RealEstate.Application.Admin.Dto;
+using RealEstate.Application.Common.Models;
 
 namespace RealEstate.Application.Property.Queries
 {
 
-    public record GetAllPropertiesQuery : IRequest<GetAllPropertiesResponse>
+    public record GetAllPropertiesQuery : IRequest<PaginatedList<PropertyDto>>
     {
         public string? City { get; init; }
         public string? Area { get; init; }
@@ -27,18 +28,14 @@ namespace RealEstate.Application.Property.Queries
         public string? Amenities { get; init; }       // comma-separated
         public string? Sort { get; init; }
         public Guid? SellerId { get; init; }
-    }
-
-    public record GetAllPropertiesResponse
-    {
-        public int Count { get; init; }
-        public List<RealEstate.Application.Property.Dto.PropertyDto> Properties { get; init; } = [];
+        public int PageNumber { get; init; } = 1;
+        public int PageSize { get; init; } = 12;
     }
 
     public class GetAllPropertiesQueryHandler(IApplicationDbContext dbContext)
-        : IRequestHandler<GetAllPropertiesQuery, GetAllPropertiesResponse>
+        : IRequestHandler<GetAllPropertiesQuery, PaginatedList<PropertyDto>>
     {
-        public async Task<GetAllPropertiesResponse> Handle(
+        public async Task<PaginatedList<PropertyDto>> Handle(
             GetAllPropertiesQuery request,
             CancellationToken ct)
         {
@@ -121,8 +118,7 @@ namespace RealEstate.Application.Property.Queries
                 _ => query.OrderByDescending(p => p.CreatedAt) // "latest" and default
             };
 
-            var properties = await query
-                .Select(p => new RealEstate.Application.Property.Dto.PropertyDto
+            var projectedQuery = query.Select(p => new PropertyDto
                 {
                     Id = p.Id,
                     Title = p.Title,
@@ -143,7 +139,7 @@ namespace RealEstate.Application.Property.Queries
                     Images = p.Images.Select(i => i.Url).ToList(),
                     CreatedAt = p.CreatedAt,
                     SellerId = p.SellerId,
-                    Seller = p.Seller != null ? new RealEstate.Application.Admin.Dto.SellerDto
+                    Seller = p.Seller != null ? new SellerDto
                     {
                         Id = p.Seller.Id,
                         Name = p.Seller.Name,
@@ -151,14 +147,13 @@ namespace RealEstate.Application.Property.Queries
                         IsApproved = p.Seller.IsApproved,
                         ProfilePic = p.Seller.ProfilePic
                     } : null!
-                })
-                .ToListAsync(ct);
+                });
 
-            return new GetAllPropertiesResponse
-            {
-                Count = properties.Count,
-                Properties = properties
-            };
+            return await PaginatedList<PropertyDto>.CreateAsync(
+                projectedQuery, 
+                request.PageNumber > 0 ? request.PageNumber : 1, 
+                request.PageSize > 0 ? request.PageSize : 12, 
+                ct);
         }
     }
 }

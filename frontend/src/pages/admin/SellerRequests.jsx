@@ -84,6 +84,22 @@ const SellerRequests = () => {
     }
   };
 
+  const handleSecureView = async (docId) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/seller/documents/${docId}/view`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob' // Important to handle the binary stream
+      });
+      const url = URL.createObjectURL(res.data);
+      window.open(url, '_blank');
+      // Revoke the object URL after a short delay to free memory
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to securely fetch document. It may have been deleted.");
+    }
+  };
+
   if (loading)
     return (
       <div className={s.loaderFullPage}>
@@ -162,17 +178,15 @@ const SellerRequests = () => {
                               </div>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                              <a 
-                                href={doc.fileUrl} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                title="View Document"
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', backgroundColor: '#f1f5f9', color: '#0ea5e9', borderRadius: '4px', transition: 'background-color 0.2s', textDecoration: 'none' }}
+                              <button 
+                                onClick={() => handleSecureView(doc.id)} 
+                                title="View Document Securely"
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', backgroundColor: '#f1f5f9', color: '#0ea5e9', borderRadius: '4px', transition: 'background-color 0.2s', border: 'none', cursor: 'pointer' }}
                                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e0f2fe'}
                                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
                               >
                                 <HiOutlineEye size={18} />
-                              </a>
+                              </button>
                               {doc.status !== 'Verified' && doc.status !== 'Rejected' && (
                                 <>
                                   <button 
