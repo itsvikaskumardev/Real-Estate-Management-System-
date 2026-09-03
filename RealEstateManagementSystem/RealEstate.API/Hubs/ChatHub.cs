@@ -15,5 +15,10 @@ namespace RealEstate.API.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
         }
+
+        public async Task JoinUserGroup(string userId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"User_{userId.ToLowerInvariant()}");
+        }
     }
 }

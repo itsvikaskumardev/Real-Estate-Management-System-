@@ -27,7 +27,8 @@ namespace RealEstate.Application.Chats.Commands
     public class SendMessageCommandHandler(
         IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
-        IChatNotificationService chatNotificationService)
+        IChatNotificationService chatNotificationService,
+        IGlobalNotificationService globalNotificationService)
         : IRequestHandler<SendMessageCommand, SendMessageResponse>
     {
         public async Task<SendMessageResponse> Handle(
@@ -38,6 +39,8 @@ namespace RealEstate.Application.Chats.Commands
                 throw new UnauthorizedException("Not authenticated");
 
             var chat = await dbContext.Chats
+                .Include(c => c.Buyer)
+                .Include(c => c.Seller)
                 .FirstOrDefaultAsync(c => c.Id == request.ChatId, ct);
 
             if (chat is null)
@@ -72,6 +75,17 @@ namespace RealEstate.Application.Chats.Commands
             };
 
             await chatNotificationService.BroadcastMessageAsync(chat.Id, response.NewMessage);
+
+            // Send global notification to the receiver
+            var receiverId = chat.BuyerId == currentUser.UserId ? chat.SellerId : chat.BuyerId;
+            var senderName = chat.BuyerId == currentUser.UserId ? chat.Buyer.Name : chat.Seller.Name;
+            
+            await globalNotificationService.SendNotificationAsync(
+                receiverId, 
+                "New Message", 
+                $"You have a new message from {senderName}", 
+                "info"
+            );
 
             return response;
         }

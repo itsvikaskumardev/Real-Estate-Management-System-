@@ -43,6 +43,7 @@ It is just a clean place to organize Dependency Injection registrations.
             services.AddHttpContextAccessor();
             services.AddSignalR();
             services.AddScoped<IChatNotificationService, ChatNotificationService>();
+            services.AddScoped<IGlobalNotificationService, GlobalNotificationService>();
             // Configure JSON to parse Enums from strings
             services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
             {
