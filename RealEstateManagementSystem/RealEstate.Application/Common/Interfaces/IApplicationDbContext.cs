@@ -18,7 +18,8 @@ namespace RealEstate.Application.Common.Interfaces
         DbSet<ChatMessage> ChatMessages { get; }
         DbSet<Transaction> Transactions { get; }
         DbSet<Document> Documents { get; }
-        // ...your other DbSets
+        DbSet<SiteVisit> SiteVisits { get; }
+        DbSet<SavedSearch> SavedSearches { get; }
         Task<int> SaveChangesAsync(CancellationToken ct);
     }
 }

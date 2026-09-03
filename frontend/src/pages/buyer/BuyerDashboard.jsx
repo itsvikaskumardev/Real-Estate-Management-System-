@@ -9,8 +9,7 @@ import {
   HiOutlineCheckCircle,
   HiOutlineClock
 } from "react-icons/hi";
-import Navbar from "../../components/common/Navbar";
-import { profileStyles as ps, sellerDashboardStyles as s } from "../../assets/dummyStyles";
+import { sellerDashboardStyles as s } from "../../assets/dummyStyles";
 
 const BuyerDashboard = () => {
   const { token } = useAuth();
@@ -55,9 +54,7 @@ const BuyerDashboard = () => {
   ];
 
   return (
-    <div className={ps.containerWrapper(token ? 'buyer' : null)}>
-      <Navbar />
-      <div className={ps.mainContainer(token ? 'buyer' : null)}>
+    <>
       <header className={s.header}>
         <div className={s.headerLeft}>
           <h1 className={s.headerTitle}>Buyer Dashboard</h1>
@@ -138,8 +135,7 @@ const BuyerDashboard = () => {
           </div>
         )}
       </div>
-      </div>
-    </div>
+    </>
   );
 };
 

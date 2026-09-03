@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import API_URL from "../../config";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../../components/common/Navbar";
 import { useAuth } from "../../context/AuthContext";
 import { useChat } from "../../context/ChatContext";
 import {
@@ -188,10 +187,7 @@ const ChatMessages = () => {
     );
 
   return (
-    <div
-      className={`${s.chatContainer} ${user?.role === "seller" ? s.chatContainerSeller : s.chatContainerNonSeller}`}
-    >
-      {user?.role !== "seller" && <Navbar />}
+    <div className={`${s.chatContainer} ${s.chatContainerSeller}`}>
       <div className={s.chatWrapper}>
         {/* Conversations Sidebar */}
         <div className={`${s.sidebar} ${activeChat ? s.sidebarHidden : ""}`}>

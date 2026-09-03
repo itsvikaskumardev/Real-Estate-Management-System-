@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { wishlistStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
-import Navbar from "../../components/common/Navbar";
 import axios from "axios";
 import API_URL from "../../config";
 import { HiHeart, HiTrash } from "react-icons/hi";
@@ -63,9 +62,7 @@ const Wishlist = () => {
     );
 
   return (
-    <div className={s.pageContainer}>
-      <Navbar />
-
+    <>
       <main className={s.mainContainer}>
         <div className={s.headingWrapper}>
           <h1 className={s.heading}>Your Wishlist</h1>
@@ -112,7 +109,7 @@ const Wishlist = () => {
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 };
 

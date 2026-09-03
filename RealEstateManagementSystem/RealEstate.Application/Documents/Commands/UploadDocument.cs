@@ -18,9 +18,9 @@ namespace RealEstate.Application.Documents.Commands
     }
 
     public class UploadDocumentCommandHandler(
-        IApplicationDbContext context, 
+        IApplicationDbContext context,
         ICurrentUserService currentUserService,
-        IFileStorageService fileStorageService) 
+        IFileStorageService fileStorageService)
         : IRequestHandler<UploadDocumentCommand, Guid>
     {
         public async Task<Guid> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
@@ -45,7 +45,7 @@ namespace RealEstate.Application.Documents.Commands
                 existingDoc.Status = "Uploaded";
                 existingDoc.VerifiedAt = null;
                 existingDoc.VerifiedBy = null;
-                
+
                 await context.SaveChangesAsync(cancellationToken);
                 return existingDoc.Id;
             }
@@ -59,7 +59,7 @@ namespace RealEstate.Application.Documents.Commands
                 Status = "Uploaded"
             };
 
-            context.Documents.Add(newDoc);
+            await context.Documents.AddAsync(newDoc);
             await context.SaveChangesAsync(cancellationToken);
             return newDoc.Id;
         }

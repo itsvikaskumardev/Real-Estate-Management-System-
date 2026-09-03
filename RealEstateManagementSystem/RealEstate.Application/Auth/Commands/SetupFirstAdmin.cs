@@ -57,7 +57,7 @@ namespace RealEstate.Application.Auth.Commands
                 IsBlocked = false
             };
 
-            dbContext.Users.Add(adminUser);
+            await dbContext.Users.AddAsync(adminUser);
             await dbContext.SaveChangesAsync(ct);
 
             logger.LogInformation("First admin user created via setup: {Email}", adminUser.Email);

@@ -3,7 +3,6 @@ import { contactStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import API_URL from "../../config";
-import Navbar from "../../components/common/Navbar";
 import {
   HiOutlineAnnotation,
   HiOutlineCheckCircle,
@@ -48,9 +47,7 @@ const Contact = () => {
   };
 
   return (
-    <div className={s.container}>
-      {user?.role !== "seller" && <Navbar />}
-
+    <>
       <div className={s.mainContainer}>
         <div className={s.header}>
           <h1 className={s.heading}>Get In Touch</h1>
@@ -187,7 +184,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -17,10 +17,13 @@ import EditProperty from "./pages/seller/EditProperty";
 import MyProperties from "./pages/seller/MyProperties";
 import Wishlist from "./pages/buyer/Wishlist";
 import MyInquiries from "./pages/buyer/MyInquiries";
+import MyVisits from "./pages/buyer/MyVisits";
+import SavedSearches from "./pages/buyer/SavedSearches";
 import Profile from "./pages/shared/Profile";
 import SellerProfile from "./pages/seller/SellerProfile";
 import ChatMessages from "./pages/shared/ChatMessages";
 import SellerLayout from "./components/SellerLayout";
+import BuyerLayout from "./components/BuyerLayout";
 import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -30,6 +33,7 @@ import AdminInquiries from "./pages/admin/AdminInquiries";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminManagement from "./pages/admin/AdminManagement";
 import SellerRequests from "./pages/admin/SellerRequests";
+import VisitRequests from "./pages/seller/VisitRequests";
 import Contact from "./pages/shared/Contact";
 import {
   ProtectedRoute,
@@ -81,10 +85,12 @@ const ScrollTopButton = () => {
   );
 };
 
-// Smart Layout Wrapper to dynamically apply SellerLayout for Sellers
-const SellerLayoutWrapper = () => {
+// Smart Layout Wrapper to dynamically apply Layouts
+const DashboardLayoutWrapper = () => {
   const { user } = useAuth();
-  return user?.role === "seller" ? <SellerLayout /> : <Outlet />;
+  if (user?.role === "seller") return <SellerLayout />;
+  if (user?.role === "buyer") return <BuyerLayout />;
+  return <Outlet />;
 };
 
 const ProfileWrapper = () => {
@@ -128,13 +134,20 @@ function App() {
             <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]} />
           }
         >
-          <Route element={<SellerLayoutWrapper />}>
-            <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+          <Route element={<DashboardLayoutWrapper />}>
             <Route path="/inquiries" element={<MyInquiries />} />
             <Route path="/profile" element={<ProfileWrapper />} />
-            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/chat-messages" element={<ChatMessages />} />
             <Route path="/contact" element={<Contact />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>
+            <Route element={<BuyerLayout />}>
+              <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/my-visits" element={<MyVisits />} />
+              <Route path="/saved-searches" element={<SavedSearches />} />
+            </Route>
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
@@ -144,6 +157,7 @@ function App() {
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/edit-property/:id" element={<EditProperty />} />
               <Route path="/my-properties" element={<MyProperties />} />
+              <Route path="/visit-requests" element={<VisitRequests />} />
             </Route>
           </Route>
 

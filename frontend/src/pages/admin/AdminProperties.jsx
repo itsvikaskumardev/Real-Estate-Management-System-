@@ -31,6 +31,11 @@ const AdminProperties = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  
+  // Pagination state
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Debounce search query to avoid spamming the API
   useEffect(() => {
@@ -49,6 +54,8 @@ const AdminProperties = () => {
             search: debouncedSearch || undefined,
             status: statusFilter || undefined,
             isVerified: verificationFilter === "true" ? true : verificationFilter === "false" ? false : undefined,
+            pageNumber,
+            pageSize: 12
           },
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -56,6 +63,8 @@ const AdminProperties = () => {
           ? res.data
           : res.data.properties || [];
         setProperties(props);
+        setTotalPages(res.data.totalPages || 1);
+        setTotalCount(res.data.count || 0);
       } catch (err) {
         console.error("Failed to load properties:", err);
       } finally {
@@ -63,7 +72,7 @@ const AdminProperties = () => {
       }
     };
     fetchProperties();
-  }, [debouncedSearch, statusFilter, verificationFilter, token]);
+  }, [debouncedSearch, statusFilter, verificationFilter, pageNumber, token]);
 
   const confirmDelete = (id) => {
     setPropertyToDelete(id);
@@ -123,7 +132,10 @@ const AdminProperties = () => {
               type="text"
               placeholder="Search by title, city, or seller..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPageNumber(1);
+              }}
               style={{ padding: '0.5rem 1rem 0.5rem 2.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none' }}
             />
           </div>
@@ -133,7 +145,10 @@ const AdminProperties = () => {
           <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Verification</label>
           <select
             value={verificationFilter}
-            onChange={(e) => setVerificationFilter(e.target.value)}
+            onChange={(e) => {
+              setVerificationFilter(e.target.value);
+              setPageNumber(1);
+            }}
             style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none', backgroundColor: '#fff', cursor: 'pointer' }}
           >
             <option value="">All Statuses</option>
@@ -146,7 +161,10 @@ const AdminProperties = () => {
           <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Listing Status</label>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPageNumber(1);
+            }}
             style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none', backgroundColor: '#fff', cursor: 'pointer' }}
           >
             <option value="">All Types</option>
@@ -219,6 +237,28 @@ const AdminProperties = () => {
                 )}
               />
             ))}
+          </div>
+        )}
+        
+        {!loading && totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '32px' }}>
+            <button 
+              onClick={() => { setPageNumber(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              disabled={pageNumber === 1}
+              style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: pageNumber === 1 ? '#f8fafc' : '#fff', color: pageNumber === 1 ? '#94a3b8' : '#0f172a', cursor: pageNumber === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+            >
+              Previous
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', fontWeight: '500', color: '#475569' }}>
+              Page {pageNumber} of {totalPages}
+            </div>
+            <button 
+              onClick={() => { setPageNumber(p => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              disabled={pageNumber === totalPages}
+              style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: pageNumber === totalPages ? '#f8fafc' : '#fff', color: pageNumber === totalPages ? '#94a3b8' : '#0f172a', cursor: pageNumber === totalPages ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

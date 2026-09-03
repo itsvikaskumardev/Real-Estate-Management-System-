@@ -20,17 +20,29 @@ import {
   HiOutlineCurrencyRupee,
 } from "react-icons/hi";
 import { Link } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import { sellerDashboardStyles as s } from "../../assets/dummyStyles";
 
 const SellerDashboard = () => {
   const { logout, token } = useAuth();
-  const [stats, setStats] = useState({
+  const [analytics, setAnalytics] = useState({
     totalProperties: 0,
-    activeListings: 0,
-    soldProperties: 0,
-    totalInquiries: 0,
-    totalViews: 0,
+    totalLeads: 0,
+    totalSales: 0,
     totalRevenue: 0,
+    monthlySales: [],
+    propertyTypeStats: []
   });
   const [properties, setProperties] = useState([]);
   const [inquiries, setInquiries] = useState([]);
@@ -40,8 +52,8 @@ const SellerDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, propsRes, inqRes] = await Promise.all([
-          axios.get(`${API_URL}/api/property/seller/dashboard`, {
+        const [analyticsRes, propsRes, inqRes] = await Promise.all([
+          axios.get(`${API_URL}/api/property/seller/analytics`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(`${API_URL}/api/property/my`, {
@@ -51,7 +63,7 @@ const SellerDashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-        setStats(statsRes.data.stats || statsRes.data);
+        setAnalytics(analyticsRes.data.data);
         const props = Array.isArray(propsRes.data)
           ? propsRes.data
           : propsRes.data.properties || [];
@@ -118,36 +130,32 @@ const SellerDashboard = () => {
 
   const statCards = [
     {
-      title: "Total Views",
-      value: stats.totalViews?.toLocaleString() || "0",
-      icon: HiOutlineEye,
-      color: "#0d6e59",
-    },
-    {
-      title: "Active Leads",
-      value: stats.totalInquiries?.toLocaleString() || "0",
-      icon: HiOutlineUserGroup,
-      color: "#0d6e59",
-    },
-    {
-      title: "Live Listings",
-      value: stats.activeListings?.toLocaleString() || "0",
+      title: "Total Properties",
+      value: analytics.totalProperties?.toLocaleString() || "0",
       icon: HiOutlineLibrary,
       color: "#0d6e59",
     },
     {
+      title: "Total Leads",
+      value: analytics.totalLeads?.toLocaleString() || "0",
+      icon: HiOutlineUserGroup,
+      color: "#0d6e59",
+    },
+    {
       title: "Properties Sold",
-      value: stats.soldProperties?.toLocaleString() || "0",
+      value: analytics.totalSales?.toLocaleString() || "0",
       icon: HiOutlineCheckCircle,
       color: "#0d6e59",
     },
     {
       title: "Total Revenue",
-      value: `₹${(stats.totalRevenue || 0).toLocaleString("en-IN")}`,
+      value: `₹${(analytics.totalRevenue || 0).toLocaleString("en-IN")}`,
       icon: HiOutlineCurrencyRupee,
       color: "#0d6e59",
     },
   ];
+
+  const COLORS = ["#0d6e59", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0"];
 
   const filteredProperties = Array.isArray(properties)
     ? properties
@@ -195,6 +203,54 @@ const SellerDashboard = () => {
             <div className={s.statValue}>{card.value}</div>
           </div>
         ))}
+      </div>
+
+      {/* Advanced Analytics Charts */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ backgroundColor: '#fff', borderRadius: '1rem', padding: '1.5rem', border: '1px solid #e2e8f0' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '1rem' }}>Monthly Revenue (Last 6 Months)</h2>
+          <div style={{ height: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={analytics.monthlySales}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val / 100000}L`} />
+                <RechartsTooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                <Bar dataKey="revenue" fill="#0d6e59" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor: '#fff', borderRadius: '1rem', padding: '1.5rem', border: '1px solid #e2e8f0' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '1rem' }}>Properties by Type</h2>
+          <div style={{ height: '300px' }}>
+            {analytics.propertyTypeStats && analytics.propertyTypeStats.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={analytics.propertyTypeStats}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {analytics.propertyTypeStats.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                No properties yet.
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Listings Section */}

@@ -11,7 +11,6 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
-import Navbar from "../../components/common/Navbar";
 import { profileStyles as s, contactStyles as cs } from "../../assets/dummyStyles";
 
 const Profile = () => {
@@ -90,10 +89,8 @@ const Profile = () => {
   };
 
   return (
-    <div className={s.containerWrapper(user?.role)}>
-      {user?.role !== "seller" && <Navbar />}
-      <div className={s.mainContainer(user?.role)}>
-        <header className={s.header}>
+    <>
+      <header className={s.header}>
           <h1 className={s.pageTitle}>Personal Profile</h1>
           <p className={s.pageSubtitle}>
             Manage your personal information and account settings.
@@ -278,8 +275,7 @@ const Profile = () => {
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </>
   );
 };
 

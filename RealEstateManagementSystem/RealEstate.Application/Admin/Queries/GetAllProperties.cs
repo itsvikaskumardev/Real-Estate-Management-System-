@@ -8,26 +8,23 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using RealEstate.Application.Property.Dto;
+using RealEstate.Application.Common.Models;
 
 namespace RealEstate.Application.Admin.Queries
 {
-    public record GetAllPropertiesQuery : IRequest<GetAllPropertiesResponse>
+    public record GetAllPropertiesQuery : IRequest<PaginatedList<PropertyDto>>
     {
         public string? Search { get; init; } // Title, city, seller name/email
         public bool? IsVerified { get; init; }
         public string? Status { get; init; }
-    }
-
-    public record GetAllPropertiesResponse
-    {
-        public int Count { get; init; }
-        public List<PropertyDto> Properties { get; init; } = [];
+        public int PageNumber { get; init; } = 1;
+        public int PageSize { get; init; } = 12;
     }
 
     public class GetAllPropertiesQueryHandler(IApplicationDbContext dbContext)
-        : IRequestHandler<GetAllPropertiesQuery, GetAllPropertiesResponse>
+        : IRequestHandler<GetAllPropertiesQuery, PaginatedList<PropertyDto>>
     {
-        public async Task<GetAllPropertiesResponse> Handle(
+        public async Task<PaginatedList<PropertyDto>> Handle(
             GetAllPropertiesQuery request,
             CancellationToken ct)
         {
@@ -59,7 +56,7 @@ namespace RealEstate.Application.Admin.Queries
                 );
             }
 
-            var properties = await query
+            var projectedQuery = query
                 .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new PropertyDto
                 {
@@ -80,14 +77,13 @@ namespace RealEstate.Application.Admin.Queries
                         Name = p.Seller.Name,
                         Email = p.Seller.Email
                     }
-                })
-                .ToListAsync(ct);
+                });
 
-            return new GetAllPropertiesResponse
-            {
-                Count = properties.Count,
-                Properties = properties
-            };
+            return await PaginatedList<PropertyDto>.CreateAsync(
+                projectedQuery, 
+                request.PageNumber > 0 ? request.PageNumber : 1, 
+                request.PageSize > 0 ? request.PageSize : 12, 
+                ct);
         }
     }
 }

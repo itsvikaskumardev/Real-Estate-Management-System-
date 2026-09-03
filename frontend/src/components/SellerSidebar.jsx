@@ -22,6 +22,7 @@ const SellerSidebar = ({ isOpen, onClose }) => {
       icon: HiOutlineClipboardList,
       path: "/my-properties",
     },
+    { name: "Visit Requests", icon: HiOutlineClipboardList, path: "/visit-requests" },
     { name: "Leads", icon: HiOutlineChartBar, path: "/inquiries" },
     { name: "Messages", icon: HiOutlineViewGrid, path: "/chat-messages" },
     { name: "Profile", icon: HiOutlineUser, path: "/profile" },

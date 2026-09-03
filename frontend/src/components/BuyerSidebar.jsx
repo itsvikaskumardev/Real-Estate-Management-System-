@@ -4,6 +4,8 @@ import {
   HiOutlineViewGrid,
   HiOutlineHeart,
   HiOutlineChat,
+  HiOutlineLocationMarker,
+  HiOutlineSearch,
   HiOutlineUser,
   HiOutlineSupport,
   HiOutlineLogout,
@@ -20,6 +22,8 @@ const BuyerSidebar = ({ isOpen, onClose }) => {
     { name: "Wishlist", icon: HiOutlineHeart, path: "/wishlist" },
     { name: "My Inquiries", icon: HiOutlineChat, path: "/inquiries" },
     { name: "Messages", icon: HiOutlineChat, path: "/chat-messages" },
+    { name: "My Visits", icon: HiOutlineLocationMarker, path: "/my-visits" },
+    { name: "Saved Searches", icon: HiOutlineSearch, path: "/saved-searches" },
     { name: "Profile", icon: HiOutlineUser, path: "/profile" },
     { name: "Support", icon: HiOutlineSupport, path: "/contact" },
   ];

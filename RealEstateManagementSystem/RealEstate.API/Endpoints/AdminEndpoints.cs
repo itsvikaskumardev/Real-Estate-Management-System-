@@ -51,7 +51,15 @@ namespace RealEstate.API.Endpoints
             group.MapGet("/properties", async ([AsParameters] GetAllPropertiesQuery query, [FromServices] ISender sender) =>
             {
                 var result = await sender.Send(query);
-                return Results.Ok(new { success = true, result.Count, result.Properties });
+                return Results.Ok(new 
+                { 
+                    success = true, 
+                    count = result.TotalCount, 
+                    properties = result.Items,
+                    pageNumber = result.PageNumber,
+                    pageSize = result.PageSize,
+                    totalPages = result.TotalPages 
+                });
             })
             .WithName("GetAllProperties");
 
@@ -116,6 +124,13 @@ namespace RealEstate.API.Endpoints
                 return Results.Ok(new { success = result });
             })
             .WithName("VerifyProperty");
+
+            group.MapGet("/seller/documents/{documentId:Guid}/view", async (Guid documentId, [FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(new ViewDocumentQuery(documentId));
+                return Results.Stream(result.Stream, result.ContentType);
+            })
+            .WithName("ViewDocument");
 
             group.MapPatch("/seller/documents/{documentId:Guid}/verify", async (Guid documentId, [FromBody] VerifyDocumentRequest request, [FromServices] ISender sender) =>
             {
