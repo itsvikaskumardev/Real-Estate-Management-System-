@@ -10,7 +10,9 @@ namespace RealEstate.Application.Admin.Commands
 {
     public record VerifyPropertyCommand(Guid PropertyId, bool Approve) : IRequest<bool>;
 
-    public class VerifyPropertyCommandHandler(IApplicationDbContext dbContext) : IRequestHandler<VerifyPropertyCommand, bool>
+    public class VerifyPropertyCommandHandler(
+        IApplicationDbContext dbContext,
+        IGlobalNotificationService globalNotificationService) : IRequestHandler<VerifyPropertyCommand, bool>
     {
         public async Task<bool> Handle(VerifyPropertyCommand request, CancellationToken ct)
         {
@@ -20,9 +22,22 @@ namespace RealEstate.Application.Admin.Commands
             property.IsVerified = request.Approve;
             // If rejected, you might also want to set IsDeleted = true or Status = Rejected, depending on requirements.
 
-
-
             await dbContext.SaveChangesAsync(ct);
+
+            // Notify the seller
+            string message = request.Approve 
+                ? $"Your property '{property.Title}' has been approved/verified by the admin."
+                : $"Your property '{property.Title}' verification was rejected by the admin.";
+            
+            string type = request.Approve ? "success" : "error";
+
+            await globalNotificationService.SendNotificationAsync(
+                property.SellerId,
+                "Property Verification Update",
+                message,
+                type
+            );
+
             return true;
         }
     }

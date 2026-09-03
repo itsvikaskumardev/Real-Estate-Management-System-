@@ -1,9 +1,11 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RealEstate.Application.Common.Exceptions;
 using RealEstate.Application.Common.Interfaces;
 using RealEstate.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using RealEstate.Application.Property.Dto;
 
@@ -40,7 +42,8 @@ namespace RealEstate.Application.Property.Commands
     public class AddPropertyCommandHandler(
         IApplicationDbContext dbContext,
         ICurrentUserService currentUser,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IGlobalNotificationService globalNotificationService)
         : IRequestHandler<AddPropertyCommand, AddPropertyResponse>
     {
         public async Task<AddPropertyResponse> Handle(
@@ -91,6 +94,26 @@ namespace RealEstate.Application.Property.Commands
 
             await dbContext.Properties.AddAsync(property);
             await dbContext.SaveChangesAsync(ct);
+
+            // Fetch the seller to get their name
+            var seller = await dbContext.Users.FindAsync(new object[] { currentUser.UserId.Value }, ct);
+            string sellerName = seller?.Name ?? "A seller";
+
+            // Notify all admins about the new property
+            var adminIds = await dbContext.Users
+                .Where(u => u.Role == UserRole.Admin && !u.IsDeleted)
+                .Select(u => u.Id)
+                .ToListAsync(ct);
+
+            foreach (var adminId in adminIds)
+            {
+                await globalNotificationService.SendNotificationAsync(
+                    adminId,
+                    "New Property Needs Review",
+                    $"{sellerName} added a new property: {property.Title}",
+                    "info"
+                );
+            }
 
             return new AddPropertyResponse
             {
