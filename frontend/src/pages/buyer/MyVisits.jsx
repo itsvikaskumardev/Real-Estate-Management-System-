@@ -3,7 +3,6 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
-import Navbar from "../../components/common/Navbar";
 import { HiOutlineCalendar, HiOutlineClock, HiOutlineLocationMarker, HiCheckCircle, HiXCircle } from "react-icons/hi";
 
 const MyVisits = () => {
@@ -41,8 +40,7 @@ const MyVisits = () => {
   }
 
   return (
-    <div className="bg-bg-alt min-h-screen pt-32 max-lg:pt-28">
-      <Navbar />
+    <>
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem' }}>
         <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '0.5rem' }}>My Scheduled Visits</h1>
       <p style={{ color: '#64748b', marginBottom: '2rem' }}>Track and manage your upcoming property tours.</p>
@@ -112,7 +110,7 @@ const MyVisits = () => {
         </div>
       )}
       </div>
-    </div>
+    </>
   );
 };
 

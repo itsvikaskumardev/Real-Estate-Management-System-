@@ -13,71 +13,42 @@ const Navbar = () => {
 
   const navLinks = (
     <>
-      {(!user || user.role !== "buyer") && (
+      <Link
+        to="/properties"
+        className={s.navLink}
+        onClick={() => setIsOpen(false)}
+      >
+        Browse Properties
+      </Link>
+
+      {user && user.role === "buyer" && (
         <Link
-          to="/properties"
+          to="/buyer-dashboard"
           className={s.navLink}
           onClick={() => setIsOpen(false)}
         >
-          Browse Properties
+          Dashboard
         </Link>
       )}
 
-      {user && user.role === "buyer" && (
-        <>
-          <Link to="/" className={s.navLink} onClick={() => setIsOpen(false)}>
-            Home
-          </Link>
-          <Link
-            to="/buyer-dashboard"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Dashboard
-          </Link>
-          <Link
-            to="/properties"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Property
-          </Link>
-          <Link
-            to="/wishlist"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Wishlist
-          </Link>
-          <Link
-            to="/chat-messages"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Messages
-          </Link>
-          <Link
-            to="/my-visits"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            My Visits
-          </Link>
-          <Link
-            to="/saved-searches"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Saved Searches
-          </Link>
-          <Link
-            to="/contact"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Contact Us
-          </Link>
-        </>
+      {user && user.role === "seller" && (
+        <Link
+          to="/dashboard"
+          className={s.navLink}
+          onClick={() => setIsOpen(false)}
+        >
+          Dashboard
+        </Link>
+      )}
+
+      {user && user.role === "admin" && (
+        <Link
+          to="/admin-dashboard"
+          className={s.navLink}
+          onClick={() => setIsOpen(false)}
+        >
+          Admin Panel
+        </Link>
       )}
 
       {!user && (
@@ -95,30 +66,6 @@ const Navbar = () => {
             onClick={() => setIsOpen(false)}
           >
             Register
-          </Link>
-        </>
-      )}
-
-      {user && user.role === "seller" && (
-        <>
-          <Link
-            to="/dashboard"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Dashboard
-          </Link>
-        </>
-      )}
-
-      {user && user.role === "admin" && (
-        <>
-          <Link
-            to="/admin-dashboard"
-            className={s.navLink}
-            onClick={() => setIsOpen(false)}
-          >
-            Admin Panel
           </Link>
         </>
       )}

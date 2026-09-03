@@ -3,7 +3,6 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
-import Navbar from "../../components/common/Navbar";
 import { HiOutlineBell, HiOutlineTrash, HiOutlineSearch, HiOutlineHome } from "react-icons/hi";
 
 const SavedSearches = () => {
@@ -50,8 +49,7 @@ const SavedSearches = () => {
   }
 
   return (
-    <div className="bg-bg-alt min-h-screen pt-32 max-lg:pt-28">
-      <Navbar />
+    <>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
@@ -121,7 +119,7 @@ const SavedSearches = () => {
         </div>
       )}
       </div>
-    </div>
+    </>
   );
 };
 

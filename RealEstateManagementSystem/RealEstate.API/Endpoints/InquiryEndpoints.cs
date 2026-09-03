@@ -27,6 +27,14 @@ namespace RealEstate.API.Endpoints
             .RequireAuthorization()
             .WithName("GetSellerInquiries");
 
+            group.MapGet("/my", async (ISender sender) =>
+            {
+                var result = await sender.Send(new GetBuyerInquiriesQuery());
+                return Results.Ok(new { success = true, result.Count, result.Inquiries });
+            })
+            .RequireAuthorization()
+            .WithName("GetBuyerInquiries");
+
             group.MapPatch("/{id:Guid}/read", async (Guid id, ISender sender) =>
             {
                 var result = await sender.Send(new MarkInquiryAsReadCommand { InquiryId = id });

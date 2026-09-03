@@ -14,7 +14,6 @@ import {
 } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import Navbar from "../../components/common/Navbar";
 import { myInquiriesStyles as s } from "../../assets/dummyStyles";
 
 const MyInquiries = () => {
@@ -90,12 +89,7 @@ const MyInquiries = () => {
 
   if (error)
     return (
-      <div
-        className={
-          user?.role !== "seller" ? s.bgBgAltMinH : s.bgTransparentMinH
-        }
-      >
-        {user?.role !== "seller" && <Navbar />}
+      <>
         <div className={s.containerPy12TextCenter}>
           <div className={s.cardPremiumPy16Px8}>
             <h2 className={s.textDangerMb4}>Error</h2>
@@ -108,18 +102,15 @@ const MyInquiries = () => {
             </button>
           </div>
         </div>
-      </div>
+      </>
     );
 
   const isSeller = user?.role === "seller";
 
   return (
-    <div
-      className={user?.role !== "seller" ? s.bgBgAltMinH : s.bgTransparentHAuto}
-    >
-      {user?.role !== "seller" && <Navbar />}
+    <>
       <div
-        className={`${s.containerFadeIn} ${user?.role !== "seller" ? s.py12Pt12 : s.pt0}`}
+        className={`${s.containerFadeIn} ${s.pt0}`}
       >
         <div className={s.mb12}>
           <h1 className={s.heading}>
@@ -233,7 +224,7 @@ const MyInquiries = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 

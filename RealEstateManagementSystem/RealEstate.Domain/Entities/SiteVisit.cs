@@ -3,7 +3,7 @@ using System;
 
 namespace RealEstate.Domain.Entities
 {
-    public class SiteVisit : BaseEntity
+    public class SiteVisit : BaseAuditableEntity
     {
         public Guid PropertyId { get; set; }
         public Property Property { get; set; } = null!;
