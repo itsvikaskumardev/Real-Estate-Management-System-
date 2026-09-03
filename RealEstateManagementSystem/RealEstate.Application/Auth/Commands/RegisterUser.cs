@@ -58,7 +58,7 @@ namespace RealEstate.Application.Auth.Commands
                 VerificationToken = verificationToken
             };
 
-            dbContext.Users.Add(user);
+            await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync(ct);
 
             try

@@ -78,7 +78,7 @@ namespace RealEstate.Application.Chats.Commands
                     SellerId = sellerId
                 };
 
-                dbContext.Chats.Add(chat);
+                await dbContext.Chats.AddAsync(chat);
                 await dbContext.SaveChangesAsync(ct);
             }
 

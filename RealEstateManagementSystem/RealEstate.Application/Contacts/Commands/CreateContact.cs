@@ -45,7 +45,7 @@ namespace RealEstate.Application.Contacts.Commands
                 Message = request.Message
             };
 
-            dbContext.Contacts.Add(contact);
+            await dbContext.Contacts.AddAsync(contact);
             await dbContext.SaveChangesAsync(ct);
 
             var adminEmail = configuration["Admin:NotificationEmail"];

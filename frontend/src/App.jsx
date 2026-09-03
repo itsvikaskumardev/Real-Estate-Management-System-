@@ -17,6 +17,8 @@ import EditProperty from "./pages/seller/EditProperty";
 import MyProperties from "./pages/seller/MyProperties";
 import Wishlist from "./pages/buyer/Wishlist";
 import MyInquiries from "./pages/buyer/MyInquiries";
+import MyVisits from "./pages/buyer/MyVisits";
+import SavedSearches from "./pages/buyer/SavedSearches";
 import Profile from "./pages/shared/Profile";
 import SellerProfile from "./pages/seller/SellerProfile";
 import ChatMessages from "./pages/shared/ChatMessages";
@@ -30,6 +32,7 @@ import AdminInquiries from "./pages/admin/AdminInquiries";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminManagement from "./pages/admin/AdminManagement";
 import SellerRequests from "./pages/admin/SellerRequests";
+import VisitRequests from "./pages/seller/VisitRequests";
 import Contact from "./pages/shared/Contact";
 import {
   ProtectedRoute,
@@ -133,6 +136,8 @@ function App() {
             <Route path="/inquiries" element={<MyInquiries />} />
             <Route path="/profile" element={<ProfileWrapper />} />
             <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/my-visits" element={<MyVisits />} />
+            <Route path="/saved-searches" element={<SavedSearches />} />
             <Route path="/chat-messages" element={<ChatMessages />} />
             <Route path="/contact" element={<Contact />} />
           </Route>
@@ -144,6 +149,7 @@ function App() {
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/edit-property/:id" element={<EditProperty />} />
               <Route path="/my-properties" element={<MyProperties />} />
+              <Route path="/visit-requests" element={<VisitRequests />} />
             </Route>
           </Route>
 

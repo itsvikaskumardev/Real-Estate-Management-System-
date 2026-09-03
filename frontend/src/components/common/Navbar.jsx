@@ -57,6 +57,20 @@ const Navbar = () => {
             Messages
           </Link>
           <Link
+            to="/my-visits"
+            className={s.navLink}
+            onClick={() => setIsOpen(false)}
+          >
+            My Visits
+          </Link>
+          <Link
+            to="/saved-searches"
+            className={s.navLink}
+            onClick={() => setIsOpen(false)}
+          >
+            Saved Searches
+          </Link>
+          <Link
             to="/contact"
             className={s.navLink}
             onClick={() => setIsOpen(false)}

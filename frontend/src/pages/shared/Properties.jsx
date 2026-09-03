@@ -14,6 +14,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import PropertyCard from "../../components/common/PropertyCard";
 import Navbar from "../../components/common/Navbar";
+import { toast } from "react-hot-toast";
 import { propertiesStyles as s } from "../../assets/dummyStyles";
 
 const Properties = () => {
@@ -225,7 +226,40 @@ const Properties = () => {
     };
     setFilters(reset);
     navigate("/properties");
+    navigate("/properties");
     fetchProperties(reset);
+  };
+
+  const [savingSearch, setSavingSearch] = useState(false);
+  const handleSaveSearch = async () => {
+    if (!user || user.role !== "buyer") {
+      toast.error("Please login as a buyer to save searches.");
+      return;
+    }
+
+    try {
+      setSavingSearch(true);
+      const title = `${filters.bhk ? filters.bhk + ' BHK' : 'Properties'} ${filters.propertyType.length > 0 ? filters.propertyType.join(', ') : ''} ${filters.city ? 'in ' + filters.city : ''}`;
+      
+      await axios.post(`${API_URL}/api/buyer/saved-searches`, {
+        title: title || "My Saved Search",
+        city: filters.city || null,
+        minPrice: null,
+        maxPrice: filters.maxPrice < 100000000 ? filters.maxPrice : null,
+        bhk: filters.bhk ? parseInt(filters.bhk) : null,
+        propertyType: filters.propertyType.length > 0 ? filters.propertyType[0] : null,
+        status: null,
+        emailAlertsEnabled: true
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success("Search saved successfully! We'll alert you when matching properties are added.");
+    } catch (err) {
+      toast.error("Failed to save search.");
+    } finally {
+      setSavingSearch(false);
+    }
   };
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -256,6 +290,11 @@ const Properties = () => {
                 <h2 className={s.sidebarTitle}>Filters</h2>
               </div>
               <div className={s.sidebarHeaderActions}>
+                {user?.role === "buyer" && (
+                  <button onClick={handleSaveSearch} disabled={savingSearch} style={{ color: "#3b82f6", background: "none", border: "none", fontSize: "0.875rem", fontWeight: "600", cursor: "pointer", marginRight: "10px" }}>
+                    {savingSearch ? "Saving..." : "Save Search"}
+                  </button>
+                )}
                 <button onClick={resetFilters} className={s.resetButton}>
                   Reset
                 </button>

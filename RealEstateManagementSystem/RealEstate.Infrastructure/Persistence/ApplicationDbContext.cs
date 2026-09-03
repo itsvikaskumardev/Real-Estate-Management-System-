@@ -27,10 +27,36 @@ namespace RealEstate.Infrastructure.Persistence
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
         public DbSet<Transaction> Transactions => Set<Transaction>();
         public DbSet<Document> Documents => Set<Document>();
+        public DbSet<SiteVisit> SiteVisits => Set<SiteVisit>();
+        public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
+
+            builder.Entity<SiteVisit>()
+                .HasOne(sv => sv.Property)
+                .WithMany()
+                .HasForeignKey(sv => sv.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<SiteVisit>()
+                .HasOne(sv => sv.Buyer)
+                .WithMany()
+                .HasForeignKey(sv => sv.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SiteVisit>()
+                .HasOne(sv => sv.Seller)
+                .WithMany()
+                .HasForeignKey(sv => sv.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SavedSearch>()
+                .HasOne(ss => ss.Buyer)
+                .WithMany()
+                .HasForeignKey(ss => ss.BuyerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
         }

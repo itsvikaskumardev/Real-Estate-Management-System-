@@ -59,7 +59,7 @@ namespace RealEstate.Application.Wishlist.Commands
                 PropertyId = request.PropertyId
             };
 
-            dbContext.Wishlists.Add(wishlistItem);
+            await dbContext.Wishlists.AddAsync(wishlistItem);
             await dbContext.SaveChangesAsync(ct);
 
             return new AddToWishlistResponse

@@ -55,7 +55,7 @@ namespace RealEstate.Application.Chats.Commands
                 CreatedAt = DateTimeOffset.UtcNow
             };
 
-            dbContext.ChatMessages.Add(message);
+            await dbContext.ChatMessages.AddAsync(message);
             await dbContext.SaveChangesAsync(ct);
 
             var response = new SendMessageResponse

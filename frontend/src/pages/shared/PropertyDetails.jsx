@@ -26,6 +26,8 @@ import {
 import { HiStar, HiOutlineStar } from "react-icons/hi";
 import Navbar from "../../components/common/Navbar";
 import PropertyCard from "../../components/common/PropertyCard";
+import EmiCalculator from "../../components/property/EmiCalculator";
+import MockCheckoutModal from "../../components/property/MockCheckoutModal";
 import { useAuth } from "../../context/AuthContext";
 import { propertyDetailsStyles as s } from "../../assets/dummyStyles";
 
@@ -51,6 +53,11 @@ const PropertyDetails = () => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [purchaseLoading, setPurchaseLoading] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  
+  const [showVisitModal, setShowVisitModal] = useState(false);
+  const [visitLoading, setVisitLoading] = useState(false);
+  const [visitDate, setVisitDate] = useState("");
+  const [visitMessage, setVisitMessage] = useState("");
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -190,6 +197,36 @@ const PropertyDetails = () => {
       alert("Failed to purchase property.");
     } finally {
       setPurchaseLoading(false);
+    }
+  };
+
+  const handleScheduleVisitClick = () => {
+    if (!user) return navigate("/login");
+    if (user.role !== "buyer") return alert("Only buyers can schedule visits");
+    setShowVisitModal(true);
+  };
+
+  const executeScheduleVisit = async (e) => {
+    e.preventDefault();
+    if (!visitDate) return alert("Please select a date and time");
+    
+    setVisitLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/buyer/visits/schedule`, {
+        propertyId: id,
+        visitDate: new Date(visitDate).toISOString(),
+        message: visitMessage
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Site visit requested successfully!", { duration: 5000 });
+      setShowVisitModal(false);
+      setVisitDate("");
+      setVisitMessage("");
+    } catch (err) {
+      alert("Failed to schedule visit. You might already have a pending request.");
+    } finally {
+      setVisitLoading(false);
     }
   };
 
@@ -541,9 +578,15 @@ const PropertyDetails = () => {
                         {purchaseLoading ? "Processing..." : "Buy Now"}
                       </button>
                     )}
-                    <button className={s.chatButton} onClick={handleChatStart}>
-                      <HiChatAlt /> Chat
-                    </button>
+                    
+                    <div style={{ display: "flex", gap: "10px", width: "100%", marginBottom: "10px" }}>
+                      <button className={s.chatButton} onClick={handleScheduleVisitClick} style={{ flex: 1, backgroundColor: "#3b82f6", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", padding: "12px" }}>
+                        <HiCalendar size={20} /> Visit
+                      </button>
+                      <button className={s.chatButton} onClick={handleChatStart} style={{ flex: 1 }}>
+                        <HiChatAlt size={20} /> Chat
+                      </button>
+                    </div>
                   </div>
 
                   {/* Inquiry Form */}
@@ -597,6 +640,13 @@ const PropertyDetails = () => {
                 </>
               )}
             </div>
+            
+            {/* EMI Calculator */}
+            {property.status?.toLowerCase() === "sale" && (
+              <div style={{ marginTop: '24px' }}>
+                <EmiCalculator propertyPrice={property.price} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -653,26 +703,59 @@ const PropertyDetails = () => {
 
       {/* Purchase Confirmation Modal */}
       {showPurchaseModal && createPortal(
+        <MockCheckoutModal 
+          property={property} 
+          onClose={() => setShowPurchaseModal(false)} 
+          onConfirm={executePurchase} 
+        />,
+        document.body
+      )}
+
+      {/* Schedule Visit Modal */}
+      {showVisitModal && createPortal(
         <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
-          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "400px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
-            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1rem", color: "#1e293b" }}>Confirm Purchase</h3>
-            <p style={{ color: "#475569", marginBottom: "1.5rem" }}>
-              Are you sure you want to purchase {property.title} for {formattedPrice}?
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "450px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.5rem", color: "#1e293b" }}>Schedule Site Visit</h3>
+            <p style={{ color: "#64748b", marginBottom: "1.5rem", fontSize: "0.875rem" }}>
+              Pick a date and time to view <strong>{property.title}</strong>.
             </p>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-              <button
-                onClick={() => setShowPurchaseModal(false)}
-                style={{ padding: "0.5rem 1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#475569", cursor: "pointer", transition: "all 0.2s" }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={executePurchase}
-                style={{ padding: "0.5rem 1rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#059669", color: "#fff", cursor: "pointer", transition: "all 0.2s" }}
-              >
-                Confirm Purchase
-              </button>
-            </div>
+            <form onSubmit={executeScheduleVisit}>
+              <div style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#475569", marginBottom: "0.5rem" }}>Date & Time</label>
+                <input 
+                  type="datetime-local" 
+                  value={visitDate}
+                  onChange={(e) => setVisitDate(e.target.value)}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #cbd5e1", outline: "none" }}
+                  required
+                />
+              </div>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#475569", marginBottom: "0.5rem" }}>Message (Optional)</label>
+                <textarea 
+                  value={visitMessage}
+                  onChange={(e) => setVisitMessage(e.target.value)}
+                  placeholder="Anything specific you'd like the seller to know?"
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #cbd5e1", outline: "none", minHeight: "80px", resize: "vertical" }}
+                />
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowVisitModal(false)}
+                  style={{ padding: "0.5rem 1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#475569", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={visitLoading}
+                  style={{ padding: "0.5rem 1.5rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#3b82f6", color: "#fff", cursor: visitLoading ? "not-allowed" : "pointer", fontWeight: "500" }}
+                >
+                  {visitLoading ? "Scheduling..." : "Request Visit"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>,
         document.body

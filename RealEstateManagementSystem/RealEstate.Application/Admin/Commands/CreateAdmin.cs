@@ -52,7 +52,7 @@ namespace RealEstate.Application.Admin.Commands
                 IsBlocked = false
             };
 
-            dbContext.Users.Add(adminUser);
+            await dbContext.Users.AddAsync(adminUser);
             await dbContext.SaveChangesAsync(ct);
 
             logger.LogInformation("New admin user created: {Email}", adminUser.Email);

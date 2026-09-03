@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RealEstate.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using RealEstate.Infrastructure.Persistence;
 namespace RealEstate.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260903073651_AddSiteVisitEntity")]
+    partial class AddSiteVisitEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,47 +339,6 @@ namespace RealEstate.Infrastructure.Migrations
                     b.HasIndex("PropertyId");
 
                     b.ToTable("PropertyImages");
-                });
-
-            modelBuilder.Entity("RealEstate.Domain.Entities.SavedSearch", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("Bhk")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("BuyerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("City")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("EmailAlertsEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<decimal?>("MaxPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("MinPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("PropertyType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuyerId");
-
-                    b.ToTable("SavedSearches");
                 });
 
             modelBuilder.Entity("RealEstate.Domain.Entities.SiteVisit", b =>
@@ -740,17 +702,6 @@ namespace RealEstate.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Property");
-                });
-
-            modelBuilder.Entity("RealEstate.Domain.Entities.SavedSearch", b =>
-                {
-                    b.HasOne("RealEstate.Domain.Entities.User", "Buyer")
-                        .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Buyer");
                 });
 
             modelBuilder.Entity("RealEstate.Domain.Entities.SiteVisit", b =>

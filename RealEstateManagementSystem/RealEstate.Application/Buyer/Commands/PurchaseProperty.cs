@@ -43,7 +43,7 @@ namespace RealEstate.Application.Buyer.Commands
 
             property.Status = PropertyStatus.Sold;
 
-            dbContext.Transactions.Add(transaction);
+            await dbContext.Transactions.AddAsync(transaction);
             await dbContext.SaveChangesAsync(ct);
 
             return true;

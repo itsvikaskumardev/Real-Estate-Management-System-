@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using RealEstate.API.Dto;
 using RealEstate.Application.Property.Commands;
 using RealEstate.Application.Property.Queries;
+using RealEstate.Application.Analytics.Queries;
 using RealEstate.Domain.Enums;
 using System;
 using System.Linq;
@@ -170,6 +171,14 @@ namespace RealEstate.API.Endpoints
             })
             .RequireAuthorization()
             .WithName("GetSellerDashboard");
+
+            group.MapGet("/seller/analytics", async (ISender sender) =>
+            {
+                var result = await sender.Send(new GetSellerAnalyticsQuery());
+                return Results.Ok(new { success = true, data = result });
+            })
+            .RequireAuthorization(policy => policy.RequireRole("seller", "Seller"))
+            .WithName("GetSellerAnalytics");
 
 
 

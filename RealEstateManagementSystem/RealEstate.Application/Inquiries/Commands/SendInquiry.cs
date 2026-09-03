@@ -23,7 +23,7 @@ namespace RealEstate.Application.Inquiries.Commands
         public InquiryDto Inquiry { get; init; } = null!;
     }
 
-   
+
 
     public class SendInquiryCommandHandler(
         IApplicationDbContext dbContext,
@@ -51,7 +51,7 @@ namespace RealEstate.Application.Inquiries.Commands
                 Message = request.Message
             };
 
-            dbContext.Inquiries.Add(inquiry);
+            await dbContext.Inquiries.AddAsync(inquiry);
             await dbContext.SaveChangesAsync(ct);
 
             return new SendInquiryResponse
