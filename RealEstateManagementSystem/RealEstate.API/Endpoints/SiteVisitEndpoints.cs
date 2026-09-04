@@ -13,7 +13,7 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapSiteVisitEndpoints(this IEndpointRouteBuilder app)
         {
-            var buyerGroup = app.MapGroup("/api/buyer/visits")
+            var buyerGroup = app.MapGroup("/api/buyer/visits").WithTags("Visits")
                 .RequireAuthorization(policy => policy.RequireRole("buyer", "Buyer"));
 
             buyerGroup.MapPost("/schedule", async ([FromBody] ScheduleVisitCommand command, [FromServices] ISender sender) =>
@@ -31,7 +31,7 @@ namespace RealEstate.API.Endpoints
             .WithName("GetBuyerVisits");
 
 
-            var sellerGroup = app.MapGroup("/api/seller/visits")
+            var sellerGroup = app.MapGroup("/api/seller/visits").WithTags("Visits")
                 .RequireAuthorization(policy => policy.RequireRole("seller", "Seller"));
 
             sellerGroup.MapGet("/", async ([FromServices] ISender sender) =>

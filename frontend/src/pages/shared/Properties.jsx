@@ -32,9 +32,11 @@ const Properties = () => {
     city: "",
     propertyType: [],
     bhk: "",
+    minPrice: 0,
     maxPrice: 100000000,
     amenities: [],
     furnishing: [],
+    maxAgeDays: "",
     sort: "latest",
     pageNumber: 1,
     pageSize: 9,
@@ -130,10 +132,16 @@ const Properties = () => {
       if (currentFilters.propertyType.length > 0)
         params.append("propertyType", currentFilters.propertyType.join(","));
       if (currentFilters.bhk) params.append("bhk", currentFilters.bhk);
+      if (currentFilters.minPrice > 0)
+        params.append("minPrice", currentFilters.minPrice);
       if (currentFilters.maxPrice)
         params.append("maxPrice", currentFilters.maxPrice);
+      if (currentFilters.amenities && currentFilters.amenities.length > 0)
+        params.append("amenities", currentFilters.amenities.join(","));
       if (currentFilters.furnishing && currentFilters.furnishing.length > 0)
         params.append("furnishing", currentFilters.furnishing.join(","));
+      if (currentFilters.maxAgeDays)
+        params.append("maxAgeDays", currentFilters.maxAgeDays);
       if (currentFilters.sort) params.append("sort", currentFilters.sort);
       params.append("pageNumber", currentFilters.pageNumber);
       params.append("pageSize", currentFilters.pageSize);
@@ -217,9 +225,11 @@ const Properties = () => {
       city: "",
       propertyType: [],
       bhk: "",
+      minPrice: 0,
       maxPrice: 100000000,
       amenities: [],
       furnishing: [],
+      maxAgeDays: "",
       sort: "latest",
       pageNumber: 1,
       pageSize: 9,
@@ -244,7 +254,7 @@ const Properties = () => {
       await axios.post(`${API_URL}/api/buyer/saved-searches`, {
         title: title || "My Saved Search",
         city: filters.city || null,
-        minPrice: null,
+        minPrice: filters.minPrice > 0 ? filters.minPrice : null,
         maxPrice: filters.maxPrice < 100000000 ? filters.maxPrice : null,
         bhk: filters.bhk ? parseInt(filters.bhk) : null,
         propertyType: filters.propertyType.length > 0 ? filters.propertyType[0] : null,
@@ -332,8 +342,35 @@ const Properties = () => {
 
               {/* Price Range */}
               <div className={s.filterSection}>
-                <div className={s.priceHeader}>
-                  <label className={s.filterLabel}>Price Range</label>
+                <label className={s.filterLabel}>Price Range</label>
+                
+                <div className={s.priceHeader} style={{marginTop: '10px'}}>
+                  <span style={{fontSize: '0.875rem', color: '#64748b'}}>Min:</span>
+                  <span className={s.priceValue}>
+                    {filters.minPrice >= 10000000
+                      ? `₹${(filters.minPrice / 10000000).toFixed(2)} Cr`
+                      : filters.minPrice >= 100000 
+                        ? `₹${(filters.minPrice / 100000).toFixed(1)} L`
+                        : "₹0"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100000000"
+                  step="500000"
+                  value={filters.minPrice}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    const updatedFilters = { ...filters, minPrice: value, pageNumber: 1 };
+                    setFilters(updatedFilters);
+                    debouncedFetch(updatedFilters);
+                  }}
+                  className={s.priceSlider}
+                />
+
+                <div className={s.priceHeader} style={{marginTop: '15px'}}>
+                  <span style={{fontSize: '0.875rem', color: '#64748b'}}>Max:</span>
                   <span className={s.priceValue}>
                     {filters.maxPrice >= 10000000
                       ? `₹${(filters.maxPrice / 10000000).toFixed(2)} Cr`
@@ -349,10 +386,6 @@ const Properties = () => {
                   onChange={handlePriceChange}
                   className={s.priceSlider}
                 />
-                <div className={s.priceLabels}>
-                  <span>₹1L</span>
-                  <span>₹10Cr</span>
-                </div>
               </div>
 
               {/* Property Type */}
@@ -409,6 +442,45 @@ const Properties = () => {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Amenities */}
+              <div className={s.filterSection}>
+                <label className={s.filterLabel}>Amenities</label>
+                <div className={s.checkboxGroup}>
+                  {amenitiesOptions.map((option) => (
+                    <label key={option} className={s.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={filters.amenities?.includes(option)}
+                        onChange={() =>
+                          handleCheckboxChange("amenities", option)
+                        }
+                        className={s.checkbox}
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Property Age */}
+              <div className={s.filterSection}>
+                <label className={s.filterLabel}>Listed In</label>
+                <select 
+                  value={filters.maxAgeDays} 
+                  onChange={(e) => {
+                    const updatedFilters = { ...filters, maxAgeDays: e.target.value, pageNumber: 1 };
+                    setFilters(updatedFilters);
+                    fetchProperties(updatedFilters);
+                  }}
+                  style={{width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', outline: 'none', marginTop: '0.5rem'}}
+                >
+                  <option value="">Any Time</option>
+                  <option value="7">Past 7 Days</option>
+                  <option value="30">Past 30 Days</option>
+                  <option value="180">Past 6 Months</option>
+                </select>
               </div>
             </div>
           </aside>

@@ -27,5 +27,10 @@ namespace RealEstate.API.Services
 
             await _hubContext.Clients.Group($"User_{userId.ToString().ToLowerInvariant()}").SendAsync("ReceiveNotification", notification);
         }
+
+        public async Task SendPropertyStatusUpdateAsync(Guid userId, Guid propertyId, bool isVerified)
+        {
+            await _hubContext.Clients.Group($"User_{userId.ToString().ToLowerInvariant()}").SendAsync("PropertyStatusUpdated", new { propertyId, isVerified });
+        }
     }
 }

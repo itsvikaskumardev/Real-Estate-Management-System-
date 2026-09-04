@@ -13,7 +13,7 @@ import {
   HiOutlineSearch,
   HiOutlineFilter,
 } from "react-icons/hi";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PropertyCard from "../../components/common/PropertyCard";
 import { adminPropertiesStyles as s } from "../../assets/dummyStyles";
 
@@ -26,11 +26,23 @@ const AdminProperties = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState(null);
 
+  const location = useLocation();
+
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [verificationFilter, setVerificationFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(location.state?.statusFilter || "");
+  const [verificationFilter, setVerificationFilter] = useState(location.state?.verificationFilter || "");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.statusFilter !== undefined) setStatusFilter(location.state.statusFilter);
+      if (location.state.verificationFilter !== undefined) setVerificationFilter(location.state.verificationFilter);
+    } else {
+      setStatusFilter("");
+      setVerificationFilter("");
+    }
+  }, [location.key]);
   
   // Pagination state
   const [pageNumber, setPageNumber] = useState(1);

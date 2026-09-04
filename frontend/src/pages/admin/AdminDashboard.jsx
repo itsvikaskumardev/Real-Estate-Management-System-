@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import {
   HiOutlineUserGroup,
   HiOutlineLibrary,
@@ -23,6 +24,7 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("AdminDashboard mounted");
@@ -57,6 +59,7 @@ const AdminDashboard = () => {
       icon: HiOutlineUserGroup,
       color: "#0d9488",
       bg: "#ccfbf1",
+      path: "/admin/users",
     },
     {
       title: "Total Properties",
@@ -64,6 +67,7 @@ const AdminDashboard = () => {
       icon: HiOutlineLibrary,
       color: "#f59e0b",
       bg: "#fef3c7",
+      path: "/admin/properties",
     },
     {
       title: "Active Listings",
@@ -71,6 +75,8 @@ const AdminDashboard = () => {
       icon: HiOutlineTicket,
       color: "#3b82f6",
       bg: "#dbeafe",
+      path: "/admin/properties",
+      state: { statusFilter: "Sale" },
     },
     {
       title: "Sold Properties",
@@ -78,6 +84,8 @@ const AdminDashboard = () => {
       icon: HiOutlineCheckCircle,
       color: "#10b981",
       bg: "#dcfce7",
+      path: "/admin/properties",
+      state: { statusFilter: "Sold" },
     },
     {
       title: "Unverified Properties",
@@ -85,6 +93,8 @@ const AdminDashboard = () => {
       icon: HiOutlineLibrary,
       color: "#ef4444",
       bg: "#fee2e2",
+      path: "/admin/properties",
+      state: { verificationFilter: "false" },
     },
     {
       title: "Platform Revenue (2%)",
@@ -117,7 +127,12 @@ const AdminDashboard = () => {
 
       <div className={s.statsGrid}>
         {statCards.map((card, i) => (
-          <div key={i} className={s.statCard}>
+          <div 
+            key={i} 
+            className={s.statCard}
+            onClick={() => card.path && navigate(card.path, { state: card.state })}
+            style={{ cursor: card.path ? "pointer" : "default" }}
+          >
             <div
               className={s.statIconContainer}
               style={{ backgroundColor: card.bg, color: card.color }}

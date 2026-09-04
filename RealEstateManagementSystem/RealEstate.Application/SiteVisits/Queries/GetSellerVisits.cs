@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RealEstate.Application.Common.Interfaces;
+using RealEstate.Application.SiteVisits.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;

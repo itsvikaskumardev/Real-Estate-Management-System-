@@ -30,6 +30,7 @@ import EmiCalculator from "../../components/property/EmiCalculator";
 import MockCheckoutModal from "../../components/property/MockCheckoutModal";
 import { useAuth } from "../../context/AuthContext";
 import { propertyDetailsStyles as s } from "../../assets/dummyStyles";
+import PropertyReviews from "../../components/property/PropertyReviews";
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -59,6 +60,14 @@ const PropertyDetails = () => {
   const [visitDate, setVisitDate] = useState("");
   const [visitMessage, setVisitMessage] = useState("");
 
+  const [existingOffer, setExistingOffer] = useState(null);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerAmount, setOfferAmount] = useState("");
+  const [offerMessage, setOfferMessage] = useState("");
+  const [offerLoading, setOfferLoading] = useState(false);
+  const [purchaseUseOfferPrice, setPurchaseUseOfferPrice] = useState(false);
+  const [showPurchaseChoiceModal, setShowPurchaseChoiceModal] = useState(false);
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -75,6 +84,16 @@ const PropertyDetails = () => {
           });
           const found = wishRes.data.some((item) => (item.property?.id || item.property?._id) === id);
           setIsInWishlist(found);
+
+          try {
+            const offersRes = await axios.get(`${API_URL}/api/buyer/offers`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const offerForThis = offersRes.data.find(o => (o.propertyId || o.property?.id) === id);
+            if (offerForThis) {
+               setExistingOffer(offerForThis);
+            }
+          } catch(e) {}
         }
         setLoading(false);
       } catch (err) {
@@ -178,17 +197,84 @@ const PropertyDetails = () => {
   const handlePurchaseClick = () => {
     if (!user) return navigate("/login");
     if (user.role !== "buyer") return alert("Only buyers can purchase properties");
-    setShowPurchaseModal(true);
+    
+    if (existingOffer && existingOffer.status === "Accepted") {
+       setShowPurchaseChoiceModal(true);
+    } else {
+       setPurchaseUseOfferPrice(false);
+       setShowPurchaseModal(true);
+    }
+  };
+
+  const handleOfferSubmit = async (e) => {
+    e.preventDefault();
+    setOfferLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/buyer/offers`, {
+        propertyId: id,
+        offerAmount: Number(offerAmount),
+        message: offerMessage
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success("Offer submitted successfully!");
+      setShowOfferModal(false);
+      
+      const offersRes = await axios.get(`${API_URL}/api/buyer/offers`, { headers: { Authorization: `Bearer ${token}` } });
+      const offerForThis = offersRes.data.find(o => o.propertyId === id);
+      setExistingOffer(offerForThis);
+    } catch(err) {
+      alert(err.response?.data?.message || "Failed to submit offer.");
+    } finally {
+      setOfferLoading(false);
+    }
   };
 
   const executePurchase = async () => {
     setShowPurchaseModal(false);
     setPurchaseLoading(true);
     try {
-      await axios.post(`${API_URL}/api/buyer/purchase/${id}`, {}, {
+      const response = await axios.post(`${API_URL}/api/buyer/purchase/${id}`, {
+        useApprovedOfferPrice: purchaseUseOfferPrice
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success("Purchase successful!", { duration: 5000 });
+      
+      const txId = response.data?.transactionId;
+      
+      if (txId) {
+        toast.success(
+          (t) => (
+            <div>
+              <div style={{fontWeight: 'bold', marginBottom: '10px'}}>Purchase successful!</div>
+              <button 
+                onClick={async () => {
+                  try {
+                    const invRes = await axios.get(`${API_URL}/api/buyer/invoice/${txId}`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                      responseType: 'text'
+                    });
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                      newWindow.document.open();
+                      newWindow.document.write(invRes.data);
+                      newWindow.document.close();
+                    }
+                  } catch(e) {
+                    alert("Failed to download invoice");
+                  }
+                  toast.dismiss(t.id);
+                }}
+                style={{ background: '#0d9488', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', display: 'block', width: '100%', textAlign: 'center' }}
+              >
+                Download Invoice
+              </button>
+            </div>
+          ),
+          { duration: 8000 }
+        );
+      } else {
+        toast.success("Purchase successful!", { duration: 5000 });
+      }
+
       const res = await axios.get(`${API_URL}/api/property/${id}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -481,6 +567,8 @@ const PropertyDetails = () => {
                 ))}
               </div>
             </div>
+            
+            <PropertyReviews propertyId={property.id || property._id} />
           </div>
 
           {/* Right Column: Sidebar */}
@@ -577,6 +665,29 @@ const PropertyDetails = () => {
                       >
                         {purchaseLoading ? "Processing..." : "Buy Now"}
                       </button>
+                    )}
+
+                    {property.status?.toLowerCase() === "sale" && !existingOffer && user?.role === "buyer" && (
+                      <button 
+                        className={s.inquirySubmitButton} 
+                        style={{ marginBottom: '10px', backgroundColor: '#f59e0b', color: '#fff' }} 
+                        onClick={() => setShowOfferModal(true)}
+                      >
+                        Make an Offer
+                      </button>
+                    )}
+
+                    {existingOffer && (
+                      <div style={{ marginBottom: '10px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '0.875rem' }}>
+                        <div style={{ fontWeight: '600', color: '#0f172a' }}>Your Offer: ₹{existingOffer.offerAmount.toLocaleString("en-IN")}</div>
+                        <div style={{ 
+                          color: existingOffer.status === 'Accepted' ? '#059669' : existingOffer.status === 'Rejected' ? '#dc2626' : '#d97706',
+                          fontWeight: '500',
+                          marginTop: '4px'
+                        }}>
+                          Status: {existingOffer.status}
+                        </div>
+                      </div>
                     )}
                     
                     <div style={{ display: "flex", gap: "10px", width: "100%", marginBottom: "10px" }}>
@@ -704,10 +815,102 @@ const PropertyDetails = () => {
       {/* Purchase Confirmation Modal */}
       {showPurchaseModal && createPortal(
         <MockCheckoutModal 
-          property={property} 
+          property={{...property, price: purchaseUseOfferPrice && existingOffer ? existingOffer.offerAmount : property.price}} 
           onClose={() => setShowPurchaseModal(false)} 
           onConfirm={executePurchase} 
         />,
+        document.body
+      )}
+
+      {/* Purchase Choice Modal (If Accepted Offer Exists) */}
+      {showPurchaseChoiceModal && createPortal(
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "450px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.5rem", color: "#1e293b" }}>Choose Purchase Price</h3>
+            <p style={{ color: "#64748b", marginBottom: "1.5rem", fontSize: "0.875rem" }}>
+              Your offer of ₹{existingOffer.offerAmount.toLocaleString("en-IN")} was approved! How would you like to proceed with the purchase?
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <button
+                onClick={() => {
+                  setPurchaseUseOfferPrice(true);
+                  setShowPurchaseChoiceModal(false);
+                  setShowPurchaseModal(true);
+                }}
+                style={{ padding: "1rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#059669", color: "#fff", cursor: "pointer", fontWeight: "bold", fontSize: "1rem" }}
+              >
+                Buy at Offer Price (₹{existingOffer.offerAmount.toLocaleString("en-IN")})
+              </button>
+              <button
+                onClick={() => {
+                  setPurchaseUseOfferPrice(false);
+                  setShowPurchaseChoiceModal(false);
+                  setShowPurchaseModal(true);
+                }}
+                style={{ padding: "1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#0f172a", cursor: "pointer", fontWeight: "600" }}
+              >
+                Buy at Normal Price (₹{property.price.toLocaleString("en-IN")})
+              </button>
+            </div>
+            <button
+              onClick={() => setShowPurchaseChoiceModal(false)}
+              style={{ marginTop: '1.5rem', width: '100%', padding: "0.75rem", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", fontWeight: "500" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Make an Offer Modal */}
+      {showOfferModal && createPortal(
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+          <div style={{ backgroundColor: "#fff", padding: "2rem", borderRadius: "0.5rem", width: "90%", maxWidth: "450px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.5rem", color: "#1e293b" }}>Make an Offer</h3>
+            <p style={{ color: "#64748b", marginBottom: "1.5rem", fontSize: "0.875rem" }}>
+              Original Price: ₹{property.price.toLocaleString("en-IN")}
+            </p>
+            <form onSubmit={handleOfferSubmit}>
+              <div style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#475569", marginBottom: "0.5rem" }}>Offer Amount (₹)</label>
+                <input 
+                  type="number" 
+                  value={offerAmount}
+                  onChange={(e) => setOfferAmount(e.target.value)}
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #cbd5e1", outline: "none" }}
+                  required
+                  min="1"
+                />
+              </div>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#475569", marginBottom: "0.5rem" }}>Message (Optional)</label>
+                <textarea 
+                  value={offerMessage}
+                  onChange={(e) => setOfferMessage(e.target.value)}
+                  placeholder="Explain why this is a good offer..."
+                  style={{ width: "100%", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #cbd5e1", outline: "none", minHeight: "80px", resize: "vertical" }}
+                />
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowOfferModal(false)}
+                  style={{ padding: "0.5rem 1rem", border: "1px solid #cbd5e1", borderRadius: "0.375rem", backgroundColor: "#f8fafc", color: "#475569", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={offerLoading}
+                  style={{ padding: "0.5rem 1.5rem", border: "none", borderRadius: "0.375rem", backgroundColor: "#f59e0b", color: "#fff", cursor: offerLoading ? "not-allowed" : "pointer", fontWeight: "500" }}
+                >
+                  {offerLoading ? "Submitting..." : "Submit Offer"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
         document.body
       )}
 

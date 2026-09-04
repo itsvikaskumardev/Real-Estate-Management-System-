@@ -29,6 +29,9 @@ namespace RealEstate.Infrastructure.Persistence
         public DbSet<Document> Documents => Set<Document>();
         public DbSet<SiteVisit> SiteVisits => Set<SiteVisit>();
         public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
+        public DbSet<Review> Reviews => Set<Review>();
+        public DbSet<PropertyOffer> PropertyOffers => Set<PropertyOffer>();
+        public DbSet<Notification> Notifications => Set<Notification>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -46,6 +49,36 @@ namespace RealEstate.Infrastructure.Persistence
                 .HasForeignKey(sv => sv.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Transaction>()
+                .HasOne(t => t.Seller)
+                .WithMany()
+                .HasForeignKey(t => t.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PropertyOffer>()
+                .HasOne(o => o.Property)
+                .WithMany()
+                .HasForeignKey(o => o.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PropertyOffer>()
+                .HasOne(o => o.Buyer)
+                .WithMany()
+                .HasForeignKey(o => o.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PropertyOffer>()
+                .HasOne(o => o.Seller)
+                .WithMany()
+                .HasForeignKey(o => o.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<SiteVisit>()
                 .HasOne(sv => sv.Seller)
                 .WithMany()
@@ -56,6 +89,18 @@ namespace RealEstate.Infrastructure.Persistence
                 .HasOne(ss => ss.Buyer)
                 .WithMany()
                 .HasForeignKey(ss => ss.BuyerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Review>()
+                .HasOne(r => r.Buyer)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Review>()
+                .HasOne(r => r.Property)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(r => r.PropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);

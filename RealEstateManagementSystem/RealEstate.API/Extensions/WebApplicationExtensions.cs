@@ -33,6 +33,8 @@ namespace RealEstate.API.Extensions
             app.MapContactEndpoints();
             app.MapSiteVisitEndpoints();
             app.MapSavedSearchEndpoints();
+            app.MapOfferEndpoints();
+            app.MapNotificationEndpoints();
 
             app.MapHub<ChatHub>("/chatHub");
             return app;

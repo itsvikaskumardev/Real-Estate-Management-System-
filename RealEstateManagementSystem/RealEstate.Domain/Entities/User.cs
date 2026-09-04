@@ -23,5 +23,7 @@ namespace RealEstate.Domain.Entities
         public string? ResetPasswordToken { get; set; }
         public DateTimeOffset? ResetPasswordExpire { get; set; }
         public string OnboardingStatus { get; set; } = "Incomplete";
+        
+        public List<Review> Reviews { get; set; } = [];
     }
 }

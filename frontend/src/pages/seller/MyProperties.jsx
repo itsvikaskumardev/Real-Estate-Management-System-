@@ -9,9 +9,11 @@ import {
   HiEye,
   HiOutlineLibrary,
   HiOutlineCheckCircle,
+  HiOutlineSearch
 } from "react-icons/hi";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PropertyCard from "../../components/common/PropertyCard";
+import { useNotification } from "../../context/NotificationContext";
 import { myPropertiesStyles as s } from "../../assets/dummyStyles";
 
 const MyProperties = () => {
@@ -19,10 +21,45 @@ const MyProperties = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { token } = useAuth();
+  const { connection } = useNotification();
+  const location = useLocation();
+  const [statusFilter, setStatusFilter] = useState(location.state?.statusFilter || "");
+  const [verificationFilter, setVerificationFilter] = useState(location.state?.verificationFilter || "");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchMyProperties();
   }, []);
+
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.statusFilter !== undefined) setStatusFilter(location.state.statusFilter);
+      if (location.state.verificationFilter !== undefined) setVerificationFilter(location.state.verificationFilter);
+    } else {
+      setStatusFilter("");
+      setVerificationFilter("");
+    }
+  }, [location.key]);
+
+  useEffect(() => {
+    if (!connection) return;
+
+    const handlePropertyStatusUpdate = ({ propertyId, isVerified }) => {
+      setProperties((prev) => 
+        prev.map((p) => 
+          (p.id || p._id) === propertyId 
+            ? { ...p, isVerified } 
+            : p
+        )
+      );
+    };
+
+    connection.on("PropertyStatusUpdated", handlePropertyStatusUpdate);
+
+    return () => {
+      connection.off("PropertyStatusUpdated", handlePropertyStatusUpdate);
+    };
+  }, [connection]);
 
   const fetchMyProperties = async () => {
     try {
@@ -52,6 +89,24 @@ const MyProperties = () => {
       alert("Failed to delete property.");
     }
   };
+  const filteredProperties = properties.filter((p) => {
+    // Status filter
+    if (statusFilter && p.status?.toLowerCase() !== statusFilter.toLowerCase()) return false;
+    
+    // Verification filter
+    if (verificationFilter === "true" && !p.isVerified) return false;
+    if (verificationFilter === "false" && p.isVerified) return false;
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const titleMatch = p.title?.toLowerCase().includes(query);
+      const cityMatch = p.city?.toLowerCase().includes(query);
+      if (!titleMatch && !cityMatch) return false;
+    }
+    
+    return true;
+  });
   if (loading)
     return (
       <div className={s.loaderFullPage}>
@@ -73,8 +128,52 @@ const MyProperties = () => {
           </Link>
         </div>
 
+        {/* Filter Bar */}
+        <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', backgroundColor: '#fff', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+          <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Search</label>
+            <div style={{ position: 'relative' }}>
+              <HiOutlineSearch style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
+              <input
+                type="text"
+                placeholder="Search by title or city..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: '0.5rem 1rem 0.5rem 2.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none' }}
+              />
+            </div>
+          </div>
+          
+          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Verification</label>
+            <select
+              value={verificationFilter}
+              onChange={(e) => setVerificationFilter(e.target.value)}
+              style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none', backgroundColor: '#fff', cursor: 'pointer' }}
+            >
+              <option value="">All Statuses</option>
+              <option value="true">Verified Only</option>
+              <option value="false">Unverified Only</option>
+            </select>
+          </div>
+
+          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#475569' }}>Listing Status</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', width: '100%', outline: 'none', backgroundColor: '#fff', cursor: 'pointer' }}
+            >
+              <option value="">All Types</option>
+              <option value="Sale">For Sale</option>
+              <option value="Rent">For Rent</option>
+              <option value="Sold">Sold</option>
+            </select>
+          </div>
+        </div>
+
         <div className={s.content}>
-          {!Array.isArray(properties) || properties.length === 0 ? (
+          {!Array.isArray(filteredProperties) || filteredProperties.length === 0 ? (
             <div className={s.emptyCard}>
               <div className={s.emptyIconWrapper}>
                 <HiOutlineLibrary size={40} color="#94a3b8" />
@@ -89,7 +188,7 @@ const MyProperties = () => {
             </div>
           ) : (
             <div className={s.grid}>
-              {properties.map((p) => (
+              {filteredProperties.map((p) => (
                 <PropertyCard
                   key={(p.id || p._id)}
                   property={p}

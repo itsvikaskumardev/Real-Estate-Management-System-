@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 import Logo from "./Logo";
+import NotificationDropdown from "./NotificationDropdown";
 import { navbarStyles as s } from "../../assets/dummyStyles";
 
 const Navbar = () => {
@@ -88,7 +89,8 @@ const Navbar = () => {
             {/* Right: Profile Section */}
             <div className={s.rightSection}>
               {user ? (
-                <div className={s.userSection}>
+                <div className={s.userSection} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <NotificationDropdown />
                   <Link to="/profile" className="flex items-center">
                     <img
                       src={

@@ -26,6 +26,7 @@ namespace RealEstate.Application.Property.Queries
         public decimal? MinPrice { get; init; }
         public decimal? MaxPrice { get; init; }
         public string? Amenities { get; init; }       // comma-separated
+        public int? MaxAgeDays { get; init; }
         public string? Sort { get; init; }
         public Guid? SellerId { get; init; }
         public int PageNumber { get; init; } = 1;
@@ -109,6 +110,12 @@ namespace RealEstate.Application.Property.Queries
                     .ToList();
 
                 query = query.Where(p => p.Amenities.Any(a => amenitiesList.Contains(a)));
+            }
+
+            if (request.MaxAgeDays.HasValue && request.MaxAgeDays.Value > 0)
+            {
+                var cutoffDate = DateTime.UtcNow.AddDays(-request.MaxAgeDays.Value);
+                query = query.Where(p => p.CreatedAt >= cutoffDate);
             }
 
             query = request.Sort switch
