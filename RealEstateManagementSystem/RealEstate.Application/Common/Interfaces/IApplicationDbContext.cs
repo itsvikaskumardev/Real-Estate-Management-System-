@@ -21,6 +21,8 @@ namespace RealEstate.Application.Common.Interfaces
         DbSet<SiteVisit> SiteVisits { get; }
         DbSet<SavedSearch> SavedSearches { get; }
         DbSet<Review> Reviews { get; }
-        Task<int> SaveChangesAsync(CancellationToken ct);
+        DbSet<PropertyOffer> PropertyOffers { get; }
+        DbSet<Notification> Notifications { get; }
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

@@ -25,7 +25,8 @@ namespace RealEstate.Application.Buyer.Queries
         public Guid PropertyId { get; init; }
         public string Title { get; init; } = string.Empty;
         public string Location { get; init; } = string.Empty;
-        public decimal Price { get; init; }
+        public decimal OriginalPrice { get; init; }
+        public decimal? OfferPrice { get; init; }
         public string? ImageUrl { get; init; }
         public string Status { get; init; } = string.Empty;
         public DateTime TransactionDate { get; init; }
@@ -59,16 +60,27 @@ namespace RealEstate.Application.Buyer.Queries
             var totalPurchased = transactions.Count;
             var totalSpent = transactions.Sum(t => t.Price);
 
-            var purchasedProperties = transactions.Select(t => new PurchasedPropertyDto
-            {
-                TransactionId = t.Id,
-                PropertyId = t.PropertyId,
-                Title = t.Property.Title,
-                Location = $"{t.Property.Address.Street}, {t.Property.Address.City}",
-                Price = t.Price,
-                ImageUrl = t.Property.Images.OrderBy(i => i.SortOrder).FirstOrDefault()?.Url,
-                Status = t.Status,
-                TransactionDate = t.CreatedAt
+            // Fetch any accepted offers for these properties to determine if an offer was used
+            var propertyIds = transactions.Select(t => t.PropertyId).ToList();
+            var acceptedOffers = await dbContext.PropertyOffers
+                .Where(o => o.BuyerId == buyerId && propertyIds.Contains(o.PropertyId) && o.Status == "Accepted")
+                .ToListAsync(ct);
+
+            var purchasedProperties = transactions.Select(t => {
+                var offer = acceptedOffers.FirstOrDefault(o => o.PropertyId == t.PropertyId && o.OfferAmount == t.Price);
+                
+                return new PurchasedPropertyDto
+                {
+                    TransactionId = t.Id,
+                    PropertyId = t.PropertyId,
+                    Title = t.Property.Title,
+                    Location = $"{t.Property.Address.Street}, {t.Property.Address.City}",
+                    OriginalPrice = t.Property.Price,
+                    OfferPrice = offer != null ? offer.OfferAmount : (t.Price != t.Property.Price ? t.Price : null),
+                    ImageUrl = t.Property.Images.OrderBy(i => i.SortOrder).FirstOrDefault()?.Url,
+                    Status = t.Status,
+                    TransactionDate = t.CreatedAt
+                };
             })
             // Sort by TransactionDate descending
             .OrderByDescending(p => p.TransactionDate)

@@ -5,8 +5,14 @@ using Microsoft.AspNetCore.Routing;
 using RealEstate.Application.Buyer.Queries;
 using System.Threading.Tasks;
 using RealEstate.Application.Buyer.Commands;
+using Microsoft.AspNetCore.Mvc;
 namespace RealEstate.API.Endpoints
 {
+    public class PurchaseRequestDto
+    {
+        public bool UseApprovedOfferPrice { get; set; }
+    }
+
     public static class BuyerEndpoints
     {
         public static void MapBuyerEndpoints(this IEndpointRouteBuilder app)
@@ -21,9 +27,9 @@ namespace RealEstate.API.Endpoints
                 return Results.Ok(result);
             });
 
-            group.MapPost("/purchase/{id:Guid}", async (Guid id, ISender sender) =>
+            group.MapPost("/purchase/{id:Guid}", async (Guid id, [FromBody] PurchaseRequestDto request, ISender sender) =>
             {
-                var result = await sender.Send(new PurchasePropertyCommand(id));
+                var result = await sender.Send(new PurchasePropertyCommand(id, request.UseApprovedOfferPrice));
                 if (result == null)
                     return Results.BadRequest(new { success = false, message = "Purchase failed." });
                 return Results.Ok(new { success = true, transactionId = result });

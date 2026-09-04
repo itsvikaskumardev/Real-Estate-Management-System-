@@ -1,5 +1,6 @@
 using MediatR;
 using RealEstate.Application.Common.Interfaces;
+using RealEstate.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,24 +26,27 @@ namespace RealEstate.Application.Admin.Commands
             await dbContext.SaveChangesAsync(ct);
 
             // Notify the seller
-            string message = request.Approve 
-                ? $"Your property '{property.Title}' has been approved/verified by the admin."
-                : $"Your property '{property.Title}' verification was rejected by the admin.";
-            
+            string title = request.Approve ? "Property Verified!" : "Property Rejected";
+            string msg = request.Approve 
+                ? $"Your property {property.Title} has been verified and is now live."
+                : $"Your property {property.Title} has been rejected by the admin.";
             string type = request.Approve ? "success" : "error";
 
-            await globalNotificationService.SendNotificationAsync(
-                property.SellerId,
-                "Property Verification Update",
-                message,
-                type
-            );
+            // Save to DB
+            var notif = new Notification
+            {
+                UserId = property.SellerId,
+                Title = title,
+                Message = msg,
+                Type = type,
+                RelatedEntityId = property.Id
+            };
+            await dbContext.Notifications.AddAsync(notif, ct);
+            await dbContext.SaveChangesAsync(ct);
 
-            await globalNotificationService.SendPropertyStatusUpdateAsync(
-                property.SellerId,
-                property.Id,
-                property.IsVerified
-            );
+            // Real-time update
+            await globalNotificationService.SendPropertyStatusUpdateAsync(property.SellerId, property.Id, request.Approve);
+            await globalNotificationService.SendNotificationAsync(property.SellerId, title, msg, type);
 
             return true;
         }

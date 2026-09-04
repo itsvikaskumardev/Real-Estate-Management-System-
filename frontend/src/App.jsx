@@ -21,6 +21,7 @@ import MyVisits from "./pages/buyer/MyVisits";
 import SavedSearches from "./pages/buyer/SavedSearches";
 import Profile from "./pages/shared/Profile";
 import SellerProfile from "./pages/seller/SellerProfile";
+import SellerOffers from "./pages/seller/SellerOffers";
 import ChatMessages from "./pages/shared/ChatMessages";
 import SellerLayout from "./components/SellerLayout";
 import BuyerLayout from "./components/BuyerLayout";
@@ -157,6 +158,7 @@ function App() {
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/edit-property/:id" element={<EditProperty />} />
               <Route path="/my-properties" element={<MyProperties />} />
+              <Route path="/offers" element={<SellerOffers />} />
               <Route path="/visit-requests" element={<VisitRequests />} />
             </Route>
           </Route>
