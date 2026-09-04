@@ -29,5 +29,6 @@ namespace RealEstate.Domain.Entities
         public List<string> ViewedBy { get; set; } = [];
 
         public List<PropertyImage> Images { get; set; } = [];
+        public List<Review> Reviews { get; set; } = [];
     }
 }

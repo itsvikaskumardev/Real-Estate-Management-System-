@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace RealEstate.Application.Buyer.Commands
 {
-    public record PurchasePropertyCommand(Guid PropertyId) : IRequest<bool>;
+    public record PurchasePropertyCommand(Guid PropertyId) : IRequest<Guid?>;
 
-    public class PurchasePropertyCommandHandler(IApplicationDbContext dbContext, ICurrentUserService currentUserService) : IRequestHandler<PurchasePropertyCommand, bool>
+    public class PurchasePropertyCommandHandler(IApplicationDbContext dbContext, ICurrentUserService currentUserService) : IRequestHandler<PurchasePropertyCommand, Guid?>
     {
-        public async Task<bool> Handle(PurchasePropertyCommand request, CancellationToken ct)
+        public async Task<Guid?> Handle(PurchasePropertyCommand request, CancellationToken ct)
         {
             if (currentUserService.UserId is null)
-                return false;
+                return null;
 
             var buyerId = currentUserService.UserId.Value;
 
@@ -24,7 +24,7 @@ namespace RealEstate.Application.Buyer.Commands
                 .FirstOrDefaultAsync(p => p.Id == request.PropertyId, ct);
 
             if (property == null || property.Status != PropertyStatus.Sale || !property.IsVerified)
-                return false;
+                return null;
 
             // Calculate 2% admin commission and 98% seller revenue
             var adminCommission = property.Price * 0.02m;
@@ -43,10 +43,10 @@ namespace RealEstate.Application.Buyer.Commands
 
             property.Status = PropertyStatus.Sold;
 
-            await dbContext.Transactions.AddAsync(transaction);
+            await dbContext.Transactions.AddAsync(transaction, ct);
             await dbContext.SaveChangesAsync(ct);
 
-            return true;
+            return transaction.Id;
         }
     }
 }

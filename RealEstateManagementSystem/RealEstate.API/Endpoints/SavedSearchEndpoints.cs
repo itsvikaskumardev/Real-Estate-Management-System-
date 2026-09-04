@@ -13,7 +13,7 @@ namespace RealEstate.API.Endpoints
     {
         public static void MapSavedSearchEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/buyer/saved-searches")
+            var group = app.MapGroup("/api/buyer/saved-searches").WithTags("Saved-Searches")
                 .RequireAuthorization(policy => policy.RequireRole("buyer", "Buyer"));
 
             group.MapPost("/", async ([FromBody] CreateSavedSearchCommand command, [FromServices] ISender sender) =>

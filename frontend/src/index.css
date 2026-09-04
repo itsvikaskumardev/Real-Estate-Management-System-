@@ -30,6 +30,10 @@
         --card-padding: 2.5rem;
     }
 
+    html {
+        font-size: 88%;
+    }
+
     * {
         @apply m-0 p-0 box-border;
     }

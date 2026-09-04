@@ -21,6 +21,7 @@ namespace RealEstate.Application.Buyer.Queries
 
     public record PurchasedPropertyDto
     {
+        public Guid TransactionId { get; init; }
         public Guid PropertyId { get; init; }
         public string Title { get; init; } = string.Empty;
         public string Location { get; init; } = string.Empty;
@@ -60,6 +61,7 @@ namespace RealEstate.Application.Buyer.Queries
 
             var purchasedProperties = transactions.Select(t => new PurchasedPropertyDto
             {
+                TransactionId = t.Id,
                 PropertyId = t.PropertyId,
                 Title = t.Property.Title,
                 Location = $"{t.Property.Address.Street}, {t.Property.Address.City}",

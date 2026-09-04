@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import PropertyCard from "../../components/common/PropertyCard";
 import {
   HiOutlineEye,
@@ -32,10 +33,13 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useNotification } from "../../context/NotificationContext";
 import { sellerDashboardStyles as s } from "../../assets/dummyStyles";
 
 const SellerDashboard = () => {
   const { logout, token } = useAuth();
+  const navigate = useNavigate();
+  const { connection } = useNotification();
   const [analytics, setAnalytics] = useState({
     totalProperties: 0,
     totalLeads: 0,
@@ -48,6 +52,26 @@ const SellerDashboard = () => {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    if (!connection) return;
+
+    const handlePropertyStatusUpdate = ({ propertyId, isVerified }) => {
+      setProperties((prev) => 
+        prev.map((p) => 
+          (p.id || p._id) === propertyId 
+            ? { ...p, isVerified } 
+            : p
+        )
+      );
+    };
+
+    connection.on("PropertyStatusUpdated", handlePropertyStatusUpdate);
+
+    return () => {
+      connection.off("PropertyStatusUpdated", handlePropertyStatusUpdate);
+    };
+  }, [connection]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -134,18 +158,22 @@ const SellerDashboard = () => {
       value: analytics.totalProperties?.toLocaleString() || "0",
       icon: HiOutlineLibrary,
       color: "#0d6e59",
+      path: "/my-properties",
     },
     {
       title: "Total Leads",
       value: analytics.totalLeads?.toLocaleString() || "0",
       icon: HiOutlineUserGroup,
       color: "#0d6e59",
+      path: "/inquiries",
     },
     {
       title: "Properties Sold",
       value: analytics.totalSales?.toLocaleString() || "0",
       icon: HiOutlineCheckCircle,
       color: "#0d6e59",
+      path: "/my-properties",
+      state: { statusFilter: "Sold" },
     },
     {
       title: "Total Revenue",
@@ -194,7 +222,8 @@ const SellerDashboard = () => {
           <div
             key={i}
             className={s.statCard}
-            style={{ "--card-color": card.color }}
+            style={{ "--card-color": card.color, cursor: card.path ? "pointer" : "default" }}
+            onClick={() => card.path && navigate(card.path, { state: card.state })}
           >
             <div className={s.statIconWrapper}>
               <card.icon size={20} />
@@ -284,18 +313,22 @@ const SellerDashboard = () => {
                     <div className={s.propertyActions}>
                       {p.status?.toLowerCase() !== "sold" && (
                         <>
-                          <Link
-                            to={`/edit-property/${(p.id || p._id)}`}
-                            className={s.editButton}
-                          >
-                            <HiOutlinePencilAlt size={14} /> Edit
-                          </Link>
-                          <button
-                            onClick={() => handleDelete((p.id || p._id))}
-                            className={s.deleteButton}
-                          >
-                            <HiOutlineTrash size={14} /> Delete
-                          </button>
+                          {!p.isVerified && (
+                            <Link
+                              to={`/edit-property/${(p.id || p._id)}`}
+                              className={s.editButton}
+                            >
+                              <HiOutlinePencilAlt size={14} /> Edit
+                            </Link>
+                          )}
+                          {!p.isVerified && (
+                            <button
+                              onClick={() => handleDelete((p.id || p._id))}
+                              className={s.deleteButton}
+                            >
+                              <HiOutlineTrash size={14} /> Delete
+                            </button>
+                          )}
                         </>
                       )}
                     </div>

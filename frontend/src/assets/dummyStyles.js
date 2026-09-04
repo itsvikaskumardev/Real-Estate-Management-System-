@@ -433,7 +433,7 @@ export const sellerDashboardStyles = {
   exportButton: "btn btn-outline bg-white flex items-center gap-2 font-bold flex-1 justify-center whitespace-nowrap",
   addButton: "btn btn-primary flex items-center gap-2 font-bold py-3 px-5 flex-1 justify-center whitespace-nowrap",
   statsGrid: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4 sm:gap-5 mb-12",
-  statCard: "bg-white p-6 rounded-[1.25rem] border border-[#f1f5f9] shadow-[0_4px_20px_rgba(0,0,0,0.02)]",
+  statCard: "bg-white p-6 rounded-[1.25rem] border border-[#f1f5f9] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-[0.4s] hover:-translate-y-2.5 hover:shadow-card",
   statIconWrapper: "w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center mb-5",
   statTitle: "text-[#64748b] text-[0.8125rem] font-semibold mb-1",
   statValue: "text-[1.5rem] font-extrabold text-text-main",

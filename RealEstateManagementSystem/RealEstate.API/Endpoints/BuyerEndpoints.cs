@@ -4,31 +4,41 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using RealEstate.Application.Buyer.Queries;
 using System.Threading.Tasks;
-
+using RealEstate.Application.Buyer.Commands;
 namespace RealEstate.API.Endpoints
 {
     public static class BuyerEndpoints
     {
         public static void MapBuyerEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/buyer")
+            var group = app.MapGroup("/api/buyer").WithTags("Buyer")
                 .RequireAuthorization(policy => policy.RequireRole("buyer", "Buyer"));
 
-            group.MapGet("/dashboard", GetBuyerDashboard);
+            group.MapGet("/dashboard", async (IMediator mediator) =>
+            {
+                var query = new GetBuyerDashboardQuery();
+                var result = await mediator.Send(query);
+                return Results.Ok(result);
+            });
 
             group.MapPost("/purchase/{id:Guid}", async (Guid id, ISender sender) =>
             {
-                var result = await sender.Send(new RealEstate.Application.Buyer.Commands.PurchasePropertyCommand(id));
-                return Results.Ok(new { success = result });
+                var result = await sender.Send(new PurchasePropertyCommand(id));
+                if (result == null)
+                    return Results.BadRequest(new { success = false, message = "Purchase failed." });
+                return Results.Ok(new { success = true, transactionId = result });
             })
             .WithName("PurchaseProperty");
-        }
 
-        private static async Task<IResult> GetBuyerDashboard(IMediator mediator)
-        {
-            var query = new GetBuyerDashboardQuery();
-            var result = await mediator.Send(query);
-            return Results.Ok(result);
+            group.MapGet("/invoice/{id:Guid}", async (Guid id, IMediator mediator) =>
+            {
+                var html = await mediator.Send(new GetTransactionInvoiceHtmlQuery(id));
+                if (html == null)
+                    return Results.NotFound("Invoice not found or unauthorized.");
+                
+                return Results.Text(html, "text/html");
+            })
+            .WithName("GetInvoiceHtml");
         }
     }
 }

@@ -183,6 +183,38 @@ namespace RealEstate.API.Endpoints
 
 
 
+            group.MapPost("/{id:Guid}/reviews", async (Guid id, [FromBody] CreateReviewRequestBody body, ISender sender) =>
+            {
+                var command = new CreateReviewCommand(id, body.Rating, body.Comment);
+                var result = await sender.Send(command);
+                return Results.Ok(new { success = true, reviewId = result });
+            })
+            .RequireAuthorization()
+            .WithName("CreatePropertyReview");
+
+            group.MapPut("/reviews/{reviewId:Guid}", async (Guid reviewId, [FromBody] UpdateReviewRequestBody body, ISender sender) =>
+            {
+                var command = new UpdateReviewCommand(reviewId, body.Rating, body.Comment);
+                await sender.Send(command);
+                return Results.Ok(new { success = true });
+            })
+            .RequireAuthorization()
+            .WithName("UpdatePropertyReview");
+
+            group.MapDelete("/reviews/{reviewId:Guid}", async (Guid reviewId, ISender sender) =>
+            {
+                await sender.Send(new DeleteReviewCommand(reviewId));
+                return Results.Ok(new { success = true });
+            })
+            .RequireAuthorization()
+            .WithName("DeletePropertyReview");
+
+            group.MapGet("/{id:Guid}/reviews", async (Guid id, ISender sender) =>
+            {
+                var result = await sender.Send(new GetPropertyReviewsQuery(id));
+                return Results.Ok(new { success = true, reviews = result });
+            })
+            .WithName("GetPropertyReviews");
         }
 
 
@@ -225,4 +257,6 @@ namespace RealEstate.API.Endpoints
     }
 
     public record UpdatePropertyStatusRequestBody(PropertyStatus Status);
+    public record CreateReviewRequestBody(int Rating, string Comment);
+    public record UpdateReviewRequestBody(int Rating, string Comment);
 }

@@ -29,6 +29,7 @@ namespace RealEstate.Infrastructure.Persistence
         public DbSet<Document> Documents => Set<Document>();
         public DbSet<SiteVisit> SiteVisits => Set<SiteVisit>();
         public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
+        public DbSet<Review> Reviews => Set<Review>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -56,6 +57,18 @@ namespace RealEstate.Infrastructure.Persistence
                 .HasOne(ss => ss.Buyer)
                 .WithMany()
                 .HasForeignKey(ss => ss.BuyerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Review>()
+                .HasOne(r => r.Buyer)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Review>()
+                .HasOne(r => r.Property)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(r => r.PropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);

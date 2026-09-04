@@ -6,6 +6,7 @@ namespace RealEstate.Application.Common.Interfaces
     public interface IGlobalNotificationService
     {
         Task SendNotificationAsync(Guid userId, string title, string message, string type = "info");
+        Task SendPropertyStatusUpdateAsync(Guid userId, Guid propertyId, bool isVerified);
     }
 
     public record NotificationDto

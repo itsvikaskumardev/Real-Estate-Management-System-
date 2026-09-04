@@ -38,6 +38,27 @@ const BuyerDashboard = () => {
 
   if (loading) return <div className="loader-full-page"><div className="loader"></div></div>;
 
+  const handleDownloadInvoice = async (transactionId) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/buyer/invoice/${transactionId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'text'
+      });
+      
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.open();
+        newWindow.document.write(response.data);
+        newWindow.document.close();
+      } else {
+        alert("Please allow popups to download the invoice.");
+      }
+    } catch (err) {
+      console.error("Failed to download invoice:", err);
+      alert("Failed to download invoice.");
+    }
+  };
+
   const statCards = [
     {
       title: "Total Properties",
@@ -95,6 +116,7 @@ const BuyerDashboard = () => {
                   <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Price</th>
                   <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Date</th>
                   <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Status</th>
+                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Invoice</th>
                 </tr>
               </thead>
               <tbody>
@@ -126,6 +148,20 @@ const BuyerDashboard = () => {
                         <span style={{ color: '#b45309', backgroundColor: '#fef3c7', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.875rem', fontWeight: '500', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <HiOutlineClock /> {p.status}
                         </span>
+                      )}
+                    </td>
+                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                      {p.status === "Completed" && p.transactionId ? (
+                        <button 
+                          onClick={() => handleDownloadInvoice(p.transactionId)}
+                          style={{ background: '#0f172a', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', transition: 'background-color 0.2s' }}
+                          onMouseEnter={(e) => e.target.style.background = '#334155'}
+                          onMouseLeave={(e) => e.target.style.background = '#0f172a'}
+                        >
+                          Download
+                        </button>
+                      ) : (
+                        <span style={{ color: '#94a3b8', fontSize: '0.875rem' }}>N/A</span>
                       )}
                     </td>
                   </tr>

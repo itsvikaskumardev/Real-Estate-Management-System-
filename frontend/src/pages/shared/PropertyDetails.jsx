@@ -30,6 +30,7 @@ import EmiCalculator from "../../components/property/EmiCalculator";
 import MockCheckoutModal from "../../components/property/MockCheckoutModal";
 import { useAuth } from "../../context/AuthContext";
 import { propertyDetailsStyles as s } from "../../assets/dummyStyles";
+import PropertyReviews from "../../components/property/PropertyReviews";
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -185,10 +186,47 @@ const PropertyDetails = () => {
     setShowPurchaseModal(false);
     setPurchaseLoading(true);
     try {
-      await axios.post(`${API_URL}/api/buyer/purchase/${id}`, {}, {
+      const response = await axios.post(`${API_URL}/api/buyer/purchase/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success("Purchase successful!", { duration: 5000 });
+      
+      const txId = response.data?.transactionId;
+      
+      if (txId) {
+        toast.success(
+          (t) => (
+            <div>
+              <div style={{fontWeight: 'bold', marginBottom: '10px'}}>Purchase successful!</div>
+              <button 
+                onClick={async () => {
+                  try {
+                    const invRes = await axios.get(`${API_URL}/api/buyer/invoice/${txId}`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                      responseType: 'text'
+                    });
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                      newWindow.document.open();
+                      newWindow.document.write(invRes.data);
+                      newWindow.document.close();
+                    }
+                  } catch(e) {
+                    alert("Failed to download invoice");
+                  }
+                  toast.dismiss(t.id);
+                }}
+                style={{ background: '#0d9488', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', display: 'block', width: '100%', textAlign: 'center' }}
+              >
+                Download Invoice
+              </button>
+            </div>
+          ),
+          { duration: 8000 }
+        );
+      } else {
+        toast.success("Purchase successful!", { duration: 5000 });
+      }
+
       const res = await axios.get(`${API_URL}/api/property/${id}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -481,6 +519,8 @@ const PropertyDetails = () => {
                 ))}
               </div>
             </div>
+            
+            <PropertyReviews propertyId={property.id || property._id} />
           </div>
 
           {/* Right Column: Sidebar */}

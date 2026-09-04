@@ -20,6 +20,7 @@ namespace RealEstate.Application.Common.Interfaces
         DbSet<Document> Documents { get; }
         DbSet<SiteVisit> SiteVisits { get; }
         DbSet<SavedSearch> SavedSearches { get; }
+        DbSet<Review> Reviews { get; }
         Task<int> SaveChangesAsync(CancellationToken ct);
     }
 }

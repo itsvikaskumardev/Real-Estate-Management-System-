@@ -38,6 +38,12 @@ namespace RealEstate.Application.Admin.Commands
                 type
             );
 
+            await globalNotificationService.SendPropertyStatusUpdateAsync(
+                property.SellerId,
+                property.Id,
+                property.IsVerified
+            );
+
             return true;
         }
     }
