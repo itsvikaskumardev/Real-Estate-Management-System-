@@ -28,6 +28,8 @@ namespace RealEstate.Application.Property.Commands
         public Furnishing? Furnishing { get; init; }
         public PropertyStatus? Status { get; init; }
         public List<string>? Amenities { get; init; }
+        public decimal? Latitude { get; init; }
+        public decimal? Longitude { get; init; }
         public List<string>? ExistingImageUrls { get; init; }
         public List<PropertyImageUpload> NewImages { get; init; } = [];
     }
@@ -88,6 +90,8 @@ namespace RealEstate.Application.Property.Commands
             if (request.Furnishing is not null) property.Furnishing = request.Furnishing;
             if (request.Status is not null) property.Status = request.Status.Value;
             if (request.Amenities is not null) property.Amenities = request.Amenities;
+            if (request.Latitude is not null) property.Latitude = request.Latitude;
+            if (request.Longitude is not null) property.Longitude = request.Longitude;
 
             // Handle existing image removal — keep only the URLs the client says to keep
             if (request.ExistingImageUrls is not null)
@@ -135,6 +139,8 @@ namespace RealEstate.Application.Property.Commands
                     Furnishing = property.Furnishing?.ToString(),
                     Status = property.Status.ToString(),
                     Amenities = property.Amenities,
+                    Latitude = property.Latitude,
+                    Longitude = property.Longitude,
                     Images = property.Images.Select(i => i.Url).ToList(),
                     SellerId = property.SellerId
                 }

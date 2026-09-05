@@ -26,6 +26,8 @@ namespace RealEstate.Application.Property.Commands
         public Furnishing? Furnishing { get; init; }
         public PropertyStatus Status { get; init; } = PropertyStatus.Sale;
         public List<string> Amenities { get; init; } = [];
+        public decimal? Latitude { get; init; }
+        public decimal? Longitude { get; set; }
         public List<PropertyImageUpload> Images { get; init; } = [];
     }
 
@@ -87,6 +89,8 @@ namespace RealEstate.Application.Property.Commands
                 Status = request.Status,
                 Amenities = request.Amenities,
                 SellerId = currentUser.UserId.Value,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
                 Images = imageUrls
                     .Select(url => new Domain.Entities.PropertyImage { Url = url })
                     .ToList()
@@ -134,6 +138,8 @@ namespace RealEstate.Application.Property.Commands
                     Furnishing = property.Furnishing?.ToString(),
                     Status = property.Status.ToString(),
                     Amenities = property.Amenities,
+                    Latitude = property.Latitude,
+                    Longitude = property.Longitude,
                     Images = property.Images.Select(i => i.Url).ToList(),
                     SellerId = property.SellerId
                 }

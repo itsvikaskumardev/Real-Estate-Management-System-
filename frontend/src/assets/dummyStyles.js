@@ -785,7 +785,7 @@ export const propertiesStyles = {
   layout: "properties-layout grid grid-cols-[minmax(280px,300px)_1fr] gap-8 max-[1024px]:grid-cols-1",
 
   // Sidebar
-  sidebar: "filters-sidebar scrollbar-hide bg-white rounded-[1.5rem] p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] max-h-[calc(100vh-120px)] overflow-y-auto sticky top-[100px] border border-[#f1f5f9] z-[90] max-[1024px]:fixed max-[1024px]:max-h-screen max-[1024px]:top-0 max-[1024px]:bottom-0 max-[1024px]:w-full max-[1024px]:max-w-[350px] max-[1024px]:rounded-none max-[1024px]:transition-[left] max-[1024px]:duration-300 max-[1024px]:ease max-[1024px]:z-[2005]",
+  sidebar: "filters-sidebar scrollbar-hide bg-white rounded-[1.5rem] p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] max-h-[calc(100vh-120px)] overflow-y-auto sticky top-[100px] border border-slate-100 z-[90] max-[1024px]:fixed max-[1024px]:max-h-screen max-[1024px]:top-0 max-[1024px]:bottom-0 max-[1024px]:w-full max-[1024px]:max-w-[350px] max-[1024px]:rounded-none max-[1024px]:transition-[left] max-[1024px]:duration-300 max-[1024px]:ease max-[1024px]:z-[2005]",
   sidebarVisible: "max-[1024px]:left-0",
   sidebarHidden: "max-[1024px]:-left-full",
   sidebarHeader: "flex justify-between items-center mb-8",
@@ -811,9 +811,9 @@ export const propertiesStyles = {
   checkboxLabel: "flex items-center gap-3 cursor-pointer text-sm text-[#64748b]",
   checkbox: "w-[18px] h-[18px] cursor-pointer accent-primary",
   bhkGroup: "flex flex-wrap gap-2",
-  bhkButton: "flex-1 min-w-[50px] p-2 rounded-lg text-sm font-bold cursor-pointer transition-all duration-200 border border-[#e2e8f0] bg-white text-[#64748b]",
-  bhkButtonActive: "border border-primary bg-primary-light text-primary-dark",
-  bhkButtonInactive: "border border-[#e2e8f0] bg-white text-[#64748b]",
+  bhkButton: "flex-1 min-w-[50px] p-2 rounded-xl text-sm font-bold cursor-pointer transition-all duration-200 border border-slate-200 bg-white text-slate-600 hover:border-primary hover:text-primary",
+  bhkButtonActive: "border-primary bg-primary-light text-primary shadow-sm hover:border-primary hover:text-primary",
+  bhkButtonInactive: "border-slate-200 bg-white text-slate-600",
 
   // Main content
   mainContent: "", // no extra classes
@@ -914,7 +914,7 @@ export const propertyDetailsStyles = {
   amenityIcon: "text-primary shrink-0 mt-0.5",
   amenityText: "break-words whitespace-normal",
   sidebarColumn: "sidebar-column min-w-0",
-  priceCard: "text-white p-6 rounded-[1.5rem] mb-6 shadow-[0_10px_25px_rgba(13,148,136,0.2)]",
+  priceCard: "text-white p-8 rounded-[1.5rem] mb-6 shadow-[0_10px_25px_rgba(13,148,136,0.25)] hover:shadow-[0_15px_35px_rgba(13,148,136,0.3)] transition-all duration-300",
   priceCardLabel: "text-[0.875rem] opacity-80 font-semibold uppercase mb-2",
   priceCardValue: "text-[2.25rem] font-extrabold my-1 break-words whitespace-normal leading-tight",
   priceCardPeriod: "text-base font-normal opacity-80",
@@ -923,7 +923,7 @@ export const propertyDetailsStyles = {
   rentDetailLabel: "opacity-80 min-w-0 break-words",
   rentDetailValue: "font-bold text-right break-words whitespace-normal",
   priceCardAvailability: "text-[0.8125rem] opacity-90 break-words whitespace-normal",
-  sellerCard: "bg-white p-6 rounded-[1.5rem] border border-[#f1f5f9] shadow-[0_4px_20px_rgba(0,0,0,0.03)] min-w-0",
+  sellerCard: "bg-white p-8 rounded-[1.5rem] border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 min-w-0",
   sellerInfo: "flex items-center gap-4 mb-6 min-w-0",
   sellerAvatar: "w-[50px] h-[50px] rounded-full overflow-hidden bg-[#f1f5f9] shrink-0",
   sellerAvatarImage: "w-full h-full object-cover",
@@ -941,7 +941,7 @@ export const propertyDetailsStyles = {
   inquiryDisabledMessage: "text-center p-4 bg-[#f8fafc] rounded-xl",
   inquiryDisabledText: "text-[0.875rem] text-[#64748b] break-words whitespace-normal",
   inquiryLoginButton: "btn btn-primary mt-2 w-full block",
-  additionalDetails: "additional-details bg-white p-8 rounded-[1.5rem] border border-[#f1f5f9] mt-12 min-w-0",
+  additionalDetails: "additional-details bg-white p-8 rounded-[1.5rem] border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 mt-12 min-w-0",
   detailsTitle: "text-xl font-bold mb-6 border-b border-[#f1f5f9] pb-3",
   detailsGrid: "details-grid-row grid grid-cols-2 gap-8 max-sm:grid-cols-1 max-sm:gap-0",
   detailRow: "flex justify-between gap-4 py-2 border-b border-dashed border-[#f1f5f9] min-w-0",
@@ -1218,11 +1218,11 @@ export const navbarStyles = {
 
 export const propertyCardStyles = {
   // Card container
-  card: "fade-in group flex flex-col bg-white rounded-[1.25rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border border-[#e2e8f0] relative w-full hover:-translate-y-2 hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] max-sm:max-w-[420px] max-sm:mx-auto",
+  card: "fade-in group flex flex-col bg-white rounded-[1.5rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border border-slate-100 relative w-full hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] max-sm:max-w-[420px] max-sm:mx-auto",
   link: "no-underline text-inherit flex flex-col w-full",
 
   // Image section
-  imageSection: "relative h-[220px] overflow-hidden shrink-0",
+  imageSection: "relative h-[260px] overflow-hidden shrink-0",
   image: "w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105",
   topBadges: "absolute top-4 left-4 right-4 flex justify-between items-center z-10",
   badgesLeft: "flex gap-2",

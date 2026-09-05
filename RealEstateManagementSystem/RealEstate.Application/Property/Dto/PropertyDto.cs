@@ -19,6 +19,8 @@ namespace RealEstate.Application.Property.Dto
         public int? Bathrooms { get; init; }
         public decimal? AreaSize { get; init; }
         public string Status { get; init; } = string.Empty;
+        public decimal? Latitude { get; init; }
+        public decimal? Longitude { get; init; }
         public List<string> Images { get; init; } = [];
 
 

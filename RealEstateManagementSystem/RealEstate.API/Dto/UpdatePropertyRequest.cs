@@ -20,6 +20,8 @@ namespace RealEstate.API.Dto
         public Furnishing? Furnishing { get; set; }
         public PropertyStatus? Status { get; set; }
         public string? Amenities { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
         public string? ExistingImages { get; set; }
         public IFormFileCollection? Images { get; set; }
     }

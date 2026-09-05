@@ -18,11 +18,18 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
 }
+
+app.MapScalarApiReference();
 
 app.UseCors("AllowFrontend");
 
 app.UseRealEstateApplication();
+
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
+
+app.MapGet("/", () => Results.Content(
+    "<html><body><h1>Real Estate API is running</h1><p><a href='/scalar'>View API Documentation</a></p></body></html>", 
+    "text/html"));
 
 app.Run();

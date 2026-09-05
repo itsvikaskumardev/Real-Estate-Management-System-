@@ -235,25 +235,40 @@ const SellerDashboard = () => {
       </div>
 
       {/* Advanced Analytics Charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div style={{ backgroundColor: '#fff', borderRadius: '1rem', padding: '1.5rem', border: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '1rem' }}>Monthly Revenue (Last 6 Months)</h2>
-          <div style={{ height: '300px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <div className="bg-emerald-50 text-emerald-600 p-2 rounded-lg">
+                <HiOutlineCurrencyRupee size={22} />
+              </div>
+              Monthly Revenue
+            </span>
+            <span className="text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 uppercase tracking-wider">
+              Last 6 Months
+            </span>
+          </h2>
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analytics.monthlySales}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val / 100000}L`} />
-                <RechartsTooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                <Bar dataKey="revenue" fill="#0d6e59" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val / 100000}L`} tick={{fill: '#64748b', fontSize: 12}} dx={-10} />
+                <RechartsTooltip formatter={(value) => `₹${value.toLocaleString()}`} cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                <Bar dataKey="revenue" fill="#0d6e59" radius={[4, 4, 0, 0]} barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#fff', borderRadius: '1rem', padding: '1.5rem', border: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a', marginBottom: '1rem' }}>Properties by Type</h2>
-          <div style={{ height: '300px' }}>
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <div className="bg-emerald-50 text-emerald-600 p-2 rounded-lg">
+              <HiOutlineLibrary size={22} />
+            </div>
+            Properties by Type
+          </h2>
+          <div className="h-[300px] w-full">
             {analytics.propertyTypeStats && analytics.propertyTypeStats.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -261,20 +276,21 @@ const SellerDashboard = () => {
                     data={analytics.propertyTypeStats}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
+                    innerRadius={70}
+                    outerRadius={110}
                     paddingAngle={5}
                     dataKey="value"
+                    stroke="none"
                   >
                     {analytics.propertyTypeStats.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <RechartsTooltip />
+                  <RechartsTooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+              <div className="h-full flex items-center justify-center text-slate-400 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
                 No properties yet.
               </div>
             )}

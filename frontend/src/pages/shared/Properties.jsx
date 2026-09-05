@@ -278,7 +278,7 @@ const Properties = () => {
     <div className={s.pageContainer}>
       <Navbar />
 
-      <div className={s.container}>
+      <div className={`${s.container} !max-w-[1500px] !px-4 lg:!px-8 xl:!px-12 w-full`}>
         {/* Mobile Filter Toggle */}
         <div className={s.mobileFilterButtonWrapper}>
           <button
@@ -289,10 +289,10 @@ const Properties = () => {
           </button>
         </div>
 
-        <div className={s.layout}>
+        <div className={`${s.layout} !flex !flex-col lg:!flex-row !gap-8 w-full`}>
           {/* Sidebar Filters */}
           <aside
-            className={`${s.sidebar} ${showMobileFilters ? s.sidebarVisible : s.sidebarHidden}`}
+            className={`${s.sidebar} ${showMobileFilters ? s.sidebarVisible : s.sidebarHidden} lg:!w-[280px] xl:!w-[300px] flex-shrink-0`}
           >
             <div className={s.sidebarHeader}>
               <div className={s.sidebarTitleWrapper}>
@@ -301,7 +301,11 @@ const Properties = () => {
               </div>
               <div className={s.sidebarHeaderActions}>
                 {user?.role === "buyer" && (
-                  <button onClick={handleSaveSearch} disabled={savingSearch} style={{ color: "#3b82f6", background: "none", border: "none", fontSize: "0.875rem", fontWeight: "600", cursor: "pointer", marginRight: "10px" }}>
+                  <button 
+                    onClick={handleSaveSearch} 
+                    disabled={savingSearch} 
+                    className="text-primary hover:text-primary-dark hover:underline bg-transparent border-none text-sm font-semibold cursor-pointer mr-3 transition-colors duration-200"
+                  >
                     {savingSearch ? "Saving..." : "Save Search"}
                   </button>
                 )}
@@ -474,7 +478,7 @@ const Properties = () => {
                     setFilters(updatedFilters);
                     fetchProperties(updatedFilters);
                   }}
-                  style={{width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e1', outline: 'none', marginTop: '0.5rem'}}
+                  className="w-full p-3 mt-1 rounded-xl border border-slate-200 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors bg-white text-slate-700 font-medium"
                 >
                   <option value="">Any Time</option>
                   <option value="7">Past 7 Days</option>
@@ -486,7 +490,7 @@ const Properties = () => {
           </aside>
 
           {/* Main Content */}
-          <main className={s.mainContent}>
+          <main className={`${s.mainContent} flex-1 min-w-0 w-full`}>
             {/* Header Section */}
             <div className={s.contentHeader}>
               <div>
@@ -556,7 +560,9 @@ const Properties = () => {
               </div>
             ) : (
               <div
-                className={`${s.propertyList} ${viewMode === "grid" ? s.propertyListGrid : s.propertyListList}`}
+                className={viewMode === "grid" 
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 lg:gap-8 w-full items-stretch" 
+                  : "flex flex-col gap-6 w-full"}
               >
                 {properties
                   .filter((p) => p)
@@ -572,21 +578,29 @@ const Properties = () => {
             )}
             
             {!loading && !error && totalPages > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '32px', marginBottom: '32px' }}>
+              <div className="flex justify-center gap-2 mt-8 mb-8">
                 <button 
                   onClick={() => handlePageChange(filters.pageNumber - 1)}
                   disabled={filters.pageNumber === 1}
-                  style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: filters.pageNumber === 1 ? '#f8fafc' : '#fff', color: filters.pageNumber === 1 ? '#94a3b8' : '#0f172a', cursor: filters.pageNumber === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                  className={`px-4 py-2.5 rounded-lg border font-semibold transition-all duration-200 ${
+                    filters.pageNumber === 1 
+                      ? "bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed" 
+                      : "bg-white border-slate-200 text-slate-700 hover:border-primary hover:text-primary shadow-sm"
+                  }`}
                 >
                   Previous
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', fontWeight: '500', color: '#475569' }}>
+                <div className="flex items-center px-4 font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg shadow-sm">
                   Page {filters.pageNumber} of {totalPages}
                 </div>
                 <button 
                   onClick={() => handlePageChange(filters.pageNumber + 1)}
                   disabled={filters.pageNumber === totalPages}
-                  style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: filters.pageNumber === totalPages ? '#f8fafc' : '#fff', color: filters.pageNumber === totalPages ? '#94a3b8' : '#0f172a', cursor: filters.pageNumber === totalPages ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                  className={`px-4 py-2.5 rounded-lg border font-semibold transition-all duration-200 ${
+                    filters.pageNumber === totalPages 
+                      ? "bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed" 
+                      : "bg-white border-slate-200 text-slate-700 hover:border-primary hover:text-primary shadow-sm"
+                  }`}
                 >
                   Next
                 </button>

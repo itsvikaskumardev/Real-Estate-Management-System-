@@ -45,6 +45,8 @@ namespace RealEstate.Application.Property.Queries
                     IsVerified = p.IsVerified,
                     Views = p.Views,
                     Amenities = p.Amenities,
+                    Latitude = p.Latitude,
+                    Longitude = p.Longitude,
                     Images = p.Images.Select(i => i.Url).ToList(),
                     CreatedAt = p.CreatedAt
                 })
