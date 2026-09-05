@@ -31,6 +31,7 @@ import MockCheckoutModal from "../../components/property/MockCheckoutModal";
 import { useAuth } from "../../context/AuthContext";
 import { propertyDetailsStyles as s } from "../../assets/dummyStyles";
 import PropertyReviews from "../../components/property/PropertyReviews";
+import PropertyMap from "../../components/common/PropertyMap";
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -476,14 +477,16 @@ const PropertyDetails = () => {
           {/* Left Column: Property Info */}
           <div className={s.infoColumn}>
             <div className={s.infoHeader}>
-              <div className={s.titleWrapper}>
-                <div className={s.badgeWrapper}>
-                  <span className={s.premiumBadge}>Premium Listing</span>
+              <div className="flex flex-col gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="bg-gradient-to-r from-amber-500 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm flex items-center gap-1">
+                    <HiStar /> Premium Listing
+                  </span>
                 </div>
-                <h1 className={s.propertyTitle}>{property.title}</h1>
-                <p className={s.propertyLocation}>
-                  <HiLocationMarker className={s.locationIcon} />
-                  <span className={s.locationText}>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 leading-tight font-display tracking-tight">{property.title}</h1>
+                <p className="flex items-center text-slate-500 font-medium text-lg mt-2">
+                  <HiLocationMarker className="text-primary mr-2" size={22} />
+                  <span>
                     {property.area}, {property.city}, India
                   </span>
                 </p>
@@ -505,7 +508,7 @@ const PropertyDetails = () => {
             </div>
 
             {/* Quick Stats Boxes */}
-            <div className={s.statsGrid}>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
               {[
                 {
                   label: "Bedrooms",
@@ -535,34 +538,42 @@ const PropertyDetails = () => {
                   icon: HiCalendar,
                 },
               ].map((stat, i) => (
-                <div key={i} className={s.statCard}>
-                  {stat.icon && <stat.icon size={18} className={s.statIcon} />}
-                  <div className={s.statValue}>{stat.value}</div>
-                  <div className={s.statLabel}>{stat.label}</div>
+                <div key={i} className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30 group">
+                  {stat.icon && <stat.icon size={28} className="text-slate-400 group-hover:text-primary transition-colors duration-300 mb-2" />}
+                  <div className="text-lg font-bold text-slate-800">{stat.value}</div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
 
             {/* Description Section */}
-            <div className={s.descriptionSection}>
-              <h3 className={s.sectionTitle}>Description</h3>
-              <p className={s.descriptionText}>
+            <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm mb-8">
+              <h3 className="text-xl font-bold text-slate-800 mb-4 font-display flex items-center gap-2">
+                <HiOutlineViewGrid className="text-primary" />
+                Description
+              </h3>
+              <p className="text-slate-600 leading-relaxed whitespace-pre-line text-[1.05rem]">
                 {property.description ||
                   "No description available for this property."}
               </p>
             </div>
 
             {/* Amenities List */}
-            <div className={s.amenitiesSection}>
-              <h3 className={s.sectionTitle}>Amenities</h3>
-              <div className={s.amenitiesGrid}>
+            <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm mb-8">
+              <h3 className="text-xl font-bold text-slate-800 mb-6 font-display flex items-center gap-2">
+                <HiCollection className="text-primary" />
+                Premium Amenities
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
                 {(property.amenities?.length
                   ? property.amenities
                   : ["Parking", "Security", "Water Supply", "Power Backup"]
                 ).map((amn, i) => (
-                  <div key={i} className={s.amenityItem}>
-                    <HiBadgeCheck size={18} className={s.amenityIcon} />
-                    <span className={s.amenityText}>{amn}</span>
+                  <div key={i} className="flex items-center gap-3 text-slate-700 font-medium group">
+                    <div className="bg-emerald-50 p-2 rounded-full text-emerald-600 group-hover:bg-emerald-100 transition-colors">
+                      <HiBadgeCheck size={20} />
+                    </div>
+                    <span className="text-md">{amn}</span>
                   </div>
                 ))}
               </div>
@@ -629,26 +640,25 @@ const PropertyDetails = () => {
             </div>
 
             {/* Seller & Contact */}
-            <div className={s.sellerCard}>
-              <div className={s.sellerInfo}>
-                <div className={s.sellerAvatar}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 p-0.5">
                   <img
                     src={
                       property.seller?.profilePic ||
                       `https://ui-avatars.com/api/?name=${property.seller?.name || "Seller"}&background=0d6e59&color=fff`
                     }
                     alt="Agent"
-                    className={s.sellerAvatarImage}
+                    className="w-full h-full rounded-full object-cover"
                   />
                 </div>
-                <div className={s.sellerDetails}>
-                  <div className={s.sellerNameLink}>
-                    <h4 className={s.sellerName}>
-                      {property.seller?.name || "Seller"}
-                    </h4>
-                  </div>
-                  <div className={s.sellerVerifiedBadge}>
-                    <HiBadgeCheck className={s.verifiedIcon} /> Verified Seller
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Listed By</span>
+                  <h4 className="text-lg font-bold text-slate-800">
+                    {property.seller?.name || "Seller"}
+                  </h4>
+                  <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full w-max mt-1 border border-emerald-100">
+                    <HiBadgeCheck size={14} /> Verified Seller
                   </div>
                 </div>
               </div>
@@ -771,28 +781,59 @@ const PropertyDetails = () => {
         </div>
 
         {/* Additional Details Box */}
-        <div className={s.additionalDetails}>
-          <h3 className={s.detailsTitle}>Property Details</h3>
-          <div className={s.detailsGrid}>
-            {[
-              {
-                label: "Property ID",
-                value: (property.id || property._id).slice(-8).toUpperCase(),
-              },
-              {
-                label: "Added On",
-                value: new Date(property.createdAt).toLocaleDateString(),
-              },
-              { label: "Property Type", value: property.propertyType },
-              { label: "Status", value: property.status?.toLowerCase() === "sold" ? "Sold" : `For ${property.status}` },
-            ].map((detail, i) => (
-              <div key={i} className={s.detailRow}>
-                <span className={s.detailLabel}>{detail.label}</span>
-                <span className={s.detailValue}>{detail.value}</span>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8 mt-8 w-full transition-shadow hover:shadow-md">
+          <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4 flex items-center gap-2">
+            <HiCollection className="text-primary" size={24} />
+            Property Details
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Property ID</span>
+              <span className="font-bold text-slate-800 text-lg uppercase bg-slate-50 px-3 py-1.5 rounded-lg w-max border border-slate-100">
+                {(property.id || property._id).slice(-8)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Added On</span>
+              <span className="font-semibold text-slate-800 text-lg flex items-center gap-2">
+                <HiCalendar className="text-slate-400" />
+                {new Date(property.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Property Type</span>
+              <span className="font-semibold text-slate-800 text-lg capitalize flex items-center gap-2">
+                <HiOutlineHome className="text-slate-400" />
+                {property.propertyType}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Listing Status</span>
+              <div>
+                <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold shadow-sm ${
+                  property.status?.toLowerCase() === "sold" 
+                    ? "bg-slate-100 text-slate-600 border border-slate-200"
+                    : property.status?.toLowerCase() === "rent"
+                    ? "bg-blue-50 text-blue-700 border border-blue-100" 
+                    : "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                }`}>
+                  {property.status?.toLowerCase() === "sold" ? "Sold Out" : `For ${property.status}`}
+                </span>
               </div>
-            ))}
+            </div>
           </div>
         </div>
+
+        {/* Property Location Map */}
+        {property.latitude && property.longitude && (
+          <PropertyMap 
+            latitude={property.latitude}
+            longitude={property.longitude}
+            title={property.title}
+            address={`${property.area}, ${property.city}`}
+            property={property}
+          />
+        )}
 
         {/* Similar Properties */}
         <section className={s.similarSection}>

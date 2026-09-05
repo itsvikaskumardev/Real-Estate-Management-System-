@@ -50,6 +50,8 @@ namespace RealEstate.API.Endpoints
                     Furnishing = request.Furnishing,
                     Status = request.Status,
                     Amenities = ParseAmenities(request.Amenities ?? ""),
+                    Latitude = request.Latitude,
+                    Longitude = request.Longitude,
                     Images = images
                 };
 
@@ -103,6 +105,8 @@ namespace RealEstate.API.Endpoints
                     Furnishing = request.Furnishing,
                     Status = request.Status,
                     Amenities = !string.IsNullOrEmpty(request.Amenities) ? ParseAmenities(request.Amenities) : null,
+                    Latitude = request.Latitude,
+                    Longitude = request.Longitude,
                     ExistingImageUrls = existingImageUrls,
                     NewImages = newImages
                 };

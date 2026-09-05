@@ -116,6 +116,8 @@ namespace RealEstate.Application.Property.Queries
                     Status = property.Status.ToString(),
                     Views = property.Views,
                     Amenities = property.Amenities,
+                    Latitude = property.Latitude,
+                    Longitude = property.Longitude,
                     Images = property.Images.Select(i => i.Url).ToList(),
                     Seller = new SellerDto
                     {

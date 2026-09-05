@@ -11,6 +11,7 @@ import {
   HiLocationMarker,
 } from "react-icons/hi";
 import { addPropertyStyles as s } from "../../assets/dummyStyles";
+import LocationPicker from "../../components/common/LocationPicker";
 
 const AddProperty = () => {
   const navigate = useNavigate();
@@ -35,6 +36,8 @@ const AddProperty = () => {
     amenities: [],
     securityDeposit: "",
     maintenance: "",
+    latitude: "",
+    longitude: "",
   });
 
   const commonAmenities = [
@@ -305,6 +308,20 @@ const AddProperty = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Section 3.5: Map Location */}
+          <div className={s.section}>
+             <LocationPicker 
+                address={`${formData.area ? formData.area + ', ' : ''}${formData.city ? formData.city + ', ' : ''}${formData.pincode ? formData.pincode : ''}`}
+                onLocationConfirmed={(coords) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    latitude: coords.latitude,
+                    longitude: coords.longitude
+                  }));
+                }}
+             />
           </div>
 
           {/* Section 4: Amenities */}

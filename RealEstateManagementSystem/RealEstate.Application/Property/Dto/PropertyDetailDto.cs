@@ -22,6 +22,8 @@ namespace RealEstate.Application.Property.Dto
         public decimal? AreaSize { get; init; }
         public string Status { get; init; } = string.Empty;
         public int Views { get; init; }
+        public decimal? Latitude { get; init; }
+        public decimal? Longitude { get; init; }
         public List<string> Amenities { get; init; } = [];
         public List<string> Images { get; init; } = [];
         public SellerDto Seller { get; init; } = null!;

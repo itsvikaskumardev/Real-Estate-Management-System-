@@ -12,6 +12,7 @@ import {
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
 import { editPropertyStyles as s } from "../../assets/dummyStyles";
+import LocationPicker from "../../components/common/LocationPicker";
 
 const EditProperty = () => {
   const { id } = useParams();
@@ -39,6 +40,8 @@ const EditProperty = () => {
     amenities: [],
     securityDeposit: "",
     maintenance: "",
+    latitude: "",
+    longitude: "",
   });
 
   const commonAmenities = [
@@ -73,6 +76,8 @@ const EditProperty = () => {
           amenities: p.amenities || [],
           securityDeposit: p.securityDeposit || "",
           maintenance: p.maintenance || "",
+          latitude: p.latitude || "",
+          longitude: p.longitude || "",
         });
         setExistingImages(p.images || []);
         setLoading(false);
@@ -365,6 +370,22 @@ const EditProperty = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Section 3.5: Map Location */}
+          <div className={s.section}>
+             <LocationPicker 
+                address={`${formData.area ? formData.area + ', ' : ''}${formData.city ? formData.city + ', ' : ''}${formData.pincode ? formData.pincode : ''}`}
+                initialLatitude={formData.latitude}
+                initialLongitude={formData.longitude}
+                onLocationConfirmed={(coords) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    latitude: coords.latitude,
+                    longitude: coords.longitude
+                  }));
+                }}
+             />
           </div>
 
           {/* Section 4: Amenities */}
