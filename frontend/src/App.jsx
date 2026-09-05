@@ -40,6 +40,7 @@ import {
   ProtectedRoute,
   PublicRoute,
 } from "./components/common/ProtectedRoute";
+import ServerWakeup from "./components/common/ServerWakeup";
 import { useAuth } from "./context/AuthContext";
 
 // Scroll to top whenever route changes
@@ -113,6 +114,7 @@ function App() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
+      <ServerWakeup />
       <Toaster position="top-center" />
       <ScrollToTopOnRouteChange />
       <ScrollTopButton />

@@ -94,7 +94,12 @@ const LandingPage = () => {
     try {
       const res = await axios.get(`${API_URL}/api/property/counts`);
       if (res.data.success) {
-        setPropertyCounts(res.data.counts);
+        const counts = res.data.counts;
+        const normalizedCounts = {};
+        Object.keys(counts).forEach(key => {
+          normalizedCounts[key.toLowerCase()] = counts[key];
+        });
+        setPropertyCounts(normalizedCounts);
       }
     } catch (err) {
       console.error("Failed to fetch property counts:", err);
@@ -104,7 +109,8 @@ const LandingPage = () => {
   const fetchProperties = async (search = "") => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/api/property?city=${search}`);
+      const url = search ? `${API_URL}/api/property?city=${encodeURIComponent(search)}` : `${API_URL}/api/property`;
+      const res = await axios.get(url);
       setProperties(res.data.properties || res.data || []);
       setError(null);
     } catch (err) {
@@ -126,26 +132,30 @@ const LandingPage = () => {
     {
       name: "Modern Flats",
       count: propertyCounts.flat || 0,
-      icon: <HiOfficeBuilding size={32} />,
+      icon: <HiOfficeBuilding size={24} />,
       type: "flat",
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       name: "Luxury Villas",
       count: propertyCounts.villa || 0,
-      icon: <HiHome size={32} />,
+      icon: <HiHome size={24} />,
       type: "villa",
+      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       name: "Penthouse",
       count: propertyCounts.penthouse || 0,
-      icon: <HiOfficeBuilding size={32} />,
+      icon: <HiOfficeBuilding size={24} />,
       type: "penthouse",
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       name: "Commercial",
       count: propertyCounts.commercial || 0,
-      icon: <HiOfficeBuilding size={32} />,
+      icon: <HiOfficeBuilding size={24} />,
       type: "commercial",
+      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
   ];
 
@@ -179,8 +189,10 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className={s.heroSection}>
         <div className={s.heroContent}>
-          <span className={s.badge}>Trusted by 20,000+ homeowners</span>
-          <h1 className={s.heroTitle}>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50/80 border border-emerald-100 text-emerald-700 font-semibold text-sm mb-6 shadow-sm hover:shadow transition-shadow backdrop-blur-sm">
+            <HiShieldCheck size={18} /> Trusted by 20,000+ homeowners
+          </div>
+          <h1 className={`${s.heroTitle} tracking-tight`}>
             Find Your <span className={s.textGradient}>Perfect</span> Next
             Chapter.
           </h1>
@@ -227,7 +239,7 @@ const LandingPage = () => {
                 </select>
               </div>
             </div>
-            <button type="submit" className={s.searchButton}>
+            <button type="submit" className={`${s.searchButton} transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgba(16,185,129,0.3)] active:scale-95 flex items-center justify-center gap-2`}>
               <HiSearch size={22} /> Search
             </button>
           </form>
@@ -254,17 +266,17 @@ const LandingPage = () => {
           <div className={s.imageWrapper}>
             <img src={banner} alt="Luxury Home" className={s.heroImage} />
             {/* Verified Badge Overlay */}
-            <div className={s.verifiedBadge}>
-              <div className={s.badgeIconWrapper}>
-                <HiShieldCheck size={24} className="text-primary" />
+            <div className={`${s.verifiedBadge} backdrop-blur-md bg-white/95 border border-slate-100 shadow-2xl hover:-translate-y-1.5 transition-all duration-300 rounded-2xl`}>
+              <div className="bg-emerald-50 p-2.5 rounded-xl shadow-sm">
+                <HiShieldCheck size={28} className="text-emerald-600" />
               </div>
-              <div>
-                <h4 className={s.badgeTitle}>Verified Listing</h4>
-                <p className={s.badgeText}>
+              <div className="flex flex-col gap-0.5">
+                <h4 className="font-bold text-slate-800 text-sm md:text-base">Verified Listing</h4>
+                <p className="text-slate-500 text-xs md:text-sm font-medium">
                   Inspected by our professional team
                 </p>
               </div>
-              <span className={s.preApproved}>Pre-Approved</span>
+              <span className="absolute -top-3 -right-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 text-[10px] uppercase tracking-wider font-bold rounded-full shadow-lg border-2 border-white">Pre-Approved</span>
             </div>
           </div>
         </div>
@@ -282,18 +294,37 @@ const LandingPage = () => {
               </p>
             </div>
           </div>
-          <div className={s.categoryGrid}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-sm:gap-4 mt-8">
             {categories.map((cat, idx) => (
               <div
                 key={idx}
-                className={s.categoryCard}
+                className="relative overflow-hidden rounded-[2rem] cursor-pointer group h-[320px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(16,185,129,0.2)]"
                 onClick={() => navigate(`/properties?type=${cat.type}`)}
               >
-                <div className={s.categoryIconWrapper}>{cat.icon}</div>
-                <h3 className={s.categoryName}>{cat.name}</h3>
-                <p className={s.categoryCount}>
-                  {cat.count.toLocaleString()} Properties
-                </p>
+                {/* Background Image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+                  style={{ backgroundImage: `url(${cat.image})` }}
+                />
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/50 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
+
+                {/* Content */}
+                <div className="absolute inset-0 p-6 flex flex-col justify-end items-start text-white">
+                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/20 transition-all duration-500 group-hover:bg-primary group-hover:scale-110 group-hover:rotate-3">
+                    {cat.icon}
+                  </div>
+                  <h3 className="text-[1.5rem] font-bold mb-2 tracking-tight group-hover:text-primary-light transition-colors duration-300">
+                    {cat.name}
+                  </h3>
+                  <div className="flex items-center gap-2.5 bg-black/30 backdrop-blur-sm py-1.5 px-3.5 rounded-full border border-white/10">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse"></span>
+                    <span className="text-white/90 font-semibold text-sm">
+                      {cat.count.toLocaleString()} Properties
+                    </span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -347,6 +378,54 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Featured Collections */}
+      <section className={s.featuredSection}>
+        <div className={s.container}>
+          <div className={s.featuredHeader}>
+            <span className={s.featuredBadge}>Handpicked For You</span>
+            <h2 className={s.featuredTitle}>Featured Collections</h2>
+            <p className={s.featuredSubtitle}>
+              Discover high-value properties curated by our experts for their
+              exceptional design, location, and investment potential.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className={s.loadingContainer}>
+              <div className={s.loader}></div>
+            </div>
+          ) : error ? (
+            <div className={s.errorContainer}>
+              <p>{error}</p>
+            </div>
+          ) : (
+            <div className={s.propertiesGrid}>
+              {properties
+                .filter((p) => p)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 3)
+                .map((property) => (
+                  <PropertyCard
+                    key={(property.id || property._id)}
+                    property={property}
+                    isWishlisted={wishlistedIds.includes(String((property.id || property._id)))}
+                    onToggleWishlist={handleToggleWishlist}
+                  />
+                ))}
+            </div>
+          )}
+
+          <div className={s.discoverButtonContainer}>
+            <button
+              onClick={() => navigate("/properties")}
+              className={s.discoverButton}
+            >
+              Discover More Properties
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works Section */}
       <section id="process" className={s.processSection}>
         <div className={s.container}>
@@ -389,54 +468,6 @@ const LandingPage = () => {
                 <p className={s.processCardDesc}>{p.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Collections */}
-      <section className={s.featuredSection}>
-        <div className={s.container}>
-          <div className={s.featuredHeader}>
-            <span className={s.featuredBadge}>Handpicked For You</span>
-            <h2 className={s.featuredTitle}>Featured Collections</h2>
-            <p className={s.featuredSubtitle}>
-              Discover high-value properties curated by our experts for their
-              exceptional design, location, and investment potential.
-            </p>
-          </div>
-
-          {loading ? (
-            <div className={s.loadingContainer}>
-              <div className={s.loader}></div>
-            </div>
-          ) : error ? (
-            <div className={s.errorContainer}>
-              <p>{error}</p>
-            </div>
-          ) : (
-            <div className={s.propertiesGrid}>
-              {properties
-                .filter((p) => p)
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .slice(0, 6)
-                .map((property) => (
-                  <PropertyCard
-                    key={(property.id || property._id)}
-                    property={property}
-                    isWishlisted={wishlistedIds.includes(String((property.id || property._id)))}
-                    onToggleWishlist={handleToggleWishlist}
-                  />
-                ))}
-            </div>
-          )}
-
-          <div className={s.discoverButtonContainer}>
-            <button
-              onClick={() => navigate("/properties")}
-              className={s.discoverButton}
-            >
-              Discover More Properties
-            </button>
           </div>
         </div>
       </section>

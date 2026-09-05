@@ -278,7 +278,7 @@ const Properties = () => {
     <div className={s.pageContainer}>
       <Navbar />
 
-      <div className={s.container}>
+      <div className={`${s.container} !max-w-[1500px] !px-4 lg:!px-8 xl:!px-12 w-full`}>
         {/* Mobile Filter Toggle */}
         <div className={s.mobileFilterButtonWrapper}>
           <button
@@ -289,10 +289,10 @@ const Properties = () => {
           </button>
         </div>
 
-        <div className={s.layout}>
+        <div className={`${s.layout} !flex !flex-col lg:!flex-row !gap-8 w-full`}>
           {/* Sidebar Filters */}
           <aside
-            className={`${s.sidebar} ${showMobileFilters ? s.sidebarVisible : s.sidebarHidden}`}
+            className={`${s.sidebar} ${showMobileFilters ? s.sidebarVisible : s.sidebarHidden} lg:!w-[280px] xl:!w-[300px] flex-shrink-0`}
           >
             <div className={s.sidebarHeader}>
               <div className={s.sidebarTitleWrapper}>
@@ -490,7 +490,7 @@ const Properties = () => {
           </aside>
 
           {/* Main Content */}
-          <main className={s.mainContent}>
+          <main className={`${s.mainContent} flex-1 min-w-0 w-full`}>
             {/* Header Section */}
             <div className={s.contentHeader}>
               <div>
@@ -560,7 +560,9 @@ const Properties = () => {
               </div>
             ) : (
               <div
-                className={`${s.propertyList} ${viewMode === "grid" ? s.propertyListGrid : s.propertyListList}`}
+                className={viewMode === "grid" 
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 lg:gap-8 w-full items-stretch" 
+                  : "flex flex-col gap-6 w-full"}
               >
                 {properties
                   .filter((p) => p)

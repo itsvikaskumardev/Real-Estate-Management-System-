@@ -511,37 +511,41 @@ const PropertyDetails = () => {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
               {[
                 {
-                  label: "Bedrooms",
-                  value: property.bhk || 0,
+                  main: property.bhk ? `${property.bhk} Bedrooms` : "N/A",
+                  sub: null,
                   icon: HiOutlineHome,
                 },
                 {
-                  label: "Bathrooms",
-                  value:
-                    property.bathrooms ||
-                    Math.max(1, (parseInt(property.bhk) || 1) - 1),
+                  main: `${property.bathrooms || Math.max(1, (parseInt(property.bhk) || 1) - 1)} Bathrooms`,
+                  sub: null,
                   icon: HiOutlineUserGroup,
                 },
                 {
-                  label: "Furnishing",
-                  value: property.furnishing || "N/A",
+                  main: property.furnishing || "N/A",
+                  sub: "Furnishing",
                   icon: HiCollection,
                 },
                 {
-                  label: "Living Area",
-                  value: `${property.areaSize} sqft`,
+                  main: `${Number(property.areaSize || 0).toLocaleString("en-US")} sq ft`,
+                  sub: "Living Area",
                   icon: HiOutlineViewGrid,
                 },
                 {
-                  label: "Type",
-                  value: property.propertyType,
+                  main: property.propertyType || "N/A",
+                  sub: "Property Type",
                   icon: HiCalendar,
                 },
               ].map((stat, i) => (
-                <div key={i} className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30 group">
-                  {stat.icon && <stat.icon size={28} className="text-slate-400 group-hover:text-primary transition-colors duration-300 mb-2" />}
-                  <div className="text-lg font-bold text-slate-800">{stat.value}</div>
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center mt-1">{stat.label}</div>
+                <div key={i} className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-emerald-50 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow hover:border-emerald-200 group">
+                  {stat.icon && (
+                    <div className="text-emerald-500/80 mb-2.5 group-hover:text-emerald-600 transition-colors duration-300">
+                      <stat.icon size={26} />
+                    </div>
+                  )}
+                  <div className="text-[15px] font-semibold text-slate-700 text-center leading-snug">{stat.main}</div>
+                  {stat.sub && (
+                    <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider text-center mt-1">{stat.sub}</div>
+                  )}
                 </div>
               ))}
             </div>
