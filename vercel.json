@@ -18,6 +18,18 @@
       }
     },
     {
+      "source": "/scalar(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/openapi(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
       "source": "/api/(.*)",
       "destination": {
         "service": "api"
