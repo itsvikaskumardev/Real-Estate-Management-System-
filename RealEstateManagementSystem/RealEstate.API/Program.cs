@@ -17,10 +17,7 @@ var app = builder.Build();
 app.UseExceptionHandler();
 
 // HTTP pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
 
 app.MapScalarApiReference();
 
@@ -30,7 +27,7 @@ app.UseRealEstateApplication();
 
 app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
 
-app.MapGet("/", () => Results.Content(
+app.MapGet("/api", () => Results.Content(
     "<html><body><h1>Real Estate API is running</h1><p><a href='/scalar'>View API Documentation</a></p></body></html>", 
     "text/html"));
 
