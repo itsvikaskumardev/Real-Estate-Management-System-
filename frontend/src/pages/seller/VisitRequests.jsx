@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
-import { HiOutlineCalendar, HiOutlineClock, HiCheckCircle, HiXCircle } from "react-icons/hi";
+import { HiOutlineCalendar, HiOutlineClock, HiCheckCircle, HiXCircle, HiCheck, HiX, HiOutlineLocationMarker } from "react-icons/hi";
+import { myPropertiesStyles as s, myInquiriesStyles as inqStyles } from "../../assets/dummyStyles";
 
 const VisitRequests = () => {
   const [visits, setVisits] = useState([]);
@@ -46,91 +47,109 @@ const VisitRequests = () => {
     switch (status) {
       case "Approved": return { bg: "#dcfce7", text: "#166534", icon: <HiCheckCircle /> };
       case "Rejected": return { bg: "#fee2e2", text: "#991b1b", icon: <HiXCircle /> };
-      case "Completed": return { bg: "#f1f5f9", text: "#475569", icon: <HiCheckCircle /> };
+      case "Completed": return { bg: "#dbeafe", text: "#1e3a8a", icon: <HiCheckCircle /> };
       default: return { bg: "#fef3c7", text: "#92400e", icon: <HiOutlineClock /> };
     }
   };
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}><div className="loader"></div></div>;
+    return <div className="loader-full-page"><div className="loader"></div></div>;
   }
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem' }}>
-      <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '0.5rem' }}>Visit Requests</h1>
-      <p style={{ color: '#64748b', marginBottom: '2rem' }}>Manage buyers requesting to tour your properties.</p>
+    <div className={`${inqStyles.containerFadeIn} ${inqStyles.pt0}`}>
+      <div className={inqStyles.mb12}>
+        <h1 className={inqStyles.heading}>Visit Requests</h1>
+        <p className={inqStyles.textMuted}>Review and manage property visit requests from interested buyers.</p>
+      </div>
 
       {visits.length === 0 ? (
-        <div style={{ padding: '4rem', textAlign: 'center', backgroundColor: '#fff', borderRadius: '0.5rem', border: '1px dashed #cbd5e1' }}>
-          <HiOutlineCalendar size={48} style={{ color: '#94a3b8', margin: '0 auto 1rem auto' }} />
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#334155', marginBottom: '0.5rem' }}>No Visit Requests</h3>
-          <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>You don't have any pending site visit requests.</p>
+        <div className={s.emptyStateContainer}>
+          <div className={s.emptyStateIcon} style={{ background: '#f1f5f9', color: '#64748b' }}>
+            <HiOutlineCalendar size={32} />
+          </div>
+          <h3 className={s.emptyStateTitle}>No Visit Requests</h3>
+          <p className={s.emptyStateText}>You don't have any pending site visit requests at the moment.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1000px', margin: '0 auto' }}>
           {visits.map((visit) => {
             const statusConfig = getStatusColor(visit.status);
             return (
-              <div key={visit.id} style={{ display: 'flex', backgroundColor: '#fff', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div key={visit.id} style={{ display: 'flex', backgroundColor: '#fff', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s ease-in-out' }} 
+                   onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'} 
+                   onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}>
+                
+                {/* Image Placeholder (Optional visual pop like SellerOffers) */}
+                <div style={{ width: '200px', height: '100%', minHeight: '200px', flexShrink: 0, backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #e2e8f0' }}>
+                   <HiOutlineLocationMarker size={48} color="#cbd5e1" />
+                </div>
+
                 <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                      <Link to={`/property/${visit.propertyId}`} style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#0f172a', textDecoration: 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                      <Link to={`/property/${visit.propertyId}`} style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a', textDecoration: 'none' }}>
                         {visit.propertyTitle}
                       </Link>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: '600', backgroundColor: statusConfig.bg, color: statusConfig.text }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: '700', backgroundColor: statusConfig.bg, color: statusConfig.text, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {statusConfig.icon} {visit.status}
                       </span>
                     </div>
                     
-                    <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '4px' }}>Requested By</div>
-                        <div style={{ fontSize: '0.875rem', color: '#334155', fontWeight: '500' }}>{visit.buyerName}</div>
-                        <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{visit.buyerEmail}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '700', marginBottom: '6px', letterSpacing: '0.05em' }}>Requested By</div>
+                        <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: '600' }}>{visit.buyerName}</div>
+                        <div style={{ fontSize: '0.875rem', color: '#475569', marginTop: '2px' }}>{visit.buyerEmail}</div>
                       </div>
                       
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '4px' }}>Date & Time</div>
-                        <div style={{ fontSize: '0.875rem', color: '#334155', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <HiOutlineCalendar /> {new Date(visit.visitDate).toLocaleDateString()}
+                        <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '700', marginBottom: '6px', letterSpacing: '0.05em' }}>Date & Time</div>
+                        <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <HiOutlineCalendar color="#3b82f6" /> {new Date(visit.visitDate).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                         </div>
-                        <div style={{ fontSize: '0.875rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <HiOutlineClock /> {new Date(visit.visitDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <div style={{ fontSize: '0.875rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                          <HiOutlineClock color="#3b82f6" /> {new Date(visit.visitDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     </div>
 
                     {visit.message && (
-                      <div style={{ fontSize: '0.875rem', color: '#475569', backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: '0.375rem', borderLeft: '3px solid #cbd5e1' }}>
+                      <div style={{ fontSize: '0.875rem', color: '#475569', backgroundColor: '#fff', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid #3b82f6', fontStyle: 'italic', boxShadow: 'inset 0 0 0 1px #e2e8f0' }}>
                         "{visit.message}"
                       </div>
                     )}
                   </div>
                   
                   {visit.status === 'Pending' && (
-                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                      <button 
-                        onClick={() => handleUpdateStatus(visit.id, 'Rejected')}
-                        style={{ padding: '6px 12px', fontSize: '0.875rem', borderRadius: '4px', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', fontWeight: '500' }}
-                      >
-                        Decline
-                      </button>
+                    <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
                       <button 
                         onClick={() => handleUpdateStatus(visit.id, 'Approved')}
-                        style={{ padding: '6px 12px', fontSize: '0.875rem', borderRadius: '4px', border: 'none', backgroundColor: '#10b981', color: '#fff', cursor: 'pointer', fontWeight: '500' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#059669', color: '#fff', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer', flex: 1, transition: 'background-color 0.2s' }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#047857'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#059669'}
                       >
-                        Approve Visit
+                        <HiCheck size={20} /> Approve Visit
+                      </button>
+                      <button 
+                        onClick={() => handleUpdateStatus(visit.id, 'Rejected')}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer', flex: 1, transition: 'background-color 0.2s' }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                      >
+                        <HiX size={20} /> Decline
                       </button>
                     </div>
                   )}
                   {visit.status === 'Approved' && (
-                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                    <div style={{ marginTop: '1.5rem', display: 'flex' }}>
                       <button 
                         onClick={() => handleUpdateStatus(visit.id, 'Completed')}
-                        style={{ padding: '6px 12px', fontSize: '0.875rem', borderRadius: '4px', border: 'none', backgroundColor: '#3b82f6', color: '#fff', cursor: 'pointer', fontWeight: '500' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer', width: '100%', transition: 'background-color 0.2s' }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
                       >
-                        Mark as Completed
+                        <HiCheckCircle size={20} /> Mark as Completed
                       </button>
                     </div>
                   )}

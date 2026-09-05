@@ -110,72 +110,71 @@ const BuyerDashboard = () => {
             You haven't purchased any properties yet.
           </div>
         ) : (
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', overflowX: 'auto', border: '1px solid #e2e8f0' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead style={{ backgroundColor: '#f8fafc' }}>
-                <tr>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Property</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Location</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Price</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Date</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Status</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Invoice</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.purchasedProperties.map((p) => (
-                  <tr key={p.propertyId} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background-color 0.2s' }}>
-                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        {p.imageUrl ? (
-                          <img src={p.imageUrl} alt={p.title} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <HiOutlineHome size={20} color="#94a3b8" />
-                          </div>
-                        )}
-                        <Link to={`/property/${p.propertyId}`} style={{ fontWeight: '600', color: '#0f172a', textDecoration: 'none' }} onMouseEnter={(e) => e.target.style.color = '#0d6e59'} onMouseLeave={(e) => e.target.style.color = '#0f172a'}>
-                          {p.title}
-                        </Link>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1.25rem 1.5rem', color: '#475569', fontSize: '0.875rem' }}>{p.location}</td>
-                    <td style={{ padding: '1.25rem 1.5rem', color: '#0f172a', fontWeight: '500', fontSize: '0.875rem' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span><span style={{color: '#64748b', fontWeight: '400'}}>Original:</span> ₹{p.originalPrice?.toLocaleString("en-IN") || p.price?.toLocaleString("en-IN")}</span>
-                        <span><span style={{color: '#64748b', fontWeight: '400'}}>Offer:</span> {p.offerPrice ? `₹${p.offerPrice.toLocaleString("en-IN")}` : "No Offer"}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1.25rem 1.5rem', color: '#475569', fontSize: '0.875rem' }}>{new Date(p.transactionDate).toLocaleDateString()}</td>
-                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                      {p.status === "Completed" ? (
-                        <span style={{ color: '#047857', backgroundColor: '#d1fae5', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.875rem', fontWeight: '500', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <HiOutlineCheckCircle /> {p.status}
-                        </span>
-                      ) : (
-                        <span style={{ color: '#b45309', backgroundColor: '#fef3c7', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.875rem', fontWeight: '500', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <HiOutlineClock /> {p.status}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                      {p.status === "Completed" && p.transactionId ? (
-                        <button 
-                          onClick={() => handleDownloadInvoice(p.transactionId)}
-                          style={{ background: '#0f172a', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', transition: 'background-color 0.2s' }}
-                          onMouseEnter={(e) => e.target.style.background = '#334155'}
-                          onMouseLeave={(e) => e.target.style.background = '#0f172a'}
-                        >
-                          Download
-                        </button>
-                      ) : (
-                        <span style={{ color: '#94a3b8', fontSize: '0.875rem' }}>N/A</span>
-                      )}
-                    </td>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Property</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Location</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Original Price</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Offer Amount</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Date</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Status</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Invoice</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.purchasedProperties.map((p) => (
+                    <tr key={p.propertyId} className="border-b border-slate-200 hover:bg-slate-50 transition-colors duration-200 group">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-4">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.title} className="w-12 h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200">
+                              <HiOutlineHome size={20} className="text-slate-400" />
+                            </div>
+                          )}
+                          <Link to={`/property/${p.propertyId}`} className="font-bold text-slate-800 text-sm hover:text-primary transition-colors">
+                            {p.title}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-slate-600 text-sm">{p.location}</td>
+                      <td className="px-6 py-5 text-slate-600 text-sm font-medium">₹{p.originalPrice?.toLocaleString("en-IN") || p.price?.toLocaleString("en-IN")}</td>
+                      <td className="px-6 py-5 text-slate-900 font-extrabold text-sm">
+                        {p.offerPrice ? `₹${p.offerPrice.toLocaleString("en-IN")}` : <span className="text-slate-400 font-semibold">No Offer</span>}
+                      </td>
+                      <td className="px-6 py-5 text-slate-600 text-sm font-medium">{new Date(p.transactionDate).toLocaleDateString()}</td>
+                      <td className="px-6 py-5">
+                        {p.status === "Completed" ? (
+                          <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+                            <HiOutlineCheckCircle size={16} /> {p.status}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+                            <HiOutlineClock size={16} /> {p.status}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-5">
+                        {p.status === "Completed" && p.transactionId ? (
+                          <button 
+                            onClick={() => handleDownloadInvoice(p.transactionId)}
+                            className="bg-slate-900 hover:bg-primary text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+                          >
+                            Download
+                          </button>
+                        ) : (
+                          <span className="text-slate-400 text-sm font-medium">N/A</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
@@ -190,50 +189,53 @@ const BuyerDashboard = () => {
             You haven't submitted any offers yet.
           </div>
         ) : (
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', overflowX: 'auto', border: '1px solid #e2e8f0' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead style={{ backgroundColor: '#f8fafc' }}>
-                <tr>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Property</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Offer Amount</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Original Price</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Date</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#475569', borderBottom: '1px solid #e2e8f0', fontSize: '0.875rem' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {offers.map((offer) => (
-                  <tr key={offer.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background-color 0.2s' }}>
-                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        {offer.propertyImageUrl ? (
-                          <img src={offer.propertyImageUrl} alt={offer.propertyTitle} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <HiOutlineHome size={20} color="#94a3b8" />
-                          </div>
-                        )}
-                        <Link to={`/property/${offer.propertyId}`} style={{ fontWeight: '600', color: '#0f172a', textDecoration: 'none' }}>
-                          {offer.propertyTitle}
-                        </Link>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1.25rem 1.5rem', color: '#0f172a', fontWeight: 'bold' }}>₹{offer.offerAmount.toLocaleString("en-IN")}</td>
-                    <td style={{ padding: '1.25rem 1.5rem', color: '#475569', fontSize: '0.875rem' }}>₹{offer.propertyPrice.toLocaleString("en-IN")}</td>
-                    <td style={{ padding: '1.25rem 1.5rem', color: '#475569', fontSize: '0.875rem' }}>{new Date(offer.createdAt).toLocaleDateString()}</td>
-                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                      <span style={{ 
-                        color: offer.status === 'Accepted' ? '#047857' : offer.status === 'Rejected' ? '#b91c1c' : '#b45309', 
-                        backgroundColor: offer.status === 'Accepted' ? '#d1fae5' : offer.status === 'Rejected' ? '#fee2e2' : '#fef3c7', 
-                        padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.875rem', fontWeight: '500', display: 'inline-flex', alignItems: 'center', gap: '4px' 
-                      }}>
-                        {offer.status}
-                      </span>
-                    </td>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Property</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Offer Amount</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Original Price</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Date</th>
+                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {offers.map((offer) => (
+                    <tr key={offer.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors duration-200 group">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-4">
+                          {offer.propertyImageUrl ? (
+                            <img src={offer.propertyImageUrl} alt={offer.propertyTitle} className="w-12 h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200">
+                              <HiOutlineHome size={20} className="text-slate-400" />
+                            </div>
+                          )}
+                          <Link to={`/property/${offer.propertyId}`} className="font-bold text-slate-800 text-sm hover:text-primary transition-colors">
+                            {offer.propertyTitle}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-slate-900 font-extrabold text-sm">₹{offer.offerAmount.toLocaleString("en-IN")}</td>
+                      <td className="px-6 py-5 text-slate-600 text-sm font-medium">₹{offer.propertyPrice.toLocaleString("en-IN")}</td>
+                      <td className="px-6 py-5 text-slate-600 text-sm font-medium">{new Date(offer.createdAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-5">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide ${
+                          offer.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : 
+                          offer.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {offer.status === 'Accepted' && <HiOutlineCheckCircle size={16} />}
+                          {offer.status === 'Pending' && <HiOutlineClock size={16} />}
+                          {offer.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

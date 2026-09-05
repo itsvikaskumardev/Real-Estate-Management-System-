@@ -4,7 +4,7 @@ import API_URL from "../../config";
 import { useAuth } from "../../context/AuthContext";
 import { HiCheck, HiX, HiCurrencyRupee } from "react-icons/hi";
 import { toast } from "react-hot-toast";
-import { myPropertiesStyles as s } from "../../assets/dummyStyles";
+import { myPropertiesStyles as s, myInquiriesStyles as inqStyles } from "../../assets/dummyStyles";
 import { Link } from "react-router-dom";
 
 const SellerOffers = () => {
@@ -57,10 +57,10 @@ const SellerOffers = () => {
     );
 
   return (
-    <div className={s.pageContainer}>
-      <div className={s.headerContainer}>
-        <h1 className={s.pageTitle}>Offers Received</h1>
-        <p className={s.pageSubtitle}>Review and manage offers on your properties</p>
+    <div className={`${inqStyles.containerFadeIn} ${inqStyles.pt0}`}>
+      <div className={inqStyles.mb12}>
+        <h1 className={inqStyles.heading}>Offers Received</h1>
+        <p className={inqStyles.textMuted}>Review and manage offers received for your properties.</p>
       </div>
 
       {offers.length === 0 ? (

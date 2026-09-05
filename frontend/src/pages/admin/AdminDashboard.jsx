@@ -22,6 +22,12 @@ const AdminDashboard = () => {
     totalPlatformRevenue: 0,
     unverifiedProperties: 0,
   });
+  const [health, setHealth] = useState({
+    database: { status: "Checking..." },
+    mediaStorage: { status: "Checking..." },
+    authService: { status: "Checking..." },
+    apiGateway: { status: "Checking..." }
+  });
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -36,11 +42,27 @@ const AdminDashboard = () => {
         if (res.data.success) {
           setStats(res.data.stats);
         }
-        setLoading(false);
       } catch (err) {
         console.error("Failed to load admin dashboard stats:", err);
-        setLoading(false);
       }
+      
+      try {
+        const healthRes = await axios.get(`${API_URL}/api/admin/system-health`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (healthRes.data.success) {
+          setHealth(healthRes.data.health);
+        }
+      } catch (err) {
+        console.error("Failed to load system health:", err);
+        setHealth({
+          database: { status: "Offline" },
+          mediaStorage: { status: "Offline" },
+          authService: { status: "Offline" },
+          apiGateway: { status: "Offline" }
+        });
+      }
+      setLoading(false);
     };
     fetchDashboardData();
   }, []);
@@ -151,13 +173,18 @@ const AdminDashboard = () => {
         <div className={s.systemHealthCard}>
           <h3 className={s.systemHealthTitle}>System Health</h3>
           <div className={s.servicesContainer}>
-            {["Database", "Media Storage", "Auth Service", "API Gateway"].map(
+            {[
+              { name: "Database", status: health.database?.status || "Offline" },
+              { name: "Media Storage", status: health.mediaStorage?.status || "Offline" },
+              { name: "Auth Service", status: health.authService?.status || "Offline" },
+              { name: "API Gateway", status: health.apiGateway?.status || "Offline" }
+            ].map(
               (service, i) => (
                 <div key={i} className={s.serviceItem}>
-                  <div className={s.serviceName}>{service}</div>
+                  <div className={s.serviceName}>{service.name}</div>
                   <div className={s.statusContainer}>
-                    <span className={s.statusDot}></span>
-                    <span className={s.statusText}>Online</span>
+                    <span className={s.statusDot} style={{ backgroundColor: service.status === "Online" ? "#10b981" : service.status === "Checking..." ? "#f59e0b" : "#ef4444" }}></span>
+                    <span className={s.statusText} style={{ color: service.status === "Online" ? "#047857" : service.status === "Checking..." ? "#b45309" : "#b91c1c" }}>{service.status}</span>
                   </div>
                 </div>
               ),
@@ -171,9 +198,30 @@ const AdminDashboard = () => {
             Quickly manage platform resources and tasks.
           </p>
           <div className={s.adminToolsButtonsContainer}>
-            <button className={s.adminToolButton}>System Logs</button>
-            <button className={s.adminToolButton}>DB Backup</button>
-            <button className={s.adminToolButton}>Settings</button>
+            <button 
+              className={s.adminToolButton} 
+              style={{ opacity: 0.6, cursor: "not-allowed" }}
+              title="System logs are currently written to standard output. Configure a database logger (e.g. Serilog) to view them here."
+              onClick={() => alert("System logs are currently only available in the application console. Enable database logging to view them here.")}
+            >
+              System Logs
+            </button>
+            <button 
+              className={s.adminToolButton} 
+              style={{ opacity: 0.6, cursor: "not-allowed" }}
+              title="Database backups are managed automatically by the cloud infrastructure."
+              onClick={() => alert("Database backups are managed automatically at the infrastructure level (e.g., AWS RDS or Azure SQL). App-level backups are disabled for security.")}
+            >
+              DB Backup
+            </button>
+            <button 
+              className={s.adminToolButton} 
+              style={{ opacity: 0.6, cursor: "not-allowed" }}
+              title="Global settings are currently managed via appsettings.json."
+              onClick={() => alert("Global platform settings are currently managed via environment variables and appsettings.json.")}
+            >
+              Settings
+            </button>
           </div>
         </div>
       </div>

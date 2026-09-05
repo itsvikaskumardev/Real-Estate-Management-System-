@@ -655,11 +655,10 @@ const PropertyDetails = () => {
 
               {!isOwner && (
                 <>
-                  <div className={s.chatButtonWrapper}>
+                  <div className={s.chatButtonWrapper} style={{ flexDirection: 'column', gap: '12px' }}>
                     {property.status?.toLowerCase() === "sale" && (
                       <button 
-                        className={s.inquirySubmitButton} 
-                        style={{ marginBottom: '10px', backgroundColor: '#059669' }} 
+                        className={`${s.inquirySubmitButton} bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] hover:-translate-y-0.5 transition-all duration-200 border-none`}
                         onClick={handlePurchaseClick}
                         disabled={purchaseLoading}
                       >
@@ -669,8 +668,7 @@ const PropertyDetails = () => {
 
                     {property.status?.toLowerCase() === "sale" && !existingOffer && user?.role === "buyer" && (
                       <button 
-                        className={s.inquirySubmitButton} 
-                        style={{ marginBottom: '10px', backgroundColor: '#f59e0b', color: '#fff' }} 
+                        className={`${s.inquirySubmitButton} bg-amber-500 hover:bg-amber-600 text-white shadow-[0_4px_14px_0_rgba(245,158,11,0.39)] hover:-translate-y-0.5 transition-all duration-200 border-none`}
                         onClick={() => setShowOfferModal(true)}
                       >
                         Make an Offer
@@ -678,23 +676,34 @@ const PropertyDetails = () => {
                     )}
 
                     {existingOffer && (
-                      <div style={{ marginBottom: '10px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '0.875rem' }}>
-                        <div style={{ fontWeight: '600', color: '#0f172a' }}>Your Offer: ₹{existingOffer.offerAmount.toLocaleString("en-IN")}</div>
-                        <div style={{ 
-                          color: existingOffer.status === 'Accepted' ? '#059669' : existingOffer.status === 'Rejected' ? '#dc2626' : '#d97706',
-                          fontWeight: '500',
-                          marginTop: '4px'
-                        }}>
-                          Status: {existingOffer.status}
+                      <div className="mb-3 p-4 rounded-xl border border-slate-200 bg-slate-50 text-sm shadow-sm transition-shadow hover:shadow-md">
+                        <div className="font-semibold text-slate-900 flex justify-between items-center">
+                          <span>Your Offer:</span>
+                          <span className="text-base text-primary">₹{existingOffer.offerAmount.toLocaleString("en-IN")}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="text-slate-500">Status:</span>
+                          <span className={`font-bold px-3 py-1 rounded-full text-xs ${
+                            existingOffer.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : 
+                            existingOffer.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {existingOffer.status}
+                          </span>
                         </div>
                       </div>
                     )}
                     
-                    <div style={{ display: "flex", gap: "10px", width: "100%", marginBottom: "10px" }}>
-                      <button className={s.chatButton} onClick={handleScheduleVisitClick} style={{ flex: 1, backgroundColor: "#3b82f6", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", padding: "12px" }}>
+                    <div className="flex gap-3 w-full">
+                      <button 
+                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white border-none rounded-xl font-semibold cursor-pointer flex justify-center items-center gap-2 py-3.5 transition-all duration-200 hover:-translate-y-0.5 shadow-[0_4px_14px_0_rgba(59,130,246,0.39)]" 
+                        onClick={handleScheduleVisitClick}
+                      >
                         <HiCalendar size={20} /> Visit
                       </button>
-                      <button className={s.chatButton} onClick={handleChatStart} style={{ flex: 1 }}>
+                      <button 
+                        className="flex-1 bg-white text-primary hover:bg-primary hover:text-white border border-primary rounded-xl font-semibold cursor-pointer flex justify-center items-center gap-2 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg" 
+                        onClick={handleChatStart}
+                      >
                         <HiChatAlt size={20} /> Chat
                       </button>
                     </div>
@@ -744,7 +753,7 @@ const PropertyDetails = () => {
                       </form>
                     </>
                   ) : (
-                    <div style={{ padding: '1rem', backgroundColor: '#f1f5f9', borderRadius: '0.5rem', textAlign: 'center', marginTop: '1rem', color: '#64748b', fontWeight: '500' }}>
+                    <div className="p-4 bg-slate-100 rounded-xl text-center mt-4 text-slate-500 font-semibold border border-slate-200">
                       This property is no longer accepting inquiries.
                     </div>
                   )}

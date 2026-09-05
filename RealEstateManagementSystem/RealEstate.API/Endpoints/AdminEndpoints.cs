@@ -82,6 +82,12 @@ namespace RealEstate.API.Endpoints
             })
             .WithName("GetDashboardStats");
 
+            group.MapGet("/system-health", async ([FromServices] ISender sender) =>
+            {
+                var result = await sender.Send(new GetSystemHealthQuery());
+                return Results.Ok(new { success = true, health = result });
+            })
+            .WithName("GetSystemHealth");
 
 
 
